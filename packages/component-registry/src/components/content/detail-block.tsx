@@ -25,14 +25,14 @@ function DetailBlock({
   suite,
 }: Props) {
   const accentColor = resolveColor(color, theme);
-  const lightBg = resolveLightBg(color);
+  const lightBg = resolveLightBg(color, theme);
 
   return (
     <div
       style={{
         borderLeft: `3px solid ${accentColor}`,
         borderRadius: "0 8px 8px 0",
-        backgroundColor: "#FAFAFA",
+        backgroundColor: theme.colors.backgroundAlt,
         padding: "14px 16px",
         marginBottom: 12,
       }}

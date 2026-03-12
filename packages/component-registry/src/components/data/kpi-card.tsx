@@ -13,7 +13,7 @@ interface Props {
 
 function KpiCard({ theme, emoji = "📊", title = "KPI", description = "", color = "blue" }: Props) {
   const accentColor = resolveColor(color, theme);
-  const lightBg = resolveLightBg(color);
+  const lightBg = resolveLightBg(color, theme);
 
   return (
     <div

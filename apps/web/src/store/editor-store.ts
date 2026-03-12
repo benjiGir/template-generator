@@ -65,11 +65,20 @@ export const useEditorStore = create<EditorState>()(
 
     loadTemplate: (template) =>
       set((s) => {
-        s.template = cloneTemplate(template);
+        const normalized = cloneTemplate(template);
+        normalized.theme = {
+          ...DEFAULT_THEME,
+          ...normalized.theme,
+          colors:     { ...DEFAULT_THEME.colors,     ...normalized.theme.colors },
+          typography: { ...DEFAULT_THEME.typography, ...normalized.theme.typography },
+          spacing:    { ...DEFAULT_THEME.spacing,    ...normalized.theme.spacing },
+          borders:    { ...DEFAULT_THEME.borders,    ...normalized.theme.borders },
+        };
+        s.template = normalized;
         s.selectedNodeId = null;
         s.selectedPageIndex = 0;
         s.isDirty = false;
-        s.history = [cloneTemplate(template)];
+        s.history = [cloneTemplate(normalized)];
         s.historyIndex = 0;
       }),
 
@@ -86,7 +95,14 @@ export const useEditorStore = create<EditorState>()(
       set((s) => {
         if (!s.template) return;
         pushHistory(s, s.template);
-        s.template.theme = { ...s.template.theme, ...theme, colors: { ...s.template.theme.colors, ...(theme.colors ?? {}) } };
+        s.template.theme = {
+          ...s.template.theme,
+          ...theme,
+          colors:     { ...s.template.theme.colors,     ...(theme.colors     ?? {}) },
+          typography: { ...s.template.theme.typography, ...(theme.typography ?? {}) },
+          spacing:    { ...s.template.theme.spacing,    ...(theme.spacing    ?? {}) },
+          borders:    { ...s.template.theme.borders,    ...(theme.borders    ?? {}) },
+        };
         s.isDirty = true;
       }),
 

@@ -7,6 +7,17 @@ interface Props {
   isEditor?: boolean;
 }
 
+function resolveThemeVars(props: Record<string, unknown>, theme: Theme): Record<string, unknown> {
+  const resolved = { ...props };
+  for (const [key, value] of Object.entries(resolved)) {
+    if (typeof value === "string" && value.startsWith("theme.")) {
+      const path = value.slice(6) as keyof typeof theme.colors;
+      resolved[key] = theme.colors[path] ?? value;
+    }
+  }
+  return resolved;
+}
+
 export function ComponentRenderer({ node, theme, isEditor }: Props) {
   const definition = get(node.type);
 
@@ -19,7 +30,7 @@ export function ComponentRenderer({ node, theme, isEditor }: Props) {
   }
 
   const Component = definition.render;
-  const mergedProps = { ...definition.defaultProps, ...node.props, theme };
+  const mergedProps = { ...definition.defaultProps, ...resolveThemeVars(node.props, theme), theme };
 
   if (definition.acceptsChildren && node.children) {
     return (
