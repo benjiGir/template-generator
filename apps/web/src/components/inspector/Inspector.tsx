@@ -4,11 +4,73 @@ import { usePresetsStore } from "@/store/presets-store";
 import { get } from "@template-generator/component-registry/registry";
 import { findNode } from "@template-generator/shared/utils/tree";
 import type { ComponentNode } from "@template-generator/shared/types/template";
+import type { PropSchema } from "@template-generator/shared/types/component";
 import { PropField } from "./PropField";
 import { TemplateSettings } from "./TemplateSettings";
 import { PageSettings } from "./PageSettings";
 import { SavePresetDialog } from "./SavePresetDialog";
 import { ThemePanel } from "./ThemePanel";
+
+interface GroupedFieldsProps {
+  groupMap: Map<string, PropSchema[]>;
+  node: ComponentNode;
+  onUpdate: (key: string, value: unknown) => void;
+}
+
+function GroupedFields({ groupMap, node, onUpdate }: GroupedFieldsProps) {
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const toggle = (g: string) => setCollapsed((c) => ({ ...c, [g]: !c[g] }));
+
+  if (groupMap.size === 1 && groupMap.has("Général")) {
+    // No grouping needed — render flat
+    const fields = groupMap.get("Général")!;
+    return (
+      <div className="space-y-4">
+        {fields.map((s) => (
+          <PropField
+            key={s.key}
+            schema={s}
+            value={node.props[s.key]}
+            onChange={(v) => onUpdate(s.key, v)}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      {Array.from(groupMap.entries()).map(([group, fields]) => {
+        const isOpen = collapsed[group] !== true;
+        return (
+          <div key={group} className="border border-gray-100 rounded overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggle(group)}
+              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+            >
+              <span>{group}</span>
+              <span className="text-gray-400 text-[10px]">{isOpen ? "▾" : "▸"}</span>
+            </button>
+            {isOpen && (
+              <div className="p-3 space-y-3 bg-white">
+                {fields.map((s) => (
+                  <PropField
+                    key={s.key}
+                    schema={s}
+                    value={node.props[s.key]}
+                    onChange={(v) => onUpdate(s.key, v)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function Inspector() {
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
@@ -65,6 +127,27 @@ export function Inspector() {
 
   const showNoSelection = selectedNodeId === null && template;
 
+  // Groups + conditions rendering
+  const renderSchema = (schema: PropSchema[], node: ComponentNode) => {
+    const props = node.props;
+
+    // Filter by condition
+    const visible = schema.filter((s) => {
+      if (!s.condition) return true;
+      return props[s.condition.prop] === s.condition.value;
+    });
+
+    // Group by group name
+    const groupMap = new Map<string, PropSchema[]>();
+    for (const s of visible) {
+      const g = s.group ?? "Général";
+      if (!groupMap.has(g)) groupMap.set(g, []);
+      groupMap.get(g)!.push(s);
+    }
+
+    return <GroupedFields groupMap={groupMap} node={node} onUpdate={(key, val) => updateNodeProps(node.id, { [key]: val })} />;
+  };
+
   return (
     <>
       <div className="h-full flex flex-col border-l border-gray-200 bg-white">
@@ -112,22 +195,13 @@ export function Inspector() {
         {/* Contenu scrollable */}
         <div className="flex-1 overflow-y-auto">
           {selectedNode && definition ? (
-            <div className="p-4 space-y-4">
+            <div className="p-4">
               {definition.schema.length === 0 ? (
                 <p className="text-xs text-gray-400 text-center">
                   Ce composant n'a pas de propriétés éditables.
                 </p>
               ) : (
-                definition.schema.map((propSchema) => (
-                  <PropField
-                    key={propSchema.key}
-                    schema={propSchema}
-                    value={selectedNode!.props[propSchema.key]}
-                    onChange={(value) =>
-                      updateNodeProps(selectedNode!.id, { [propSchema.key]: value })
-                    }
-                  />
-                ))
+                renderSchema(definition.schema, selectedNode)
               )}
             </div>
           ) : showNoSelection ? (

@@ -11,7 +11,31 @@ export type PropType =
   | "number"
   | "boolean"
   | "list"
-  | "emoji";
+  | "emoji"
+  | "spacing"
+  | "font"
+  | "border"
+  | "image"
+  | "icon";
+
+export interface SpacingValue {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export interface BorderValue {
+  style: "none" | "solid" | "dashed" | "dotted";
+  width: number;
+  color: string;
+  radius: number;
+}
+
+export interface ImageValue {
+  type: "url" | "base64";
+  value: string;
+}
 
 /** Définition d'une prop éditable */
 export interface PropSchema {
@@ -22,6 +46,11 @@ export interface PropSchema {
   required?: boolean;
   options?: { label: string; value: string }[];
   placeholder?: string;
+  group?: string;
+  condition?: {
+    prop: string;
+    value: unknown;
+  };
 }
 
 /** Définition d'un composant dans le registre */

@@ -59,14 +59,15 @@ register({
   category: "data",
   description: "Indicateur clé avec emoji, titre et description",
   schema: [
-    { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊" },
-    { key: "title", label: "Titre", type: "text", defaultValue: "KPI" },
-    { key: "description", label: "Description", type: "textarea", defaultValue: "" },
+    { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊", group: "Contenu" },
+    { key: "title", label: "Titre", type: "text", defaultValue: "KPI", group: "Contenu" },
+    { key: "description", label: "Description", type: "textarea", defaultValue: "", group: "Contenu" },
     {
       key: "color",
       label: "Couleur",
       type: "select",
       defaultValue: "blue",
+      group: "Style",
       options: [
         { label: "Bleu", value: "blue" },
         { label: "Vert", value: "green" },

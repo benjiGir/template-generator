@@ -28,7 +28,8 @@
     "@lexical/link": "^0.21.0",
     "@lexical/list": "^0.21.0",
     "@lexical/rich-text": "^0.21.0",
-    "@lexical/history": "^0.21.0"
+    "@lexical/history": "^0.21.0",
+    "lucide-react": "^0.469.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
