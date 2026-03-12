@@ -11,8 +11,8 @@ function ResultBox({ theme, text = "" }: Props) {
   return (
     <div
       style={{
-        backgroundColor: theme.colors.border,
-        borderRadius: 6,
+        backgroundColor: theme.colors.backgroundAlt,
+        borderRadius: theme.borders.radius - 2,
         padding: "10px 14px",
         marginTop: 10,
       }}

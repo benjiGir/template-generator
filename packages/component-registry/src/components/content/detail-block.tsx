@@ -31,7 +31,7 @@ function DetailBlock({
     <div
       style={{
         borderLeft: `3px solid ${accentColor}`,
-        borderRadius: "0 8px 8px 0",
+        borderRadius: `0 ${theme.borders.radius}px ${theme.borders.radius}px 0`,
         backgroundColor: theme.colors.backgroundAlt,
         padding: "14px 16px",
         marginBottom: 12,

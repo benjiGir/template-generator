@@ -8,6 +8,7 @@ import { PropField } from "./PropField";
 import { TemplateSettings } from "./TemplateSettings";
 import { PageSettings } from "./PageSettings";
 import { SavePresetDialog } from "./SavePresetDialog";
+import { ThemePanel } from "./ThemePanel";
 
 export function Inspector() {
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
@@ -20,6 +21,7 @@ export function Inspector() {
   const createPreset = usePresetsStore((s) => s.createPreset);
 
   const [showPresetDialog, setShowPresetDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<"props" | "theme">("props");
 
   // Recherche récursive du nœud sélectionné et de sa page
   let selectedNode: ComponentNode | null = null;
@@ -61,6 +63,8 @@ export function Inspector() {
     setShowPresetDialog(false);
   };
 
+  const showNoSelection = selectedNodeId === null && template;
+
   return (
     <>
       <div className="h-full flex flex-col border-l border-gray-200 bg-white">
@@ -76,6 +80,32 @@ export function Inspector() {
             <p className="text-xs text-gray-400 mt-0.5">
               {template?.name ?? "Aucun template"}
             </p>
+          )}
+
+          {/* Tabs — affichés quand aucun composant n'est sélectionné */}
+          {showNoSelection && (
+            <div className="flex gap-1 mt-2.5">
+              <button
+                onClick={() => setActiveTab("props")}
+                className={`flex-1 py-1 text-xs font-medium rounded transition-colors ${
+                  activeTab === "props"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-500 hover:text-gray-700 border border-gray-200"
+                }`}
+              >
+                Propriétés
+              </button>
+              <button
+                onClick={() => setActiveTab("theme")}
+                className={`flex-1 py-1 text-xs font-medium rounded transition-colors ${
+                  activeTab === "theme"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-500 hover:text-gray-700 border border-gray-200"
+                }`}
+              >
+                Thème
+              </button>
+            </div>
           )}
         </div>
 
@@ -100,8 +130,15 @@ export function Inspector() {
                 ))
               )}
             </div>
-          ) : selectedNodeId === null ? (
-            template ? <PageSettings /> : null
+          ) : showNoSelection ? (
+            activeTab === "theme" ? (
+              <ThemePanel />
+            ) : (
+              <>
+                <PageSettings />
+                <TemplateSettings />
+              </>
+            )
           ) : null}
 
           {!selectedNode && !template && (
@@ -110,10 +147,6 @@ export function Inspector() {
                 Cliquez sur un composant pour l'éditer
               </p>
             </div>
-          )}
-
-          {!selectedNode && template && (
-            <TemplateSettings />
           )}
         </div>
 

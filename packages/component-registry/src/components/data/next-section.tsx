@@ -21,8 +21,8 @@ function NextSection({
     <div
       style={{
         backgroundColor: `${theme.colors.primary}08`,
-        border: `1px solid ${theme.colors.primary}20`,
-        borderRadius: 8,
+        border: `${theme.borders.width}px solid ${theme.colors.primary}20`,
+        borderRadius: theme.borders.radius,
         padding: "16px 20px",
         marginTop: 12,
       }}

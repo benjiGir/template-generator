@@ -19,9 +19,9 @@ function KpiCard({ theme, emoji = "📊", title = "KPI", description = "", color
     <div
       style={{
         backgroundColor: lightBg,
-        border: `1px solid ${accentColor}30`,
+        border: `${theme.borders.width}px solid ${accentColor}30`,
         borderTop: `3px solid ${accentColor}`,
-        borderRadius: 8,
+        borderRadius: theme.borders.radius,
         padding: "12px 14px",
         flex: 1,
       }}

@@ -1,5 +1,13 @@
-import type { Template } from "@template-generator/shared/types/template";
+import type { Template, Theme } from "@template-generator/shared/types/template";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
+
+export interface ThemeRecord {
+  id: string;
+  name: string;
+  theme: Theme;
+  isBuiltin: boolean;
+  createdAt: string;
+}
 
 const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:3001";
 
@@ -37,5 +45,11 @@ export const api = {
     update: (id: string, data: Partial<ComponentPreset>) =>
       request<ComponentPreset>(`/api/presets/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: string) => request<{ ok: boolean }>(`/api/presets/${id}`, { method: "DELETE" }),
+  },
+  themes: {
+    list: () => request<ThemeRecord[]>("/api/themes"),
+    create: (data: { name: string; theme: Theme }) =>
+      request<ThemeRecord>("/api/themes", { method: "POST", body: JSON.stringify(data) }),
+    delete: (id: string) => request<{ success: boolean }>(`/api/themes/${id}`, { method: "DELETE" }),
   },
 };

@@ -18,7 +18,7 @@ function IntroBox({ theme, content = "", accentColor }: Props) {
         borderLeft: `4px solid ${borderColor}`,
         backgroundColor: `${borderColor}12`,
         padding: "12px 16px",
-        borderRadius: "0 6px 6px 0",
+        borderRadius: `0 ${theme.borders.radius - 2}px ${theme.borders.radius - 2}px 0`,
         marginBottom: 16,
       }}
     >
