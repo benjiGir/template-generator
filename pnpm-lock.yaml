@@ -56,6 +56,12 @@ importers:
       '@template-generator/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@uiw/color-convert':
+        specifier: ^2.3.0
+        version: 2.9.6(@babel/runtime@7.28.6)
+      '@uiw/react-color-colorful':
+        specifier: ^2.3.0
+        version: 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       immer:
         specifier: ^10.0.0
         version: 10.2.0
@@ -191,6 +197,10 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
+
+  '@babel/runtime@7.28.6':
+    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
     resolution: {integrity: sha512-YA6Ma2KsCdGb+WC6UpBVFJGXL58MDA6oyONbjyF/+5sBgxY/dwkhLogbMT2GXXyU84/IhRw/2D1Os1B/giz+BQ==}
@@ -1097,6 +1107,46 @@ packages:
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
+  '@uiw/color-convert@2.9.6':
+    resolution: {integrity: sha512-w8TpU3MRcquurQJxWR1daKcRygu/a0hLP/VGsLMA3ebb41sAZGxMQLHtS+zC/e3ciFNB7BbPrSPlzOcz6w6cRg==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+
+  '@uiw/react-color-alpha@2.9.6':
+    resolution: {integrity: sha512-DNzEVHZ0Izp4NAwzKqTcl4rLdPjSFjyZCP6Q2vKJEglugZ/bdPsmZaos9IYOrgnd1kPDmTSKZ/p8nI7vBIATGw==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
+  '@uiw/react-color-colorful@2.9.6':
+    resolution: {integrity: sha512-h74zo+ve9Rpv7xwb1dRfoa23yN39b6eYScDIm7V2d5FzkXN6hR7jnnJ7ZUD9Joz/rdaCz1eFQD9ig+wp8+wSnQ==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
+  '@uiw/react-color-hue@2.9.6':
+    resolution: {integrity: sha512-B99dW2/AHMD3py83BrXl94bhXeGCZR1FMpU/FNbIIbUrV9QTiIXDs2/SB/tMD9ltcSP59RD5Sc5m2vCb/8anjw==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
+  '@uiw/react-color-saturation@2.9.6':
+    resolution: {integrity: sha512-R1tiKbTG2WiJXerkmuaKnBFfzgyZUn08q9OjQSvNH1f3ov2/YeUVlOwQY9MbQE7ytZv+9x+1h0Lpk4QG7AdulQ==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
+  '@uiw/react-drag-event-interactive@2.9.6':
+    resolution: {integrity: sha512-jXzt3Xis/BIYap2Hj2++gB3aEUD0mZoVNGfckurrwjAwxasxNiwkmTGxV5er3due0ZgaVKdOAfTRoYKlgZukSg==}
+    peerDependencies:
+      '@babel/runtime': '>=7.19.0'
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
   '@vitejs/plugin-react@4.7.0':
     resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -1889,6 +1939,8 @@ snapshots:
       '@babel/core': 7.29.0
       '@babel/helper-plugin-utils': 7.28.6
 
+  '@babel/runtime@7.28.6': {}
+
   '@babel/template@7.28.6':
     dependencies:
       '@babel/code-frame': 7.29.0
@@ -2457,6 +2509,50 @@ snapshots:
   '@types/react@19.2.14':
     dependencies:
       csstype: 3.2.3
+
+  '@uiw/color-convert@2.9.6(@babel/runtime@7.28.6)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+
+  '@uiw/react-color-alpha@2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      '@uiw/color-convert': 2.9.6(@babel/runtime@7.28.6)
+      '@uiw/react-drag-event-interactive': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
+  '@uiw/react-color-colorful@2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      '@uiw/color-convert': 2.9.6(@babel/runtime@7.28.6)
+      '@uiw/react-color-alpha': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@uiw/react-color-hue': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@uiw/react-color-saturation': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
+  '@uiw/react-color-hue@2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      '@uiw/color-convert': 2.9.6(@babel/runtime@7.28.6)
+      '@uiw/react-color-alpha': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
+  '@uiw/react-color-saturation@2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      '@uiw/color-convert': 2.9.6(@babel/runtime@7.28.6)
+      '@uiw/react-drag-event-interactive': 2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
+  '@uiw/react-drag-event-interactive@2.9.6(@babel/runtime@7.28.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   '@vitejs/plugin-react@4.7.0(vite@6.4.1(@types/node@25.4.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0))':
     dependencies:
