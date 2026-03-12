@@ -1,8 +1,10 @@
 import { Fragment } from "react";
 import { get } from "@template-generator/component-registry/registry";
 import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
+import { useEditorStore } from "@/store/editor-store";
 import { SelectableWrapper } from "./SelectableWrapper";
 import { DropZone } from "./DropZone";
+import { InlineEditor } from "@/components/inspector/InlineEditor";
 
 interface Props {
   node: ComponentNode;
@@ -12,6 +14,8 @@ interface Props {
 
 export function EditorRenderer({ node, theme, pageIndex }: Props) {
   const definition = get(node.type);
+  const inlineEditingNodeId = useEditorStore((s) => s.inlineEditingNodeId);
+  const inlineEditingPropKey = useEditorStore((s) => s.inlineEditingPropKey);
 
   if (!definition) {
     return (
@@ -37,9 +41,19 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
   const mergedProps = { ...definition.defaultProps, ...node.props, theme };
 
   if (!definition.acceptsChildren) {
+    const isInlineEditing = inlineEditingNodeId === node.id && !!inlineEditingPropKey;
     return (
       <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
-        <Component {...mergedProps} />
+        <div style={{ position: "relative" }}>
+          <Component {...mergedProps} />
+          {isInlineEditing && (
+            <InlineEditor
+              nodeId={node.id}
+              propKey={inlineEditingPropKey!}
+              value={String(node.props[inlineEditingPropKey!] ?? "")}
+            />
+          )}
+        </div>
       </SelectableWrapper>
     );
   }

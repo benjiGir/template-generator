@@ -1,6 +1,7 @@
 import type { PropSchema } from "@template-generator/shared/types/component";
 import { TextPropField } from "./fields/TextPropField";
 import { TextareaPropField } from "./fields/TextareaPropField";
+import { RichtextPropField } from "./RichtextPropField";
 import { NumberPropField } from "./fields/NumberPropField";
 import { BooleanPropField } from "./fields/BooleanPropField";
 import { SelectPropField } from "./fields/SelectPropField";
@@ -32,9 +33,18 @@ export function PropField({ schema, value, onChange }: Props) {
       );
 
     case "textarea":
-    case "richtext":
       return (
         <TextareaPropField
+          label={schema.label}
+          value={str}
+          placeholder={schema.placeholder}
+          onChange={onChange}
+        />
+      );
+
+    case "richtext":
+      return (
+        <RichtextPropField
           label={schema.label}
           value={str}
           placeholder={schema.placeholder}

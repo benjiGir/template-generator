@@ -1,7 +1,7 @@
 import type { Theme } from "@template-generator/shared/types/template";
 import { register } from "../../registry";
 import type { RegisteredComponent } from "../../registry";
-import { RichText } from "../../rich-text";
+import { RichBlock } from "../../rich-text";
 
 interface Props {
   theme: Theme;
@@ -10,16 +10,10 @@ interface Props {
 
 function TextBlock({ theme, content = "" }: Props) {
   return (
-    <p
-      style={{
-        margin: "0 0 12px",
-        fontSize: 13,
-        lineHeight: 1.65,
-        color: theme.colors.text,
-      }}
-    >
-      <RichText text={content} />
-    </p>
+    <RichBlock
+      text={content}
+      style={{ margin: "0 0 8px", fontSize: 13, lineHeight: 1.65, color: theme.colors.text }}
+    />
   );
 }
 

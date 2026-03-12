@@ -37,6 +37,11 @@ interface EditorState {
   selectNode: (nodeId: string | null) => void;
   selectPage: (pageIndex: number) => void;
 
+  inlineEditingNodeId: string | null;
+  inlineEditingPropKey: string | null;
+  startInlineEdit: (nodeId: string, propKey: string) => void;
+  stopInlineEdit: () => void;
+
   undo: () => void;
   redo: () => void;
 }
@@ -59,6 +64,8 @@ export const useEditorStore = create<EditorState>()(
     template: null,
     selectedNodeId: null,
     selectedPageIndex: 0,
+    inlineEditingNodeId: null,
+    inlineEditingPropKey: null,
     isDirty: false,
     history: [],
     historyIndex: -1,
@@ -209,6 +216,21 @@ export const useEditorStore = create<EditorState>()(
     selectNode: (nodeId) =>
       set((s) => {
         s.selectedNodeId = nodeId;
+        s.inlineEditingNodeId = null;
+        s.inlineEditingPropKey = null;
+      }),
+
+    startInlineEdit: (nodeId, propKey) =>
+      set((s) => {
+        s.selectedNodeId = nodeId;
+        s.inlineEditingNodeId = nodeId;
+        s.inlineEditingPropKey = propKey;
+      }),
+
+    stopInlineEdit: () =>
+      set((s) => {
+        s.inlineEditingNodeId = null;
+        s.inlineEditingPropKey = null;
       }),
 
     selectPage: (pageIndex) =>
