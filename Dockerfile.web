@@ -1,0 +1,33 @@
+# ---- Build ----
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+RUN npm install -g pnpm@10
+
+# Workspace config
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
+
+# Package manifests only
+COPY packages/shared/package.json packages/shared/
+COPY packages/component-registry/package.json packages/component-registry/
+COPY apps/web/package.json apps/web/
+
+RUN pnpm install --frozen-lockfile
+
+# Sources
+COPY packages/shared packages/shared
+COPY packages/component-registry packages/component-registry
+COPY apps/web apps/web
+
+# VITE_API_URL vide = URLs relatives proxifiées par nginx
+ARG VITE_API_URL=""
+ENV VITE_API_URL=${VITE_API_URL}
+
+# Build
+RUN pnpm --filter @template-generator/web run build
+
+# ---- Runtime ----
+FROM nginx:alpine
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80

@@ -1,0 +1,20 @@
+{
+  "name": "@template-generator/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./types/template": "./src/types/template.ts",
+    "./types/component": "./src/types/component.ts",
+    "./types/document": "./src/types/document.ts",
+    "./utils/tree": "./src/utils/tree.ts",
+    "./utils/markdown": "./src/utils/markdown.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

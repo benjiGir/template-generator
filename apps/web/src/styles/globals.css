@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Masquer tout, ne montrer que le contenu du canvas */
+  body * {
+    visibility: hidden;
+  }
+
+  [data-print-root],
+  [data-print-root] * {
+    visibility: visible;
+  }
+
+  [data-print-root] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto !important;
+    overflow: visible !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  /* Conteneur des pages : supprimer le style éditeur */
+  [data-print-root] > div {
+    display: block !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Onglets de page : masqués à l'impression */
+  [data-page-tab] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Wrapper par page : supprimer l'espacement éditeur */
+  [data-page-wrapper] {
+    margin-bottom: 0 !important;
+  }
+
+  /* Styles des pages */
+  [data-doc-page] {
+    break-after: page;
+    break-inside: avoid;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    margin: 0 !important;
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@template-generator/component-registry",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./registry": "./src/registry.ts",
+    "./renderer": "./src/renderer.tsx",
+    "./components": "./src/components.ts"
+  },
+  "dependencies": {
+    "@template-generator/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

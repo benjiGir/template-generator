@@ -1,0 +1,17 @@
+{
+  "name": "Template generator",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' run dev",
+    "dev:web": "pnpm --filter @template-generator/web run dev",
+    "dev:api": "pnpm --filter @template-generator/api run dev",
+    "build": "pnpm --filter @template-generator/shared run build && pnpm --filter @template-generator/component-registry run build && pnpm --filter './apps/*' run build",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild"
+    ]
+  }
+}
