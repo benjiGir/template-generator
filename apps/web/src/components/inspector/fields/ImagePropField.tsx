@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, type ChangeEvent } from "react";
 import type { ImageValue } from "@template-generator/shared/types/component";
 
 interface Props {
@@ -13,7 +13,7 @@ export function ImagePropField({ label, value, onChange }: Props) {
   const val: ImageValue = { ...EMPTY, ...((value as ImageValue | undefined) ?? {}) };
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { BorderValue } from "@template-generator/shared/types/component";
 
 interface Props {
@@ -22,7 +23,7 @@ export function BorderPropField({ label, value, onChange }: Props) {
     onChange({ ...val, [key]: v });
   };
 
-  const previewStyle: React.CSSProperties = {
+  const previewStyle: CSSProperties = {
     border: val.style === "none" ? "none" : `${val.width}px ${val.style} ${val.color}`,
     borderRadius: val.radius,
     height: 28,

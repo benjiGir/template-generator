@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   DndContext,
   closestCenter,
@@ -27,7 +27,7 @@ function SortableItem({ id, value, onUpdate, onRemove }: ItemProps) {
     id,
   });
 
-  const style: React.CSSProperties = {
+  const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,

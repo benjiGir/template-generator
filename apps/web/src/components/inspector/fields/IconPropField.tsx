@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ElementType } from "react";
 import * as LucideIcons from "lucide-react";
 
 // Curated list of common icons
@@ -33,7 +33,7 @@ export function IconPropField({ label, value, onChange }: Props) {
     ? ICON_NAMES.filter((n) => n.toLowerCase().includes(query.toLowerCase()))
     : ICON_NAMES;
 
-  const CurrentIcon = current ? (LucideIcons as Record<string, React.ElementType>)[current] : null;
+  const CurrentIcon = current ? (LucideIcons as Record<string, ElementType>)[current] : null;
 
   return (
     <div>
@@ -70,7 +70,7 @@ export function IconPropField({ label, value, onChange }: Props) {
           <div className="overflow-y-auto max-h-52 p-1.5">
             <div className="grid grid-cols-6 gap-1">
               {filtered.map((name) => {
-                const Icon = (LucideIcons as Record<string, React.ElementType>)[name];
+                const Icon = (LucideIcons as Record<string, ElementType>)[name];
                 if (!Icon) return null;
                 return (
                   <button
