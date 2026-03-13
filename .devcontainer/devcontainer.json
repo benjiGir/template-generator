@@ -40,6 +40,12 @@
         "editor.formatOnSave": true,
         "typescript.preferences.importModuleSpecifier": "non-relative"
       }
+    },
+    "jetbrains": {
+      "plugins": [
+        "com.jetbrains.plugins.tailwindcss",
+        "intellij.prettierJS"
+      ]
     }
   }
 }
