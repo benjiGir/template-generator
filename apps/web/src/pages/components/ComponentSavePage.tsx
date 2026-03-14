@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { get } from "@template-generator/component-registry/registry";
 import { ComponentRenderer } from "@template-generator/component-registry/renderer";
 import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { usePresetsStore } from "@/store/presets-store";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { buildComponentWorkflowSteps, useComponentWorkflow } from "./hooks/useComponentWorkflow";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 
@@ -21,18 +23,41 @@ const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
 export function ComponentSavePage() {
   const navigate = useNavigate();
   const { goToStep } = useComponentWorkflow();
+  const queryClient = useQueryClient();
   const baseType = useComponentDraftStore((s) => s.baseType);
   const props = useComponentDraftStore((s) => s.props);
+  const editingId = useComponentDraftStore((s) => s.editingId);
+  const editingLabel = useComponentDraftStore((s) => s.editingLabel);
+  const editingDescription = useComponentDraftStore((s) => s.editingDescription);
+  const editingCategory = useComponentDraftStore((s) => s.editingCategory);
   const reset = useComponentDraftStore((s) => s.reset);
-  const createPreset = usePresetsStore((s) => s.createPreset);
 
   const def = baseType ? get(baseType) : null;
-  const [label, setLabel] = useState(def ? `${def.label} preset` : "");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<ComponentCategory>(def?.category ?? "content");
-  const [saving, setSaving] = useState(false);
+  const [label, setLabel] = useState(editingId ? editingLabel : (def ? `${def.label} preset` : ""));
+  const [description, setDescription] = useState(editingId ? editingDescription : "");
+  const [category, setCategory] = useState<ComponentCategory>(editingId ? editingCategory : (def?.category ?? "content"));
 
   const steps = buildComponentWorkflowSteps(CURRENT_STEP);
+
+  const saveMutation = useMutation({
+    mutationFn: () => {
+      const payload = {
+        baseType: baseType!,
+        label: label.trim(),
+        description: description.trim() || undefined,
+        defaultProps: props,
+        category,
+      };
+      return editingId
+        ? api.presets.update(editingId, payload)
+        : api.presets.create(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() });
+      reset();
+      navigate("/components");
+    },
+  });
 
   if (!baseType || !def) {
     return (
@@ -47,44 +72,25 @@ export function ComponentSavePage() {
 
   const previewNode = { id: "preview", type: baseType, props, children: [] };
 
-  const handleSave = async () => {
-    if (!label.trim()) return;
-    setSaving(true);
-    try {
-      await createPreset({
-        baseType,
-        label: label.trim(),
-        description: description.trim() || undefined,
-        defaultProps: props,
-        category,
-      });
-      reset();
-      navigate("/components");
-    } catch (e) {
-      console.error("Erreur sauvegarde preset:", e);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <WorkflowLayout
       title="Bibliothèque Composants"
       steps={steps}
       currentStep={CURRENT_STEP}
-      canGoNext={label.trim().length > 0 && !saving}
-      nextLabel="Sauvegarder"
+      canGoNext={label.trim().length > 0 && !saveMutation.isPending}
+      nextLabel={editingId ? "Mettre à jour" : "Sauvegarder"}
       onPrevious={() => navigate("/components/new/edit")}
-      onNext={handleSave}
+      onNext={() => saveMutation.mutate()}
       onStepClick={(i) => {
         const key = steps[i]?.key;
         if (key) goToStep(key);
       }}
     >
       <div className="h-full flex overflow-hidden bg-gray-50">
-        {/* Left: form */}
         <div className="w-[400px] shrink-0 overflow-y-auto bg-white border-r border-gray-200 p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-5">Nommer et sauvegarder</h2>
+          <h2 className="text-base font-semibold text-gray-900 mb-5">
+            {editingId ? "Modifier le preset" : "Nommer et sauvegarder"}
+          </h2>
 
           <div className="space-y-4">
             <div>
@@ -120,9 +126,7 @@ export function ComponentSavePage() {
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-white"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             </div>
@@ -135,7 +139,6 @@ export function ComponentSavePage() {
           </div>
         </div>
 
-        {/* Right: preview */}
         <div className="flex-1 overflow-y-auto bg-gray-100 flex items-start justify-center p-8">
           <div className="w-full max-w-2xl">
             <p className="text-xs text-gray-400 text-center mb-4">Aperçu final</p>

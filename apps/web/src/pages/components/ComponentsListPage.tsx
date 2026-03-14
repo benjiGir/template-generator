@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { usePresetsStore } from "@/store/presets-store";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useComponentDraftStore } from "@/store/component-draft-store";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
@@ -14,25 +16,38 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function ComponentsListPage() {
   const navigate = useNavigate();
-  const { presets, loading, fetchPresets, deletePreset } = usePresetsStore();
+  const queryClient = useQueryClient();
   const resetDraft = useComponentDraftStore((s) => s.reset);
 
   const [categoryFilter, setCategoryFilter] = useState<ComponentCategory | "all">("all");
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetchPresets();
-  }, [fetchPresets]);
+  const { data: presets = [], isLoading } = useQuery({
+    queryKey: queryKeys.presets.list(),
+    queryFn: () => api.presets.list(),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.presets.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
+  });
 
   const handleNew = () => {
     resetDraft();
     navigate("/components/new");
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const loadPreset = useComponentDraftStore((s) => s.loadPreset);
+
+  const handleEdit = (preset: ComponentPreset) => {
+    loadPreset(preset);
+    navigate("/components/new/edit");
+  };
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!confirm("Supprimer ce preset ?")) return;
-    await deletePreset(id);
+    deleteMutation.mutate(id);
   };
 
   const filtered = presets.filter((p) => {
@@ -57,7 +72,6 @@ export function ComponentsListPage() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="bg-white border-b border-gray-100 px-8 py-2 flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-gray-500">Catégorie :</span>
@@ -81,7 +95,6 @@ export function ComponentsListPage() {
             </button>
           ))}
         </div>
-
         <div className="ml-auto">
           <input
             type="text"
@@ -94,9 +107,9 @@ export function ComponentsListPage() {
       </div>
 
       <div className="px-8 py-8">
-        {loading && <p className="text-sm text-gray-400">Chargement...</p>}
+        {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
-        {!loading && presets.length === 0 && (
+        {!isLoading && presets.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-400 text-sm mb-4">Aucun preset. Créez-en un pour commencer.</p>
             <button
@@ -108,13 +121,13 @@ export function ComponentsListPage() {
           </div>
         )}
 
-        {!loading && presets.length > 0 && filtered.length === 0 && (
+        {!isLoading && presets.length > 0 && filtered.length === 0 && (
           <p className="text-sm text-gray-400">Aucun preset ne correspond aux filtres.</p>
         )}
 
         <div className="grid grid-cols-3 gap-4 max-w-5xl">
           {filtered.map((p) => (
-            <PresetCard key={p.id} preset={p} onDelete={handleDelete} />
+            <PresetCard key={p.id} preset={p} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
         </div>
       </div>
@@ -124,9 +137,11 @@ export function ComponentsListPage() {
 
 function PresetCard({
   preset,
+  onEdit,
   onDelete,
 }: {
   preset: ComponentPreset;
+  onEdit: (preset: ComponentPreset) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
 }) {
   return (
@@ -146,7 +161,14 @@ function PresetCard({
             <p className="text-xs text-gray-400 mt-1 line-clamp-2">{preset.description}</p>
           )}
         </div>
-        <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="ml-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onEdit(preset)}
+            className="text-gray-400 hover:text-blue-500 text-xs px-1.5 py-1 rounded hover:bg-blue-50 transition-colors"
+            title="Modifier"
+          >
+            Modifier
+          </button>
           <button
             onClick={(e) => onDelete(e, preset.id)}
             className="text-gray-400 hover:text-red-500 text-xs p-1"
