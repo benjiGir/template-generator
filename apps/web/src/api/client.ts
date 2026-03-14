@@ -1,4 +1,4 @@
-import type { Template, Theme } from "@template-generator/shared/types/template";
+import type { Template, EditableField, Theme } from "@template-generator/shared/types/template";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
 export interface ThemeRecord {
@@ -24,6 +24,7 @@ export interface TemplateSummary {
   id: string;
   name: string;
   description: string | null;
+  published: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,8 +35,10 @@ export const api = {
     get: (id: string) => request<Template>(`/api/templates/${id}`),
     create: (data: Omit<Template, "id" | "createdAt" | "updatedAt">) =>
       request<Template>("/api/templates", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: string, data: Partial<Template>) =>
+    update: (id: string, data: Partial<Omit<Template, "id" | "createdAt" | "updatedAt">>) =>
       request<Template>(`/api/templates/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+    publish: (id: string, data: { editableFields: EditableField[]; tags?: string[] }) =>
+      request<Template>(`/api/templates/${id}/publish`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: string) => request<{ ok: boolean }>(`/api/templates/${id}`, { method: "DELETE" }),
   },
   presets: {

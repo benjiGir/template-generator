@@ -2,7 +2,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RootLayout } from "@/layouts/RootLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { TemplatesListPage } from "@/pages/templates/TemplatesListPage";
+import { TemplateStartPage } from "@/pages/templates/TemplateStartPage";
+import { TemplateThemePage } from "@/pages/templates/TemplateThemePage";
 import { TemplateEditPage } from "@/pages/templates/TemplateEditPage";
+import { TemplatePublishPage } from "@/pages/templates/TemplatePublishPage";
 import { ComponentsListPage } from "@/pages/components/ComponentsListPage";
 import { DocumentsListPage } from "@/pages/documents/DocumentsListPage";
 
@@ -10,11 +13,14 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: "/", element: <DashboardPage /> },
-      { path: "/templates", element: <TemplatesListPage /> },
-      { path: "/templates/:id/edit", element: <TemplateEditPage /> },
-      { path: "/components", element: <ComponentsListPage /> },
-      { path: "/documents", element: <DocumentsListPage /> },
+      { path: "/",                          element: <DashboardPage /> },
+      { path: "/templates",                 element: <TemplatesListPage /> },
+      { path: "/templates/new",             element: <TemplateStartPage /> },
+      { path: "/templates/:id/theme",       element: <TemplateThemePage /> },
+      { path: "/templates/:id/edit",        element: <TemplateEditPage /> },
+      { path: "/templates/:id/publish",     element: <TemplatePublishPage /> },
+      { path: "/components",               element: <ComponentsListPage /> },
+      { path: "/documents",                element: <DocumentsListPage /> },
     ],
   },
 ]);

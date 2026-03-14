@@ -1,15 +1,18 @@
 import { pgTable, uuid, text, jsonb, timestamp, boolean } from "drizzle-orm/pg-core";
-import type { Theme, PageFormat, TemplatePage } from "@template-generator/shared/types/template";
+import type { Theme, PageFormat, TemplatePage, EditableField } from "@template-generator/shared/types/template";
 
 export const templates = pgTable("templates", {
-  id:          uuid("id").primaryKey().defaultRandom(),
-  name:        text("name").notNull(),
-  description: text("description"),
-  theme:       jsonb("theme").notNull().$type<Theme>(),
-  pageFormat:  jsonb("page_format").notNull().$type<PageFormat>(),
-  pages:       jsonb("pages").notNull().$type<TemplatePage[]>(),
-  createdAt:   timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt:   timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  id:             uuid("id").primaryKey().defaultRandom(),
+  name:           text("name").notNull(),
+  description:    text("description"),
+  theme:          jsonb("theme").notNull().$type<Theme>(),
+  pageFormat:     jsonb("page_format").notNull().$type<PageFormat>(),
+  pages:          jsonb("pages").notNull().$type<TemplatePage[]>(),
+  published:      boolean("published").default(false).notNull(),
+  editableFields: jsonb("editable_fields").default([]).notNull().$type<EditableField[]>(),
+  tags:           jsonb("tags").default([]).notNull().$type<string[]>(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:      timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const componentPresets = pgTable("component_presets", {

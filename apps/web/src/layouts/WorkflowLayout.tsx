@@ -16,6 +16,7 @@ interface WorkflowLayoutProps {
   onStepClick: (stepIndex: number) => void;
   canGoNext: boolean;
   nextLabel?: string;
+  footerActions?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -28,6 +29,7 @@ export function WorkflowLayout({
   onStepClick,
   canGoNext,
   nextLabel,
+  footerActions,
   children,
 }: WorkflowLayoutProps) {
   const isLastStep = currentStep === steps.length - 1;
@@ -94,13 +96,16 @@ export function WorkflowLayout({
           Précédent
         </button>
 
-        <button
-          onClick={onNext}
-          disabled={!canGoNext}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {resolvedNextLabel}
-        </button>
+        <div className="flex items-center gap-2">
+          {footerActions}
+          <button
+            onClick={onNext}
+            disabled={!canGoNext}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {resolvedNextLabel}
+          </button>
+        </div>
       </div>
     </div>
   );

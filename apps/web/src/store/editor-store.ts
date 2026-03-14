@@ -275,4 +275,7 @@ export const DEFAULT_NEW_TEMPLATE: Omit<Template, "id" | "createdAt" | "updatedA
       children: [],
     },
   ],
+  published:      false,
+  editableFields: [],
+  tags:           [],
 };

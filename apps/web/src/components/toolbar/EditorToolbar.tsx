@@ -1,14 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { useEditorStore } from "@/store/editor-store";
-import { ExportButton } from "./ExportButton";
 
 interface Props {
-  onSave?: () => void;
   saving?: boolean;
 }
 
-export function EditorToolbar({ onSave, saving }: Props) {
-  const navigate = useNavigate();
+export function EditorToolbar({ saving }: Props) {
   const template = useEditorStore((s) => s.template);
   const isDirty = useEditorStore((s) => s.isDirty);
   const historyIndex = useEditorStore((s) => s.historyIndex);
@@ -21,20 +17,11 @@ export function EditorToolbar({ onSave, saving }: Props) {
 
   return (
     <div className="h-12 flex items-center gap-3 px-4 border-b border-gray-200 bg-white shrink-0">
-      {/* Retour */}
-      <button
-        onClick={() => navigate("/templates")}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-      >
-        ← Templates
-      </button>
-
-      <div className="w-px h-5 bg-gray-200" />
-
       {/* Nom du template */}
       <span className="text-sm font-semibold text-gray-900 truncate max-w-xs">
         {template?.name ?? "—"}
       </span>
+
       {saving && <span className="text-xs text-gray-400">Sauvegarde...</span>}
       {!saving && isDirty && <span className="text-xs text-amber-500 font-medium">Non sauvegardé</span>}
 
@@ -57,19 +44,6 @@ export function EditorToolbar({ onSave, saving }: Props) {
       >
         ↪
       </button>
-
-      <div className="w-px h-5 bg-gray-200" />
-
-      {/* Sauvegarder */}
-      <button
-        onClick={onSave}
-        disabled={!isDirty || saving}
-        className="px-3 py-1.5 text-sm font-medium rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        Sauvegarder
-      </button>
-
-      <ExportButton />
     </div>
   );
 }

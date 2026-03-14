@@ -1,3 +1,5 @@
+import type { PropType } from "./component";
+
 /** Un noeud dans l'arbre de composants */
 export interface ComponentNode {
   id: string;
@@ -86,6 +88,18 @@ export interface TemplatePage {
   children: ComponentNode[];
 }
 
+/** Champ éditable exposé pour le remplissage dans le Studio */
+export interface EditableField {
+  nodeId: string;
+  propKey: string;
+  label: string;
+  type: PropType;
+  defaultValue: unknown;
+  required: boolean;
+  group?: string;
+  order: number;
+}
+
 /** Le template complet */
 export interface Template {
   id: string;
@@ -94,6 +108,9 @@ export interface Template {
   theme: Theme;
   pageFormat: PageFormat;
   pages: TemplatePage[];
+  published: boolean;
+  editableFields: EditableField[];
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 }

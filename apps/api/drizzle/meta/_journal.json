@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773269707395,
-      "tag": "0000_nostalgic_starfox",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741737600000,
-      "tag": "0001_add_themes_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1773332118963,
-      "tag": "0002_lovely_skreet",
+      "when": 1773476058667,
+      "tag": "0000_glamorous_mephistopheles",
       "breakpoints": true
     }
   ]

@@ -11,6 +11,7 @@ router.get("/", async (c) => {
       id:          templates.id,
       name:        templates.name,
       description: templates.description,
+      published:   templates.published,
       createdAt:   templates.createdAt,
       updatedAt:   templates.updatedAt,
     })
@@ -38,6 +39,23 @@ router.put("/:id", async (c) => {
   const [result] = await db
     .update(templates)
     .set({ ...body, updatedAt: new Date() })
+    .where(eq(templates.id, id))
+    .returning();
+  if (!result) return c.json({ error: "Not found" }, 404);
+  return c.json(result);
+});
+
+router.put("/:id/publish", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json<{ editableFields: unknown[]; tags?: string[] }>();
+  const [result] = await db
+    .update(templates)
+    .set({
+      published:      true,
+      editableFields: body.editableFields ?? [],
+      tags:           body.tags ?? [],
+      updatedAt:      new Date(),
+    })
     .where(eq(templates.id, id))
     .returning();
   if (!result) return c.json({ error: "Not found" }, 404);
