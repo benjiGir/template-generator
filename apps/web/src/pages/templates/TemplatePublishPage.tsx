@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { get } from "@template-generator/component-registry/registry";
 import { buildWorkflowSteps, useTemplateWorkflow } from "./hooks/useTemplateWorkflow";
@@ -40,9 +42,7 @@ function detectEditableFields(template: Template): EditableField[] {
     }
   }
 
-  for (const page of template.pages) {
-    scan(page.children);
-  }
+  for (const page of template.pages) scan(page.children);
   return fields;
 }
 
@@ -50,43 +50,54 @@ export function TemplatePublishPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { goToStep } = useTemplateWorkflow();
-
-  const [template, setTemplate] = useState<Template | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [publishing, setPublishing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [detectedFields, setDetectedFields] = useState<EditableField[]>([]);
   const [enabledFields, setEnabledFields] = useState<Set<string>>(new Set());
+  const initialized = useRef(false);
+
+  const { data: template, isLoading, isError } = useQuery({
+    queryKey: queryKeys.templates.detail(id!),
+    queryFn: () => api.templates.get(id!),
+    enabled: !!id,
+  });
+
+  const detectedFields = useMemo(
+    () => (template ? detectEditableFields(template) : []),
+    [template]
+  );
 
   useEffect(() => {
-    if (!id) return;
-    api.templates
-      .get(id)
-      .then((t) => {
-        setTemplate(t);
-        setName(t.name);
-        setDescription(t.description ?? "");
-        const fields = detectEditableFields(t);
-        setDetectedFields(fields);
-        // Enable all by default, or restore existing selection
-        const existing = new Set(
-          (t.editableFields ?? []).map((f) => `${f.nodeId}.${f.propKey}`)
-        );
-        setEnabledFields(
-          existing.size > 0
-            ? existing
-            : new Set(fields.map((f) => `${f.nodeId}.${f.propKey}`))
-        );
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id]);
+    if (template && !initialized.current) {
+      initialized.current = true;
+      setName(template.name);
+      setDescription(template.description ?? "");
+      const existing = new Set(
+        (template.editableFields ?? []).map((f) => `${f.nodeId}.${f.propKey}`)
+      );
+      const fields = detectEditableFields(template);
+      setEnabledFields(
+        existing.size > 0
+          ? existing
+          : new Set(fields.map((f) => `${f.nodeId}.${f.propKey}`))
+      );
+    }
+  }, [template]);
+
+  const publishMutation = useMutation({
+    mutationFn: async () => {
+      await api.templates.update(id!, { name, description });
+      const selectedFields = detectedFields
+        .filter((f) => enabledFields.has(`${f.nodeId}.${f.propKey}`))
+        .map((f, i) => ({ ...f, order: i }));
+      return api.templates.publish(id!, { editableFields: selectedFields });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.templates.list() });
+      navigate("/templates");
+    },
+  });
 
   const toggleField = (key: string) => {
     setEnabledFields((prev) => {
@@ -97,28 +108,9 @@ export function TemplatePublishPage() {
     });
   };
 
-  const handlePublish = async () => {
-    if (!id || !template) return;
-    setPublishing(true);
-    try {
-      // Save name/description first
-      await api.templates.update(id, { name, description });
-      // Then publish
-      const selectedFields = detectedFields
-        .filter((f) => enabledFields.has(`${f.nodeId}.${f.propKey}`))
-        .map((f, i) => ({ ...f, order: i }));
-      await api.templates.publish(id, { editableFields: selectedFields });
-      navigate("/templates");
-    } catch (e) {
-      console.error("Erreur publication:", e);
-    } finally {
-      setPublishing(false);
-    }
-  };
-
   const steps = buildWorkflowSteps(CURRENT_STEP);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement...</p>
@@ -126,10 +118,10 @@ export function TemplatePublishPage() {
     );
   }
 
-  if (error || !template) {
+  if (isError || !template) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Template introuvable"}</p>
+        <p className="text-sm text-red-500">Template introuvable</p>
         <button onClick={() => navigate("/templates")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux templates
         </button>
@@ -142,10 +134,10 @@ export function TemplatePublishPage() {
       title="Atelier Templates"
       steps={steps}
       currentStep={CURRENT_STEP}
-      canGoNext={!publishing && name.trim().length > 0}
+      canGoNext={!publishMutation.isPending && name.trim().length > 0}
       nextLabel="Publier"
       onPrevious={() => navigate(`/templates/${id}/edit`)}
-      onNext={handlePublish}
+      onNext={() => publishMutation.mutate()}
       onStepClick={(i) => {
         const key = steps[i]?.key;
         if (key && id) goToStep(key, id);
@@ -155,7 +147,6 @@ export function TemplatePublishPage() {
         <div className="max-w-2xl">
           <h2 className="text-base font-semibold text-gray-900 mb-6">Finaliser le template</h2>
 
-          {/* Metadata */}
           <section className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
             <h3 className="text-sm font-semibold text-gray-700 mb-4">Informations</h3>
             <div className="space-y-3">
@@ -182,7 +173,6 @@ export function TemplatePublishPage() {
             </div>
           </section>
 
-          {/* Editable fields */}
           <section className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-sm font-semibold text-gray-700">Champs éditables</h3>
@@ -196,7 +186,7 @@ export function TemplatePublishPage() {
 
             {detectedFields.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-6">
-                Aucun champ éditable détecté dans ce template. Ajoutez des composants avec du contenu d'abord.
+                Aucun champ éditable détecté dans ce template.
               </p>
             ) : (
               <table className="w-full text-xs">
@@ -219,11 +209,9 @@ export function TemplatePublishPage() {
                         className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer"
                       >
                         <td className="py-2 pr-3">
-                          <div
-                            className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                              enabled ? "bg-blue-600 border-blue-600" : "border-gray-300"
-                            }`}
-                          >
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                            enabled ? "bg-blue-600 border-blue-600" : "border-gray-300"
+                          }`}>
                             {enabled && <Check size={10} className="text-white" />}
                           </div>
                         </td>

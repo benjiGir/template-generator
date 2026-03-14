@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { useEditorStore } from "@/store/editor-store";
 import { useTemplateSave } from "@/hooks/useTemplateSave";
 import { useExportPdf } from "@/hooks/useExportPdf";
@@ -16,32 +18,23 @@ export function TemplateEditPage() {
   const { goToStep } = useTemplateWorkflow();
   const loadTemplate = useEditorStore((s) => s.loadTemplate);
   const template = useEditorStore((s) => s.template);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const { save, saving, isDirty } = useTemplateSave();
   const { exportPdf } = useExportPdf();
 
-  useEffect(() => {
-    if (!id) return;
-    if (template?.id === id) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    api.templates
-      .get(id)
-      .then((t) => {
-        loadTemplate(t);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id, loadTemplate, template?.id]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.templates.detail(id!),
+    queryFn: () => api.templates.get(id!),
+    enabled: !!id,
+  });
 
-  if (loading) {
+  useEffect(() => {
+    if (data && data.id !== template?.id) loadTemplate(data);
+  }, [data, template?.id, loadTemplate]);
+
+  const steps = buildWorkflowSteps(CURRENT_STEP);
+
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement du template...</p>
@@ -49,14 +42,11 @@ export function TemplateEditPage() {
     );
   }
 
-  if (error || !template) {
+  if (isError || !template) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Template introuvable"}</p>
-        <button
-          onClick={() => navigate("/templates")}
-          className="text-sm text-blue-600 hover:underline"
-        >
+        <p className="text-sm text-red-500">Template introuvable</p>
+        <button onClick={() => navigate("/templates")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux templates
         </button>
       </div>
@@ -64,7 +54,6 @@ export function TemplateEditPage() {
   }
 
   const hasComponents = template.pages.some((p) => p.children.length > 0);
-  const steps = buildWorkflowSteps(CURRENT_STEP);
 
   const footerActions = (
     <>
@@ -78,7 +67,6 @@ export function TemplateEditPage() {
       <button
         onClick={exportPdf}
         className="px-3 py-1.5 text-sm font-medium rounded border border-gray-300 hover:bg-gray-50 transition-colors"
-        title="Exporter en PDF"
       >
         Export PDF
       </button>

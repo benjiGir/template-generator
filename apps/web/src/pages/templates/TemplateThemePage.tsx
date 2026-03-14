@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { useEditorStore } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { ThemePanel } from "@/components/inspector/ThemePanel";
@@ -15,32 +17,20 @@ export function TemplateThemePage() {
   const { goToStep } = useTemplateWorkflow();
   const loadTemplate = useEditorStore((s) => s.loadTemplate);
   const template = useEditorStore((s) => s.template);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.templates.detail(id!),
+    queryFn: () => api.templates.get(id!),
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    if (!id) return;
-    // Only load if different template (avoid resetting the theme being edited)
-    if (template?.id === id) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    api.templates
-      .get(id)
-      .then((t) => {
-        loadTemplate(t);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id, loadTemplate, template?.id]);
+    if (data && data.id !== template?.id) loadTemplate(data);
+  }, [data, template?.id, loadTemplate]);
 
   const steps = buildWorkflowSteps(CURRENT_STEP);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement...</p>
@@ -48,10 +38,10 @@ export function TemplateThemePage() {
     );
   }
 
-  if (error || !template) {
+  if (isError || !template) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Template introuvable"}</p>
+        <p className="text-sm text-red-500">Template introuvable</p>
         <button onClick={() => navigate("/templates")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux templates
         </button>
@@ -73,7 +63,6 @@ export function TemplateThemePage() {
       }}
     >
       <div className="h-full flex overflow-hidden">
-        {/* Left: ThemePanel */}
         <div className="w-[380px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
           <div className="px-4 py-3 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900">Thème</h2>
@@ -82,7 +71,6 @@ export function TemplateThemePage() {
           <ThemePanel />
         </div>
 
-        {/* Right: Live preview */}
         <div className="flex-1 overflow-y-auto bg-gray-100 p-6">
           <div className="text-xs text-gray-500 text-center mb-4">Aperçu en temps réel</div>
           {template.pages.map((page) => (
@@ -100,9 +88,7 @@ export function TemplateThemePage() {
               }}
             >
               {page.children.length === 0 ? (
-                <div className="flex items-center justify-center h-40 text-gray-300 text-sm">
-                  Page vide
-                </div>
+                <div className="flex items-center justify-center h-40 text-gray-300 text-sm">Page vide</div>
               ) : (
                 page.children.map((node) => (
                   <ComponentRenderer key={node.id} node={node} theme={template.theme} />

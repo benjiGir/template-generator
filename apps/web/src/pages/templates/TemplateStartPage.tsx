@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, Copy, Upload, Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { FileText, Copy, Upload, Sparkles, LayoutTemplate } from "lucide-react";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { api } from "@/api/client";
-import { useTemplatesStore } from "@/store/templates-store";
+import { queryKeys } from "@/api/queryKeys";
 import { DEFAULT_NEW_TEMPLATE } from "@/store/editor-store";
 import { buildWorkflowSteps, useTemplateWorkflow } from "./hooks/useTemplateWorkflow";
 import type { TemplateSummary } from "@/api/client";
@@ -15,17 +16,21 @@ type Mode = "blank" | "model" | "import" | "ai";
 export function TemplateStartPage() {
   const navigate = useNavigate();
   const { goToStep } = useTemplateWorkflow();
-  const { templates, fetchTemplates } = useTemplatesStore();
   const [mode, setMode] = useState<Mode | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const steps = buildWorkflowSteps(CURRENT_STEP);
 
+  const { data: templates = [] } = useQuery({
+    queryKey: queryKeys.templates.list(),
+    queryFn: () => api.templates.list(),
+    enabled: mode === "model",
+  });
+
   const handleModeSelect = (m: Mode) => {
     setMode(m);
     setSelectedTemplateId(null);
-    if (m === "model") fetchTemplates();
   };
 
   const handleNext = async () => {
@@ -79,7 +84,6 @@ export function TemplateStartPage() {
       }}
     >
       <div className="h-full overflow-y-auto bg-gray-50 p-8">
-        {/* Mode selection */}
         <h2 className="text-base font-semibold text-gray-900 mb-4">Choisissez un point de départ</h2>
         <div className="grid grid-cols-4 gap-3 max-w-4xl mb-8">
           <ModeCard
@@ -116,7 +120,6 @@ export function TemplateStartPage() {
           />
         </div>
 
-        {/* Template grid for "from model" */}
         {mode === "model" && (
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-3">Sélectionnez un template</h3>
@@ -142,13 +145,7 @@ export function TemplateStartPage() {
 }
 
 function ModeCard({
-  icon,
-  label,
-  description,
-  active,
-  disabled,
-  badge,
-  onClick,
+  icon, label, description, active, disabled, badge, onClick,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -183,9 +180,7 @@ function ModeCard({
 }
 
 function TemplateCard({
-  template,
-  selected,
-  onClick,
+  template, selected, onClick,
 }: {
   template: TemplateSummary;
   selected: boolean;
@@ -194,22 +189,19 @@ function TemplateCard({
   return (
     <button
       onClick={onClick}
-      className={`text-left p-3 rounded-lg border-2 transition-all ${
-        selected
-          ? "border-blue-500 bg-blue-50"
-          : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
+      className={`text-left rounded-lg border-2 transition-all overflow-hidden ${
+        selected ? "border-blue-500" : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
       }`}
     >
-      <p className="text-sm font-semibold text-gray-900 truncate">{template.name}</p>
-      {template.description && (
-        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{template.description}</p>
-      )}
-      <p className="text-xs text-gray-400 mt-2">
-        {new Date(template.updatedAt).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "short",
-        })}
-      </p>
+      <div className={`w-full aspect-[210/297] flex items-center justify-center ${selected ? "bg-blue-50" : "bg-gray-50"}`}>
+        <LayoutTemplate size={28} className={selected ? "text-blue-200" : "text-gray-200"} />
+      </div>
+      <div className="p-2.5 bg-white">
+        <p className="text-xs font-semibold text-gray-900 truncate">{template.name}</p>
+        <p className="text-[10px] text-gray-400 mt-1">
+          {new Date(template.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+        </p>
+      </div>
     </button>
   );
 }
