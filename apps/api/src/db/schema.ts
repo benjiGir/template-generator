@@ -21,6 +21,7 @@ export const componentPresets = pgTable("component_presets", {
   label:        text("label").notNull(),
   description:  text("description"),
   defaultProps: jsonb("default_props").notNull(),
+  category:     text("category"),
   createdAt:    timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

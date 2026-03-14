@@ -7,6 +7,9 @@ import { TemplateThemePage } from "@/pages/templates/TemplateThemePage";
 import { TemplateEditPage } from "@/pages/templates/TemplateEditPage";
 import { TemplatePublishPage } from "@/pages/templates/TemplatePublishPage";
 import { ComponentsListPage } from "@/pages/components/ComponentsListPage";
+import { ComponentSelectPage } from "@/pages/components/ComponentSelectPage";
+import { ComponentEditPage } from "@/pages/components/ComponentEditPage";
+import { ComponentSavePage } from "@/pages/components/ComponentSavePage";
 import { DocumentsListPage } from "@/pages/documents/DocumentsListPage";
 
 const router = createBrowserRouter([
@@ -20,6 +23,9 @@ const router = createBrowserRouter([
       { path: "/templates/:id/edit",        element: <TemplateEditPage /> },
       { path: "/templates/:id/publish",     element: <TemplatePublishPage /> },
       { path: "/components",               element: <ComponentsListPage /> },
+      { path: "/components/new",           element: <ComponentSelectPage /> },
+      { path: "/components/new/edit",      element: <ComponentEditPage /> },
+      { path: "/components/new/save",      element: <ComponentSavePage /> },
       { path: "/documents",                element: <DocumentsListPage /> },
     ],
   },

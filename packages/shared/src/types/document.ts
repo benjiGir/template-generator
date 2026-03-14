@@ -1,4 +1,5 @@
 import type { Template } from "./template";
+import type { ComponentCategory } from "./component";
 
 /** Preset de composant sauvegardé */
 export interface ComponentPreset {
@@ -7,6 +8,7 @@ export interface ComponentPreset {
   label: string;
   description?: string;
   defaultProps: Record<string, unknown>;
+  category?: ComponentCategory;
   createdAt: string;
 }
 
