@@ -1,5 +1,6 @@
 node_modules
 dist
+.claude
 .env
 .env.local
 
@@ -17,6 +18,7 @@ yarn-error.log*
 
 # Editors
 .vscode/*
+!.vscode/extensions.json
 .idea/
 
 # Build artifacts

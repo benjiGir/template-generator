@@ -5,16 +5,20 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "exports": {
     "./types/template": "./src/types/template.ts",
     "./types/component": "./src/types/component.ts",
     "./types/document": "./src/types/document.ts",
     "./utils/tree": "./src/utils/tree.ts",
-    "./utils/markdown": "./src/utils/markdown.ts"
+    "./utils/markdown": "./src/utils/markdown.ts",
+    "./themes/presets": "./src/themes/presets.ts"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }

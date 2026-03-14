@@ -2,7 +2,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { templates } from "../db/schema";
 import type { Template } from "@template-generator/shared/types/template";
-import { DEFAULT_THEME, DEFAULT_PAGE_FORMAT } from "@template-generator/shared/types/template";
+import { DEFAULT_PAGE_FORMAT } from "@template-generator/shared/types/template";
+import { KOMITY_BLUE } from "@template-generator/shared/themes/presets";
 
 const pool = new Pool({ connectionString: process.env["DATABASE_URL"] });
 const db = drizzle(pool);
@@ -10,14 +11,7 @@ const db = drizzle(pool);
 const komityTemplate: Omit<Template, "id" | "createdAt" | "updatedAt"> = {
   name: "KOMITY — Chantiers Techniques",
   description: "Template de revue des chantiers techniques mensuels",
-  theme: {
-    ...DEFAULT_THEME,
-    colors: {
-      ...DEFAULT_THEME.colors,
-      primary: "#2563EB",
-      accent: "#3B82F6",
-    },
-  },
+  theme: KOMITY_BLUE,
   pageFormat: DEFAULT_PAGE_FORMAT,
   pages: [
     {

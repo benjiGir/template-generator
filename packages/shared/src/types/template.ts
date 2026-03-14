@@ -6,21 +6,69 @@ export interface ComponentNode {
   children?: ComponentNode[];
 }
 
+/** Couleurs du thème */
+export interface ThemeColors {
+  primary: string;
+  primaryLight: string;
+  accent: string;
+  accentLight: string;
+  success: string;
+  successLight: string;
+  warning: string;
+  warningLight: string;
+  danger: string;
+  dangerLight: string;
+  text: string;
+  textLight: string;
+  textMuted: string;
+  background: string;
+  backgroundAlt: string;
+  border: string;
+  borderLight: string;
+}
+
+/** Typographie du thème */
+export interface ThemeTypography {
+  fontFamily: string;
+  headingFontFamily: string;
+  baseFontSize: number;
+  lineHeight: number;
+  headingSizes: {
+    h1: number;
+    h2: number;
+    h3: number;
+  };
+  fontWeights: {
+    normal: number;
+    medium: number;
+    semibold: number;
+    bold: number;
+    extrabold: number;
+  };
+}
+
+/** Espacements du thème */
+export interface ThemeSpacing {
+  unit: number;
+  pagePadding: string;
+  sectionGap: number;
+  componentGap: number;
+}
+
+/** Bordures du thème */
+export interface ThemeBorder {
+  radius: number;
+  radiusLg: number;
+  width: number;
+}
+
 /** Configuration du thème */
 export interface Theme {
-  colors: {
-    primary: string;
-    accent: string;
-    success: string;
-    warning: string;
-    danger: string;
-    text: string;
-    textLight: string;
-    background: string;
-    border: string;
-  };
-  fontFamily: string;
-  baseFontSize: number;
+  name: string;
+  colors: ThemeColors;
+  typography: ThemeTypography;
+  spacing: ThemeSpacing;
+  borders: ThemeBorder;
 }
 
 /** Format de page */
@@ -50,21 +98,47 @@ export interface Template {
   updatedAt: string;
 }
 
-/** Thème par défaut */
+/** Thème par défaut (KOMITY Blue) */
 export const DEFAULT_THEME: Theme = {
+  name: "KOMITY Blue",
   colors: {
     primary: "#2563EB",
+    primaryLight: "#EFF6FF",
     accent: "#3B82F6",
+    accentLight: "#DBEAFE",
     success: "#16A34A",
+    successLight: "#F0FDF4",
     warning: "#D97706",
+    warningLight: "#FFFBEB",
     danger: "#DC2626",
+    dangerLight: "#FEF2F2",
     text: "#111827",
     textLight: "#6B7280",
+    textMuted: "#9CA3AF",
     background: "#FFFFFF",
+    backgroundAlt: "#F8FAFC",
     border: "#E5E7EB",
+    borderLight: "#F3F4F6",
   },
-  fontFamily: "Inter, system-ui, sans-serif",
-  baseFontSize: 14,
+  typography: {
+    fontFamily: "Inter, system-ui, sans-serif",
+    headingFontFamily: "Inter, system-ui, sans-serif",
+    baseFontSize: 14,
+    lineHeight: 1.65,
+    headingSizes: { h1: 28, h2: 20, h3: 16 },
+    fontWeights: { normal: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800 },
+  },
+  spacing: {
+    unit: 4,
+    pagePadding: "28px 36px 32px",
+    sectionGap: 4,
+    componentGap: 3,
+  },
+  borders: {
+    radius: 8,
+    radiusLg: 12,
+    width: 1,
+  },
 };
 
 /** Format A4 par défaut */

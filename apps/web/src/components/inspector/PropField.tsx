@@ -1,12 +1,18 @@
-import type { PropSchema } from "@template-generator/shared/types/component";
+import type { PropSchema, SpacingValue, BorderValue, ImageValue } from "@template-generator/shared/types/component";
 import { TextPropField } from "./fields/TextPropField";
 import { TextareaPropField } from "./fields/TextareaPropField";
+import { RichtextPropField } from "./RichtextPropField";
 import { NumberPropField } from "./fields/NumberPropField";
 import { BooleanPropField } from "./fields/BooleanPropField";
 import { SelectPropField } from "./fields/SelectPropField";
 import { ColorPropField } from "./fields/ColorPropField";
 import { ListPropField } from "./fields/ListPropField";
 import { EmojiPropField } from "./fields/EmojiPropField";
+import { SpacingPropField } from "./fields/SpacingPropField";
+import { FontPropField } from "./fields/FontPropField";
+import { BorderPropField } from "./fields/BorderPropField";
+import { ImagePropField } from "./fields/ImagePropField";
+import { IconPropField } from "./fields/IconPropField";
 
 interface Props {
   schema: PropSchema;
@@ -32,9 +38,18 @@ export function PropField({ schema, value, onChange }: Props) {
       );
 
     case "textarea":
-    case "richtext":
       return (
         <TextareaPropField
+          label={schema.label}
+          value={str}
+          placeholder={schema.placeholder}
+          onChange={onChange}
+        />
+      );
+
+    case "richtext":
+      return (
+        <RichtextPropField
           label={schema.label}
           value={str}
           placeholder={schema.placeholder}
@@ -66,6 +81,39 @@ export function PropField({ schema, value, onChange }: Props) {
 
     case "emoji":
       return <EmojiPropField label={schema.label} value={str} onChange={onChange} />;
+
+    case "spacing":
+      return (
+        <SpacingPropField
+          label={schema.label}
+          value={(value as SpacingValue | undefined) ?? (schema.defaultValue as SpacingValue) ?? { top: 0, right: 0, bottom: 0, left: 0 }}
+          onChange={onChange}
+        />
+      );
+
+    case "font":
+      return <FontPropField label={schema.label} value={str} onChange={onChange} />;
+
+    case "border":
+      return (
+        <BorderPropField
+          label={schema.label}
+          value={(value as BorderValue | undefined) ?? (schema.defaultValue as BorderValue) ?? { style: "solid", width: 1, color: "#000000", radius: 0 }}
+          onChange={onChange}
+        />
+      );
+
+    case "image":
+      return (
+        <ImagePropField
+          label={schema.label}
+          value={(value as ImageValue | undefined) ?? (schema.defaultValue as ImageValue) ?? { type: "url", value: "" }}
+          onChange={onChange}
+        />
+      );
+
+    case "icon":
+      return <IconPropField label={schema.label} value={str} onChange={onChange} />;
 
     default:
       return null;

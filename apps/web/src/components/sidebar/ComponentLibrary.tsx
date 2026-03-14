@@ -3,12 +3,19 @@ import { getAll } from "@template-generator/component-registry/registry";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 import { usePresetsStore } from "@/store/presets-store";
 import { ComponentCard } from "./ComponentCard";
-import { CategoryFilter } from "./CategoryFilter";
 import { PresetCard } from "./PresetCard";
+
+const CATEGORY_ORDER: ComponentCategory[] = ["layout", "content", "data", "decoration"];
+
+const CATEGORY_LABELS: Record<ComponentCategory, string> = {
+  layout: "Mise en page",
+  content: "Contenu",
+  data: "Données",
+  decoration: "Décoration",
+};
 
 export function ComponentLibrary() {
   const allComponents = getAll();
-  const [activeCategory, setActiveCategory] = useState<ComponentCategory | null>(null);
   const [search, setSearch] = useState("");
   const { presets, fetchPresets } = usePresetsStore();
 
@@ -16,42 +23,53 @@ export function ComponentLibrary() {
     fetchPresets();
   }, [fetchPresets]);
 
-  const filtered = allComponents.filter((def) => {
-    const matchesCategory = activeCategory === null || def.category === activeCategory;
-    const matchesSearch =
+  const filtered = allComponents.filter(
+    (def) =>
       search === "" ||
       def.label.toLowerCase().includes(search.toLowerCase()) ||
-      def.description.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+      def.description.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const byCategory = CATEGORY_ORDER.map((cat) => ({
+    category: cat,
+    label: CATEGORY_LABELS[cat],
+    items: filtered.filter((def) => def.category === cat),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <div className="h-full flex flex-col border-r border-gray-200 bg-white">
       <div className="px-4 py-3 border-b border-gray-200">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
           Bibliothèque
         </h2>
-        <p className="text-xs text-gray-400 mt-0.5">{filtered.length} composant{filtered.length > 1 ? "s" : ""}</p>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher…"
+          className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-gray-50"
+        />
       </div>
 
-      <CategoryFilter
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-        search={search}
-        onSearchChange={setSearch}
-      />
-
-      <div className="flex-1 overflow-y-auto py-1">
-        {filtered.length === 0 ? (
+      <div className="flex-1 overflow-y-auto">
+        {byCategory.length === 0 ? (
           <p className="text-xs text-gray-400 text-center mt-8 px-4">Aucun composant trouvé</p>
         ) : (
-          filtered.map((def) => <ComponentCard key={def.type} definition={def} />)
+          byCategory.map((group) => (
+            <div key={group.category}>
+              <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest border-b-gray-300 border-b">
+                {group.label}
+              </p>
+              {group.items.map((def) => (
+                <ComponentCard key={def.type} definition={def} />
+              ))}
+            </div>
+          ))
         )}
 
-        {/* Section presets */}
         {presets.length > 0 && (
-          <div className="mt-2 border-t border-gray-100 pt-2">
-            <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <div className="border-t border-gray-100 mt-2">
+            <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
               Mes presets
             </p>
             {presets.map((preset) => (

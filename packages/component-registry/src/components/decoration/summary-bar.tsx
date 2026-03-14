@@ -14,7 +14,7 @@ function SummaryBar({ theme, text = "" }: Props) {
         backgroundColor: theme.colors.primary,
         color: "#fff",
         padding: "8px 16px",
-        borderRadius: 4,
+        borderRadius: theme.borders.radius / 2,
         fontSize: 12,
         fontWeight: 600,
         marginBottom: 12,

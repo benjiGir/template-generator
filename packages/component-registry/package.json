@@ -13,7 +13,8 @@
     "./components": "./src/components.ts"
   },
   "dependencies": {
-    "@template-generator/shared": "workspace:*"
+    "@template-generator/shared": "workspace:*",
+    "lucide-react": "^0.469.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

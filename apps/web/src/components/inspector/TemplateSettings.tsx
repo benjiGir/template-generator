@@ -1,15 +1,23 @@
 import { useEditorStore } from "@/store/editor-store";
 
 const COLOR_KEYS = [
-  { key: "primary", label: "Primaire" },
-  { key: "accent", label: "Accent" },
-  { key: "success", label: "Succès" },
-  { key: "warning", label: "Avertissement" },
-  { key: "danger", label: "Danger" },
-  { key: "text", label: "Texte" },
-  { key: "textLight", label: "Texte clair" },
-  { key: "background", label: "Fond" },
-  { key: "border", label: "Bordure" },
+  { key: "primary",       label: "Primaire" },
+  { key: "primaryLight",  label: "Primaire clair" },
+  { key: "accent",        label: "Accent" },
+  { key: "accentLight",   label: "Accent clair" },
+  { key: "success",       label: "Succès" },
+  { key: "successLight",  label: "Succès clair" },
+  { key: "warning",       label: "Avertissement" },
+  { key: "warningLight",  label: "Avertissement clair" },
+  { key: "danger",        label: "Danger" },
+  { key: "dangerLight",   label: "Danger clair" },
+  { key: "text",          label: "Texte" },
+  { key: "textLight",     label: "Texte clair" },
+  { key: "textMuted",     label: "Texte atténué" },
+  { key: "background",    label: "Fond" },
+  { key: "backgroundAlt", label: "Fond alternatif" },
+  { key: "border",        label: "Bordure" },
+  { key: "borderLight",   label: "Bordure claire" },
 ] as const;
 
 export function TemplateSettings() {

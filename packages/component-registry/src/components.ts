@@ -20,3 +20,13 @@ import "./components/decoration/page-header";
 import "./components/decoration/page-footer";
 import "./components/decoration/summary-bar";
 import "./components/decoration/watermark";
+import "./components/decoration/divider";
+
+import "./components/content/callout-box";
+import "./components/content/image-block";
+import "./components/content/quote-block";
+
+import "./components/data/metric-card";
+import "./components/data/timeline-item";
+
+import "./components/layout/two-column-text";

@@ -6,7 +6,8 @@
     "dev:web": "pnpm --filter @template-generator/web run dev",
     "dev:api": "pnpm --filter @template-generator/api run dev",
     "build": "pnpm --filter @template-generator/shared run build && pnpm --filter @template-generator/component-registry run build && pnpm --filter './apps/*' run build",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm --filter @template-generator/shared run test"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

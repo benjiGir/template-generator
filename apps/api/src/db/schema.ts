@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, jsonb, timestamp, boolean } from "drizzle-orm/pg-core";
 import type { Theme, PageFormat, TemplatePage } from "@template-generator/shared/types/template";
 
 export const templates = pgTable("templates", {
@@ -19,6 +19,14 @@ export const componentPresets = pgTable("component_presets", {
   description:  text("description"),
   defaultProps: jsonb("default_props").notNull(),
   createdAt:    timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const themes = pgTable("themes", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  name:      text("name").notNull(),
+  theme:     jsonb("theme").notNull().$type<Theme>(),
+  isBuiltin: boolean("is_builtin").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const documents = pgTable("documents", {

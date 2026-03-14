@@ -13,15 +13,15 @@ interface Props {
 
 function KpiCard({ theme, emoji = "📊", title = "KPI", description = "", color = "blue" }: Props) {
   const accentColor = resolveColor(color, theme);
-  const lightBg = resolveLightBg(color);
+  const lightBg = resolveLightBg(color, theme);
 
   return (
     <div
       style={{
         backgroundColor: lightBg,
-        border: `1px solid ${accentColor}30`,
+        border: `${theme.borders.width}px solid ${accentColor}30`,
         borderTop: `3px solid ${accentColor}`,
-        borderRadius: 8,
+        borderRadius: theme.borders.radius,
         padding: "12px 14px",
         flex: 1,
       }}
@@ -59,14 +59,15 @@ register({
   category: "data",
   description: "Indicateur clé avec emoji, titre et description",
   schema: [
-    { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊" },
-    { key: "title", label: "Titre", type: "text", defaultValue: "KPI" },
-    { key: "description", label: "Description", type: "textarea", defaultValue: "" },
+    { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊", group: "Contenu" },
+    { key: "title", label: "Titre", type: "text", defaultValue: "KPI", group: "Contenu" },
+    { key: "description", label: "Description", type: "textarea", defaultValue: "", group: "Contenu" },
     {
       key: "color",
       label: "Couleur",
       type: "select",
       defaultValue: "blue",
+      group: "Style",
       options: [
         { label: "Bleu", value: "blue" },
         { label: "Vert", value: "green" },

@@ -25,14 +25,14 @@ function DetailBlock({
   suite,
 }: Props) {
   const accentColor = resolveColor(color, theme);
-  const lightBg = resolveLightBg(color);
+  const lightBg = resolveLightBg(color, theme);
 
   return (
     <div
       style={{
         borderLeft: `3px solid ${accentColor}`,
-        borderRadius: "0 8px 8px 0",
-        backgroundColor: "#FAFAFA",
+        borderRadius: `0 ${theme.borders.radius}px ${theme.borders.radius}px 0`,
+        backgroundColor: theme.colors.backgroundAlt,
         padding: "14px 16px",
         marginBottom: 12,
       }}
@@ -151,12 +151,18 @@ register({
   category: "content",
   description: "Bloc structuré avec titre, contenu, bénéfices et résultat",
   schema: [
-    { key: "title", label: "Titre", type: "text", defaultValue: "Titre du chantier" },
+    { key: "title", label: "Titre", type: "text", defaultValue: "Titre du chantier", group: "Contenu" },
+    { key: "paragraphs", label: "Paragraphes", type: "list", defaultValue: [], group: "Contenu" },
+    { key: "benefits", label: "Bénéfices", type: "list", defaultValue: [], group: "Contenu" },
+    { key: "benefitsLabel", label: "Label bénéfices", type: "text", defaultValue: "Bénéfices", group: "Contenu" },
+    { key: "result", label: "Résultat", type: "textarea", defaultValue: "", group: "Contenu" },
+    { key: "suite", label: "Suite", type: "textarea", defaultValue: "", group: "Contenu" },
     {
       key: "color",
       label: "Couleur",
       type: "select",
       defaultValue: "blue",
+      group: "Style",
       options: [
         { label: "Bleu", value: "blue" },
         { label: "Vert", value: "green" },
@@ -164,11 +170,6 @@ register({
         { label: "Rouge", value: "red" },
       ],
     },
-    { key: "paragraphs", label: "Paragraphes", type: "list", defaultValue: [] },
-    { key: "benefitsLabel", label: "Label bénéfices", type: "text", defaultValue: "Bénéfices" },
-    { key: "benefits", label: "Bénéfices", type: "list", defaultValue: [] },
-    { key: "result", label: "Résultat", type: "textarea", defaultValue: "" },
-    { key: "suite", label: "Suite", type: "textarea", defaultValue: "" },
   ],
   acceptsChildren: false,
   defaultProps: {

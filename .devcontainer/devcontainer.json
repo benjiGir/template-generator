@@ -1,0 +1,51 @@
+{
+  "name": "DocForge",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "pnpmVersion": "10"
+    }
+  },
+
+  "postCreateCommand": "pnpm install",
+
+  "forwardPorts": [5173, 3001],
+  "portsAttributes": {
+    "5173": { "label": "Web (Vite)", "onAutoForward": "openBrowser" },
+    "3001": { "label": "API (Hono)" }
+  },
+
+  "remoteEnv": {
+    "DATABASE_URL": "postgres://docforge:devpassword@db:5432/docforge",
+    "PORT": "3001",
+    "CORS_ORIGIN": "http://localhost:5173"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "typescript.preferences.importModuleSpecifier": "non-relative"
+      }
+    },
+    "jetbrains": {
+      "plugins": [
+        "com.jetbrains.plugins.tailwindcss",
+        "intellij.prettierJS"
+      ]
+    }
+  }
+}

@@ -13,8 +13,8 @@ function TitleBlock({ theme, title = "Titre", subtitle }: Props) {
     <div style={{ marginBottom: 20 }}>
       <h1
         style={{
-          fontSize: 28,
-          fontWeight: 800,
+          fontSize: theme.typography.headingSizes.h1,
+          fontWeight: theme.typography.fontWeights.extrabold,
           color: theme.colors.text,
           margin: 0,
           lineHeight: 1.2,
@@ -26,10 +26,10 @@ function TitleBlock({ theme, title = "Titre", subtitle }: Props) {
       {subtitle && (
         <p
           style={{
-            fontSize: 14,
+            fontSize: theme.typography.baseFontSize,
             color: theme.colors.textLight,
             margin: "6px 0 0",
-            fontWeight: 400,
+            fontWeight: theme.typography.fontWeights.normal,
           }}
         >
           {subtitle}

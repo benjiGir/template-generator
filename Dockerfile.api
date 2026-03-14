@@ -1,0 +1,18 @@
+FROM node:22-alpine
+WORKDIR /app
+
+RUN npm install -g pnpm@10
+
+# Workspace config + manifests (layer cache séparé des sources)
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
+COPY packages/shared/package.json packages/shared/
+COPY apps/api/package.json apps/api/
+
+RUN pnpm install --frozen-lockfile
+
+# Sources
+COPY packages/shared packages/shared
+COPY apps/api apps/api
+
+EXPOSE 3001
+CMD ["pnpm", "--filter", "@template-generator/api", "run", "start"]

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { useEditorStore } from "@/store/editor-store";
+import { get } from "@template-generator/component-registry/registry";
 import type { CanvasDragData } from "@/hooks/useDragAndDrop";
 
 interface Props {
@@ -13,7 +14,17 @@ interface Props {
 export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Props) {
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
   const selectNode = useEditorStore((s) => s.selectNode);
+  const startInlineEdit = useEditorStore((s) => s.startInlineEdit);
   const isSelected = selectedNodeId === nodeId;
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const definition = get(nodeType);
+    const richtextProp = definition?.schema.find(
+      (p) => p.type === "richtext" || p.type === "textarea"
+    );
+    if (richtextProp) startInlineEdit(nodeId, richtextProp.key);
+  };
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `canvas-${nodeId}`,
@@ -33,10 +44,8 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
         cursor: "default",
         transition: "outline-color 0.1s",
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        selectNode(nodeId);
-      }}
+      onClick={(e) => { e.stopPropagation(); selectNode(nodeId); }}
+      onDoubleClick={handleDoubleClick}
     >
       {/* Poignée de déplacement */}
       <div
