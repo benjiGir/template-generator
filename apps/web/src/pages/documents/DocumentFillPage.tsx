@@ -4,6 +4,8 @@ import { api } from "@/api/client";
 import { useDocumentStore } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { FormFillMode } from "@/components/document/FormFillMode";
+import { InlineFillMode } from "@/components/document/InlineFillMode";
+import { FillModeToggle } from "@/components/document/FillModeToggle";
 import { buildDocumentWorkflowSteps, useDocumentWorkflow } from "./hooks/useDocumentWorkflow";
 
 const CURRENT_STEP = 1;
@@ -17,6 +19,7 @@ export function DocumentFillPage() {
   const document = useDocumentStore((s) => s.document);
   const save = useDocumentStore((s) => s.save);
   const isDirty = useDocumentStore((s) => s.isDirty);
+  const fillMode = useDocumentStore((s) => s.fillMode);
   const getCompletionPercent = useDocumentStore((s) => s.getCompletionPercent);
 
   const [loading, setLoading] = useState(true);
@@ -98,7 +101,17 @@ export function DocumentFillPage() {
         if (key) goToStep(key, id);
       }}
     >
-      <FormFillMode />
+      <div className="h-full flex flex-col overflow-hidden">
+        {/* Mode toggle */}
+        <div className="shrink-0 flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200">
+          <FillModeToggle />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          {fillMode === "form" ? <FormFillMode /> : <InlineFillMode />}
+        </div>
+      </div>
     </WorkflowLayout>
   );
 }
