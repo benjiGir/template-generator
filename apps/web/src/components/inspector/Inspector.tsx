@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEditorStore } from "@/store/editor-store";
-import { usePresetsStore } from "@/store/presets-store";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { get } from "@template-generator/component-registry/registry";
 import { findNode } from "@template-generator/shared/utils/tree";
 import type { ComponentNode } from "@template-generator/shared/types/template";
@@ -80,7 +82,11 @@ export function Inspector() {
   const removeNode = useEditorStore((s) => s.removeNode);
   const duplicateNode = useEditorStore((s) => s.duplicateNode);
   const selectNode = useEditorStore((s) => s.selectNode);
-  const createPreset = usePresetsStore((s) => s.createPreset);
+  const queryClient = useQueryClient();
+  const createPresetMutation = useMutation({
+    mutationFn: (data: Parameters<typeof api.presets.create>[0]) => api.presets.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
+  });
 
   const [showPresetDialog, setShowPresetDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<"props" | "theme">("props");
@@ -117,7 +123,7 @@ export function Inspector() {
 
   const handleSavePreset = async (label: string) => {
     if (!selectedNode) return;
-    await createPreset({
+    await createPresetMutation.mutateAsync({
       baseType: selectedNode.type,
       label,
       defaultProps: selectedNode.props,

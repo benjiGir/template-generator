@@ -1,14 +1,21 @@
 import { useDraggable } from "@dnd-kit/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 import type { PresetDragData } from "@/hooks/useDragAndDrop";
-import { usePresetsStore } from "@/store/presets-store";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 
 interface Props {
   preset: ComponentPreset;
 }
 
 export function PresetCard({ preset }: Props) {
-  const deletePreset = usePresetsStore((s) => s.deletePreset);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.presets.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
+  });
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `preset-${preset.id}`,
@@ -34,7 +41,7 @@ export function PresetCard({ preset }: Props) {
       </div>
       <button
         onPointerDown={(e) => e.stopPropagation()}
-        onClick={(e) => { e.stopPropagation(); deletePreset(preset.id); }}
+        onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(preset.id); }}
         className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 text-xs transition-opacity shrink-0 mt-0.5"
         title="Supprimer"
       >

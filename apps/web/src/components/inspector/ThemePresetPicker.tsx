@@ -1,38 +1,37 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Theme } from "@template-generator/shared/types/template";
 import { BUILTIN_THEMES } from "@template-generator/shared/themes/presets";
 import { api, type ThemeRecord } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { useEditorStore } from "@/store/editor-store";
 
 export function ThemePresetPicker() {
-  const [records, setRecords] = useState<ThemeRecord[]>([]);
+  const queryClient = useQueryClient();
   const currentThemeName = useEditorStore((s) => s.template?.theme.name);
   const updateTheme = useEditorStore((s) => s.updateTheme);
 
-  useEffect(() => {
-    api.themes.list()
-      .then(setRecords)
-      .catch(() => {
-        setRecords(
-          BUILTIN_THEMES.map((theme, i) => ({
-            id: String(i),
-            name: theme.name,
-            theme,
-            isBuiltin: true,
-            createdAt: "",
-          }))
-        );
-      });
-  }, []);
+  const { data: records = [] } = useQuery({
+    queryKey: queryKeys.themes.list(),
+    queryFn: () => api.themes.list(),
+    placeholderData: BUILTIN_THEMES.map((theme, i) => ({
+      id: String(i),
+      name: theme.name,
+      theme,
+      isBuiltin: true,
+      createdAt: "",
+    })),
+  });
 
-  const applyTheme = (theme: Theme) => {
-    updateTheme(theme);
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.themes.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.themes.list() }),
+  });
 
-  const handleDelete = async (record: ThemeRecord) => {
+  const applyTheme = (theme: Theme) => updateTheme(theme);
+
+  const handleDelete = (record: ThemeRecord) => {
     if (record.isBuiltin) return;
-    await api.themes.delete(record.id);
-    setRecords((prev) => prev.filter((r) => r.id !== record.id));
+    deleteMutation.mutate(record.id);
   };
 
   return (
@@ -51,7 +50,6 @@ export function ThemePresetPicker() {
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
               >
-                {/* Swatches */}
                 <div className="flex gap-1 mb-1.5">
                   {[
                     record.theme.colors.primary,
@@ -70,7 +68,6 @@ export function ThemePresetPicker() {
                 <p className="text-xs font-medium text-gray-700 truncate">{record.theme.name}</p>
               </button>
 
-              {/* Bouton supprimer pour les thèmes custom */}
               {!record.isBuiltin && (
                 <button
                   onClick={() => handleDelete(record)}

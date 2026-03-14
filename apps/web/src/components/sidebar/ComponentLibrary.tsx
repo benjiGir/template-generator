@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getAll } from "@template-generator/component-registry/registry";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
-import { usePresetsStore } from "@/store/presets-store";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { ComponentCard } from "./ComponentCard";
 import { PresetCard } from "./PresetCard";
 
@@ -17,11 +19,11 @@ const CATEGORY_LABELS: Record<ComponentCategory, string> = {
 export function ComponentLibrary() {
   const allComponents = getAll();
   const [search, setSearch] = useState("");
-  const { presets, fetchPresets } = usePresetsStore();
 
-  useEffect(() => {
-    fetchPresets();
-  }, [fetchPresets]);
+  const { data: presets = [] } = useQuery({
+    queryKey: queryKeys.presets.list(),
+    queryFn: () => api.presets.list(),
+  });
 
   const filtered = allComponents.filter(
     (def) =>
