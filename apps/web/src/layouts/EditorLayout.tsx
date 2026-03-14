@@ -95,7 +95,7 @@ export function EditorLayout() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="h-full flex flex-col overflow-hidden">
         <EditorToolbar onSave={handleSave} saving={saving} />
         <div className="flex flex-1 overflow-hidden">
           <div className="w-[280px] shrink-0 overflow-hidden">
