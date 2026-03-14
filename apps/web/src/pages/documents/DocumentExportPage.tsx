@@ -1,5 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
+import { useDocumentStore } from "@/store/document-store";
+import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { ExportPanel } from "@/components/document/ExportPanel";
+import { ComponentRenderer } from "@template-generator/component-registry/renderer";
+import { buildDocumentWorkflowSteps, useDocumentWorkflow } from "./hooks/useDocumentWorkflow";
+
+const CURRENT_STEP = 3;
 
 /** Converts CSS dimension strings (mm, cm, in, px) to pixels */
 function dimToPx(value: string): number {
@@ -9,46 +19,38 @@ function dimToPx(value: string): number {
   if (value.endsWith("px")) return parseFloat(value);
   return parseFloat(value) || 794;
 }
-import { api } from "@/api/client";
-import { useDocumentStore } from "@/store/document-store";
-import { WorkflowLayout } from "@/layouts/WorkflowLayout";
-import { ExportPanel } from "@/components/document/ExportPanel";
-import { ComponentRenderer } from "@template-generator/component-registry/renderer";
-import { buildDocumentWorkflowSteps, useDocumentWorkflow } from "./hooks/useDocumentWorkflow";
-
-const CURRENT_STEP = 3;
 
 export function DocumentExportPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { goToStep } = useDocumentWorkflow();
+  const queryClient = useQueryClient();
 
   const loadDocument = useDocumentStore((s) => s.loadDocument);
   const document = useDocumentStore((s) => s.document);
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: fetchedDoc, isLoading, isError } = useQuery({
+    queryKey: queryKeys.documents.detail(id!),
+    queryFn: () => api.documents.get(id!),
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    if (!id) return;
-    if (document?.id === id) {
-      setLoading(false);
-      return;
-    }
-    api.documents
-      .get(id)
-      .then((doc) => {
-        loadDocument(doc);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id, document?.id, loadDocument]);
+    if (fetchedDoc) loadDocument(fetchedDoc);
+  }, [fetchedDoc, loadDocument]);
 
-  if (loading) {
+  const finalizeMutation = useMutation({
+    mutationFn: () => api.documents.finalize(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents.detail(id!) });
+    },
+  });
+
+  const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
+
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement...</p>
@@ -56,10 +58,10 @@ export function DocumentExportPage() {
     );
   }
 
-  if (error || !document) {
+  if (isError || !document) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Document introuvable"}</p>
+        <p className="text-sm text-red-500">Document introuvable</p>
         <button onClick={() => navigate("/documents")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux documents
         </button>
@@ -67,13 +69,7 @@ export function DocumentExportPage() {
     );
   }
 
-  const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
   const mergedTemplate = getMergedTemplate();
-
-  const handleFinalize = async () => {
-    if (!id) return;
-    await api.documents.finalize(id);
-  };
 
   return (
     <WorkflowLayout
@@ -95,7 +91,7 @@ export function DocumentExportPage() {
           <ExportPanel
             documentName={document.name}
             mergedTemplate={mergedTemplate}
-            onFinalize={handleFinalize}
+            onFinalize={async () => { await finalizeMutation.mutateAsync(); }}
           />
         </div>
 

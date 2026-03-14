@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { useDocumentStore } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { FormFillMode } from "@/components/document/FormFillMode";
@@ -22,32 +24,20 @@ export function DocumentFillPage() {
   const fillMode = useDocumentStore((s) => s.fillMode);
   const getCompletionPercent = useDocumentStore((s) => s.getCompletionPercent);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.documents.detail(id!),
+    queryFn: () => api.documents.get(id!),
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    if (!id) return;
-    if (document?.id === id) {
-      setLoading(false);
-      return;
-    }
-    api.documents
-      .get(id)
-      .then((doc) => {
-        loadDocument(doc);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id, document?.id, loadDocument]);
+    if (data) loadDocument(data);
+  }, [data, loadDocument]);
 
   const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
   const completion = document ? getCompletionPercent() : 0;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement...</p>
@@ -55,10 +45,10 @@ export function DocumentFillPage() {
     );
   }
 
-  if (error || !document) {
+  if (isError || !document) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Document introuvable"}</p>
+        <p className="text-sm text-red-500">Document introuvable</p>
         <button onClick={() => navigate("/documents")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux documents
         </button>
@@ -67,8 +57,7 @@ export function DocumentFillPage() {
   }
 
   const handleSave = async () => {
-    setSaving(true);
-    try { await save(); } finally { setSaving(false); }
+    await save();
   };
 
   const footerActions = (
@@ -76,10 +65,10 @@ export function DocumentFillPage() {
       <span className="text-xs text-gray-400 mr-2">{completion}% rempli</span>
       <button
         onClick={handleSave}
-        disabled={!isDirty || saving}
+        disabled={!isDirty}
         className="px-3 py-1.5 text-sm font-medium rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        {saving ? "Sauvegarde..." : "Sauvegarder"}
+        Sauvegarder
       </button>
     </>
   );
@@ -102,12 +91,9 @@ export function DocumentFillPage() {
       }}
     >
       <div className="h-full flex flex-col overflow-hidden">
-        {/* Mode toggle */}
         <div className="shrink-0 flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200">
           <FillModeToggle />
         </div>
-
-        {/* Content */}
         <div className="flex-1 overflow-hidden">
           {fillMode === "form" ? <FormFillMode /> : <InlineFillMode />}
         </div>

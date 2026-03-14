@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { LayoutTemplate } from "lucide-react";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { buildDocumentWorkflowSteps } from "./hooks/useDocumentWorkflow";
 import type { TemplateSummary } from "@/api/client";
@@ -9,19 +12,15 @@ const CURRENT_STEP = 0;
 
 export function DocumentSelectPage() {
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState<TemplateSummary[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<TemplateSummary | null>(null);
   const [creating, setCreating] = useState(false);
 
   const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
 
-  useEffect(() => {
-    api.templates.list({ published: true }).then((list) => {
-      setTemplates(list);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+  const { data: templates = [], isLoading } = useQuery({
+    queryKey: queryKeys.templates.list({ published: true }),
+    queryFn: () => api.templates.list({ published: true }),
+  });
 
   const handleNext = async () => {
     if (!selected || creating) return;
@@ -54,9 +53,9 @@ export function DocumentSelectPage() {
       <div className="h-full overflow-y-auto bg-gray-50 p-8">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Choisissez un template</h2>
 
-        {loading && <p className="text-sm text-gray-400">Chargement...</p>}
+        {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
-        {!loading && templates.length === 0 && (
+        {!isLoading && templates.length === 0 && (
           <div className="text-center py-16">
             <p className="text-gray-400 text-sm mb-3">Aucun template publié disponible.</p>
             <button
@@ -75,19 +74,26 @@ export function DocumentSelectPage() {
               <button
                 key={t.id}
                 onClick={() => setSelected(t)}
-                className={`text-left p-4 rounded-lg border-2 transition-all bg-white ${
+                className={`text-left rounded-lg border-2 transition-all bg-white overflow-hidden ${
                   selected?.id === t.id
                     ? "border-blue-500 shadow-sm"
                     : "border-gray-200 hover:border-blue-300 hover:shadow-sm"
                 }`}
               >
-                <h3 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h3>
-                {t.description && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{t.description}</p>
-                )}
-                <p className="text-xs text-gray-400 mt-3">
-                  {fieldCount} champ{fieldCount !== 1 ? "s" : ""} à remplir
-                </p>
+                <div className={`w-full aspect-[210/297] flex items-center justify-center ${
+                  selected?.id === t.id ? "bg-blue-50" : "bg-gray-50"
+                }`}>
+                  <LayoutTemplate size={36} className={selected?.id === t.id ? "text-blue-200" : "text-gray-200"} />
+                </div>
+                <div className="p-3">
+                  <h3 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h3>
+                  {t.description && (
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{t.description}</p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    {fieldCount} champ{fieldCount !== 1 ? "s" : ""} à remplir
+                  </p>
+                </div>
               </button>
             );
           })}

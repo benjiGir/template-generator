@@ -1,29 +1,30 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api/client";
-import type { DocumentSummary } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 
 export function DocumentsListPage() {
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState<DocumentSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    api.documents.list().then((docs) => {
-      setDocuments(docs);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+  const { data: documents = [], isLoading } = useQuery({
+    queryKey: queryKeys.documents.list(),
+    queryFn: () => api.documents.list(),
+  });
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.documents.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() }),
+  });
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!confirm("Supprimer ce document ?")) return;
-    await api.documents.delete(id);
-    setDocuments((d) => d.filter((doc) => doc.id !== id));
+    deleteMutation.mutate(id);
   };
 
   return (
-    <div className="min-h-full bg-gray-50">
+    <div className="h-full overflow-y-auto bg-gray-50">
       <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Studio de Publication</h1>
         <button
@@ -35,9 +36,9 @@ export function DocumentsListPage() {
       </div>
 
       <div className="px-8 py-8">
-        {loading && <p className="text-sm text-gray-400">Chargement...</p>}
+        {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
-        {!loading && documents.length === 0 && (
+        {!isLoading && documents.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-400 text-sm mb-4">Aucun document. Commencez par choisir un template publié.</p>
             <button

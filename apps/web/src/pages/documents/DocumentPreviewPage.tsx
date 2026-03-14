@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { api } from "@/api/client";
+import { queryKeys } from "@/api/queryKeys";
 import { useDocumentStore } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { ComponentRenderer } from "@template-generator/component-registry/renderer";
@@ -21,28 +23,19 @@ export function DocumentPreviewPage() {
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
   const data = useDocumentStore((s) => s.data);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: fetchedDoc, isLoading, isError } = useQuery({
+    queryKey: queryKeys.documents.detail(id!),
+    queryFn: () => api.documents.get(id!),
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    if (!id) return;
-    if (document?.id === id) {
-      setLoading(false);
-      return;
-    }
-    api.documents
-      .get(id)
-      .then((doc) => {
-        loadDocument(doc);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(String(e));
-        setLoading(false);
-      });
-  }, [id, document?.id, loadDocument]);
+    if (fetchedDoc) loadDocument(fetchedDoc);
+  }, [fetchedDoc, loadDocument]);
 
-  if (loading) {
+  const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
+
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
         <p className="text-sm text-gray-400">Chargement...</p>
@@ -50,10 +43,10 @@ export function DocumentPreviewPage() {
     );
   }
 
-  if (error || !document) {
+  if (isError || !document) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">{error ?? "Document introuvable"}</p>
+        <p className="text-sm text-red-500">Document introuvable</p>
         <button onClick={() => navigate("/documents")} className="text-sm text-blue-600 hover:underline">
           ← Retour aux documents
         </button>
@@ -61,7 +54,6 @@ export function DocumentPreviewPage() {
     );
   }
 
-  const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
   const mergedTemplate = getMergedTemplate();
   const completion = getCompletionPercent();
 
