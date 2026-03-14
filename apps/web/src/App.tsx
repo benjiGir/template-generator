@@ -13,6 +13,8 @@ import { ComponentSavePage } from "@/pages/components/ComponentSavePage";
 import { DocumentsListPage } from "@/pages/documents/DocumentsListPage";
 import { DocumentSelectPage } from "@/pages/documents/DocumentSelectPage";
 import { DocumentFillPage } from "@/pages/documents/DocumentFillPage";
+import { DocumentPreviewPage } from "@/pages/documents/DocumentPreviewPage";
+import { DocumentExportPage } from "@/pages/documents/DocumentExportPage";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,8 @@ const router = createBrowserRouter([
       { path: "/documents",                element: <DocumentsListPage /> },
       { path: "/documents/new",            element: <DocumentSelectPage /> },
       { path: "/documents/:id/fill",       element: <DocumentFillPage /> },
+      { path: "/documents/:id/preview",    element: <DocumentPreviewPage /> },
+      { path: "/documents/:id/export",     element: <DocumentExportPage /> },
     ],
   },
 ]);
