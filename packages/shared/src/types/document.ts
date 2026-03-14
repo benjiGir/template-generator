@@ -19,5 +19,8 @@ export interface Document {
   name: string;
   data: Record<string, unknown>;
   templateSnapshot: Template;
+  status: "draft" | "finalized";
+  completionPercent: number;
+  updatedAt: string;
   createdAt: string;
 }

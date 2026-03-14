@@ -6,17 +6,23 @@ import { eq } from "drizzle-orm";
 const router = new Hono();
 
 router.get("/", async (c) => {
-  const result = await db
+  const publishedFilter = c.req.query("published");
+  let query = db
     .select({
       id:          templates.id,
       name:        templates.name,
       description: templates.description,
       published:   templates.published,
+      editableFields: templates.editableFields,
       createdAt:   templates.createdAt,
       updatedAt:   templates.updatedAt,
     })
     .from(templates)
-    .orderBy(templates.updatedAt);
+    .$dynamic();
+  if (publishedFilter === "true") {
+    query = query.where(eq(templates.published, true));
+  }
+  const result = await query.orderBy(templates.updatedAt);
   return c.json(result);
 });
 

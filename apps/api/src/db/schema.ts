@@ -34,10 +34,13 @@ export const themes = pgTable("themes", {
 });
 
 export const documents = pgTable("documents", {
-  id:               uuid("id").primaryKey().defaultRandom(),
-  templateId:       uuid("template_id").references(() => templates.id),
-  name:             text("name").notNull(),
-  data:             jsonb("data").notNull(),
-  templateSnapshot: jsonb("template_snapshot").notNull(),
-  createdAt:        timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  id:                uuid("id").primaryKey().defaultRandom(),
+  templateId:        uuid("template_id").references(() => templates.id),
+  name:              text("name").notNull(),
+  data:              jsonb("data").notNull(),
+  templateSnapshot:  jsonb("template_snapshot").notNull(),
+  status:            text("status").default("draft").notNull(),
+  completionPercent: jsonb("completion_percent").default(0).notNull(),
+  updatedAt:         timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt:         timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });

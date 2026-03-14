@@ -11,6 +11,8 @@ import { ComponentSelectPage } from "@/pages/components/ComponentSelectPage";
 import { ComponentEditPage } from "@/pages/components/ComponentEditPage";
 import { ComponentSavePage } from "@/pages/components/ComponentSavePage";
 import { DocumentsListPage } from "@/pages/documents/DocumentsListPage";
+import { DocumentSelectPage } from "@/pages/documents/DocumentSelectPage";
+import { DocumentFillPage } from "@/pages/documents/DocumentFillPage";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
       { path: "/components/new/edit",      element: <ComponentEditPage /> },
       { path: "/components/new/save",      element: <ComponentSavePage /> },
       { path: "/documents",                element: <DocumentsListPage /> },
+      { path: "/documents/new",            element: <DocumentSelectPage /> },
+      { path: "/documents/:id/fill",       element: <DocumentFillPage /> },
     ],
   },
 ]);
