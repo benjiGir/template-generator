@@ -18,6 +18,10 @@ interface Props {
   /** Composant à mettre en évidence (et à amener à l'écran quand il change) */
   highlightNodeId?: string | null;
   highlightTone?: "focus" | "warning";
+  /** Zones repérées en permanence, discrètement (ex. : contenus retenus comme champs) */
+  outlineNodeIds?: string[];
+  /** Curseur « main » sur les composants : l'aperçu sert à désigner des zones */
+  pickable?: boolean;
   renderNodes?: (nodes: ComponentNode[], theme: Theme, page: TemplatePage) => ReactNode;
   onBackgroundClick?: MouseEventHandler<HTMLDivElement>;
   /** Contenu affiché au-dessus du document, dans la zone de défilement */
@@ -28,7 +32,20 @@ interface Props {
  * Zone de document d'un écran d'édition ou de relecture : fond neutre (la « chrome »),
  * pages réduites pour tenir en largeur, et repère sur le composant en cours.
  */
-export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", renderNodes, onBackgroundClick, header }: Props) {
+/** Union des boîtes rendues par un composant (son repère est en display: contents) */
+function measureNode(el: HTMLElement, nodeId: string): Rect | null {
+  const marker = el.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+  const boxes = marker ? Array.from(marker.children).map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0 || r.height > 0) : [];
+  if (boxes.length === 0) return null;
+  const container = el.getBoundingClientRect();
+  const top = Math.min(...boxes.map((b) => b.top));
+  const left = Math.min(...boxes.map((b) => b.left));
+  const bottom = Math.max(...boxes.map((b) => b.bottom));
+  const right = Math.max(...boxes.map((b) => b.right));
+  return { top: top - container.top + el.scrollTop, left: left - container.left + el.scrollLeft, width: right - left, height: bottom - top };
+}
+
+export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, pickable = false, renderNodes, onBackgroundClick, header }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -45,38 +62,23 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
   const pageWidthPx = dimToPx(template.pageFormat.width);
   const zoom = width > 0 ? Math.min(1, (width - PADDING) / pageWidthPx) : 1;
 
-  // Position du repère : union des boîtes rendues par le composant (son repère est en display: contents)
+  const [outlines, setOutlines] = useState<Rect[]>([]);
+  const outlineKey = outlineNodeIds?.join("|") ?? "";
+
+  // Positions des repères, recalculées quand la mise en page change
   useLayoutEffect(() => {
     const el = scrollRef.current;
-    if (!el || !highlightNodeId) {
-      setRect(null);
-      return;
-    }
+    if (!el) return;
     const measure = () => {
-      const marker = el.querySelector(`[data-node-id="${CSS.escape(highlightNodeId)}"]`);
-      const boxes = marker ? Array.from(marker.children).map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0 || r.height > 0) : [];
-      if (boxes.length === 0) {
-        setRect(null);
-        return;
-      }
-      const container = el.getBoundingClientRect();
-      const top = Math.min(...boxes.map((b) => b.top));
-      const left = Math.min(...boxes.map((b) => b.left));
-      const bottom = Math.max(...boxes.map((b) => b.bottom));
-      const right = Math.max(...boxes.map((b) => b.right));
-      setRect({
-        top: top - container.top + el.scrollTop,
-        left: left - container.left + el.scrollLeft,
-        width: right - left,
-        height: bottom - top,
-      });
+      setRect(highlightNodeId ? measureNode(el, highlightNodeId) : null);
+      setOutlines(outlineKey ? outlineKey.split("|").map((id) => measureNode(el, id)).filter((r): r is Rect => r !== null) : []);
     };
     measure();
     const observer = new ResizeObserver(measure);
     const content = el.firstElementChild;
     if (content) observer.observe(content);
     return () => observer.disconnect();
-  }, [highlightNodeId, template, zoom]);
+  }, [highlightNodeId, outlineKey, template, zoom]);
 
   // Amène le composant à l'écran quand on change de cible (pas à chaque frappe)
   const scrolledFor = useRef<string | null>(null);
@@ -95,11 +97,24 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
   }, [highlightNodeId]);
 
   return (
-    <div ref={scrollRef} className="relative h-full overflow-auto bg-slate-200/70 p-8" onClick={onBackgroundClick}>
+    <div
+      ref={scrollRef}
+      data-pickable={pickable || undefined}
+      className="relative h-full overflow-auto bg-slate-200/70 p-8"
+      onClick={onBackgroundClick}
+    >
       <div>
         {header}
         <DocumentView template={template} renderNodes={renderNodes} zoom={zoom} />
       </div>
+      {outlines.map((r, i) => (
+        <div
+          key={i}
+          aria-hidden
+          className="pointer-events-none absolute rounded-sm bg-emerald-400/5 outline-1 outline-offset-1 outline-emerald-500/70 outline-dashed"
+          style={{ top: r.top, left: r.left, width: r.width, height: r.height }}
+        />
+      ))}
       {rect && (
         <div
           aria-hidden

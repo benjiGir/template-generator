@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Aperçu servant à désigner des zones (Atelier, champs remplissables) */
+[data-pickable] [data-node-id] > * {
+  cursor: pointer;
+}
+
 /*
  * Impression : seul le portail d'impression (usePrintDocument) est imprimé.
  * Il contient le document rendu à l'échelle 1 avec les mêmes composants qu'à l'écran.

@@ -14,9 +14,16 @@ interface Props {
 /** Types pour lesquels le contenu du template est montré en grisé plutôt que comme valeur */
 const PLACEHOLDER_TYPES = new Set(["text", "textarea", "richtext", "list"]);
 
+/** Texte lisible du contenu par défaut (le Markdown du texte enrichi est retiré) */
 function defaultAsText(value: unknown): string {
   if (Array.isArray(value)) return value.filter(Boolean).join(" · ");
-  return typeof value === "string" ? value : "";
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/(\*\*|__|\*|_|`)(.+?)\1/g, "$2")
+    .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /**
