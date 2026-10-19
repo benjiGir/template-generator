@@ -189,7 +189,7 @@ export function WorkflowLayout({
   const heading = (
     <div className="min-w-0">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{workflow.space}</p>
-      <p className="truncate text-sm font-semibold text-gray-900">{title ?? "Nouveau"}</p>
+      <div className="truncate text-sm font-semibold text-gray-900">{title ?? "Nouveau"}</div>
     </div>
   );
 

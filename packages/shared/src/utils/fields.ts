@@ -51,6 +51,20 @@ export function mergeDocumentData(snapshot: Template, data: Record<string, unkno
   return merged;
 }
 
+/**
+ * La valeur par défaut d'un champ est le contenu actuel du composant dans le template :
+ * c'est ce que le document affiche tant que rien n'est saisi.
+ */
+export function withNodeDefaults(fields: EditableField[], pages: Template["pages"]): EditableField[] {
+  return fields.map((field) => {
+    for (const page of pages) {
+      const node = findNode(page.children, field.nodeId);
+      if (node) return field.propKey in node.props ? { ...field, defaultValue: node.props[field.propKey] } : field;
+    }
+    return field;
+  });
+}
+
 /** Fige l'état courant d'un template pour publication */
 export function buildPublishedVersion(template: Pick<Template, "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields">): PublishedVersion {
   return structuredClone({
@@ -59,7 +73,7 @@ export function buildPublishedVersion(template: Pick<Template, "name" | "descrip
     theme:          template.theme,
     pageFormat:     template.pageFormat,
     pages:          template.pages,
-    editableFields: template.editableFields,
+    editableFields: withNodeDefaults(template.editableFields, template.pages),
   });
 }
 

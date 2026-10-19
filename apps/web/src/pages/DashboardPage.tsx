@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { LayoutTemplate, Puzzle, FileText } from "lucide-react";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
-import { DocumentStatusBadge, TemplateStatusBadge } from "@/components/ui/StatusBadge";
+import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
+import { DocumentCard } from "@/components/document/DocumentCard";
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -12,24 +13,15 @@ export function DashboardPage() {
   const { data: templateSummaries = [] } = useQuery({
     queryKey: queryKeys.templates.list(),
     queryFn: () => api.templates.list(),
-    select: (list) => list.slice(0, 6),
+    select: (list) => list.slice(0, 4),
   });
 
+  // Le dashboard est un point de reprise : les brouillons d'abord, puis les plus récents
   const { data: recentDocuments = [] } = useQuery({
     queryKey: queryKeys.documents.list(),
     queryFn: () => api.documents.list(),
-    select: (list) => list.slice(0, 6),
+    select: (list) => [...list].sort((a, b) => Number(b.status === "draft") - Number(a.status === "draft")).slice(0, 6),
   });
-
-  const templateDetailQueries = useQueries({
-    queries: templateSummaries.map((t) => ({
-      queryKey: queryKeys.templates.detail(t.id),
-      queryFn: (): Promise<import("@template-generator/shared/types/template").Template> =>
-        api.templates.get(t.id),
-    })),
-  });
-
-  const recentTemplates = templateDetailQueries.flatMap((q) => (q.data ? [q.data] : []));
 
   return (
     <div className="h-full bg-gray-50 overflow-y-auto">
@@ -70,31 +62,8 @@ export function DashboardPage() {
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Documents récents</h2>
               <Link to="/documents" className="text-xs text-blue-600 hover:underline">Voir tous</Link>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {recentDocuments.map((doc) => (
-                <button
-                  key={doc.id}
-                  onClick={() => navigate(`/documents/${doc.id}`)}
-                  className="text-left bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-semibold text-gray-900 truncate flex-1">{doc.name}</span>
-                    <DocumentStatusBadge document={doc} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full"
-                        style={{ width: `${doc.completionPercent}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-gray-400 shrink-0">{doc.completionPercent}%</span>
-                  </div>
-                  <p className="text-[11px] text-gray-400 mt-2">
-                    {new Date(doc.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-4">
+              {recentDocuments.map((doc) => <DocumentCard key={doc.id} doc={doc} compact />)}
             </div>
           </section>
         )}
@@ -108,7 +77,6 @@ export function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 gap-3">
               {templateSummaries.map((summary) => {
-                const fullTemplate = recentTemplates.find((t) => t.id === summary.id);
                 return (
                   <button
                     key={summary.id}
@@ -116,8 +84,8 @@ export function DashboardPage() {
                     className="text-left bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all overflow-hidden"
                   >
                     <div className="w-full overflow-hidden border-b border-gray-100 bg-gray-50">
-                      {fullTemplate ? (
-                        <DocumentThumbnail template={fullTemplate} width={220} />
+                      {summary.preview ? (
+                        <DocumentThumbnail template={summary.preview} width={220} />
                       ) : (
                         <div className="aspect-[210/297] flex items-center justify-center">
                           <LayoutTemplate size={24} className="text-gray-200" />

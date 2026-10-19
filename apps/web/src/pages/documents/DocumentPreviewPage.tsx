@@ -1,45 +1,64 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useDocumentStore } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
-import { DocumentView } from "@/components/document-view/DocumentView";
+import { DocumentTitle } from "@/components/document/DocumentTitle";
+import { FOCUS_PARAM } from "@/components/document/FormFillMode";
+import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
-import { computeCompletion } from "@template-generator/shared/utils/fields";
+import { computeCompletion, fieldKey } from "@template-generator/shared/utils/fields";
 
+/** Relecture : le document tel qu'il sortira en PDF, sans aucun outil d'édition */
 export function DocumentPreviewPage() {
   const document = useDocumentStore((s) => s.document)!;
   const editableFields = useDocumentStore((s) => s.editableFields);
   const data = useDocumentStore((s) => s.data);
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
+  const [hovered, setHovered] = useState<string | null>(null);
 
   const mergedTemplate = getMergedTemplate();
   const { missingRequired } = computeCompletion(editableFields, data);
   const fillPath = DOCUMENT_WORKFLOW.steps[1]!.path(document.id);
 
   return (
-    <WorkflowLayout workflow={DOCUMENT_WORKFLOW} current="preview" entityId={document.id} title={document.name}>
+    <WorkflowLayout workflow={DOCUMENT_WORKFLOW} current="preview" entityId={document.id} title={<DocumentTitle />}>
       <div className="flex h-full flex-col overflow-hidden">
-        <div className="flex shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-5 py-2 text-xs">
+        <div
+          className={`flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b px-5 py-2 text-xs ${
+            missingRequired.length > 0 ? "border-amber-200 bg-amber-50" : "border-emerald-100 bg-emerald-50"
+          }`}
+        >
           {missingRequired.length > 0 ? (
-            <span className="flex items-center gap-1.5 text-amber-700">
-              <AlertTriangle size={13} />
-              {missingRequired.length} champ{missingRequired.length > 1 ? "s" : ""} obligatoire{missingRequired.length > 1 ? "s" : ""} vide{missingRequired.length > 1 ? "s" : ""} :
+            <>
+              <span className="flex items-center gap-1.5 font-medium text-amber-800">
+                <AlertTriangle size={13} />
+                {missingRequired.length} champ{missingRequired.length > 1 ? "s" : ""} obligatoire{missingRequired.length > 1 ? "s" : ""} vide{missingRequired.length > 1 ? "s" : ""} :
+              </span>
               {missingRequired.map((f) => (
-                <Link key={`${f.nodeId}.${f.propKey}`} to={fillPath} className="font-medium underline hover:no-underline">
+                <Link
+                  key={fieldKey(f)}
+                  to={`${fillPath}?${FOCUS_PARAM}=${encodeURIComponent(fieldKey(f))}`}
+                  onMouseEnter={() => setHovered(f.nodeId)}
+                  onMouseLeave={() => setHovered(null)}
+                  onFocus={() => setHovered(f.nodeId)}
+                  onBlur={() => setHovered(null)}
+                  className="rounded bg-white px-1.5 py-0.5 font-medium text-amber-900 ring-1 ring-amber-200 hover:ring-amber-400"
+                >
                   {f.label}
                 </Link>
               ))}
-              <span className="text-gray-400">— vous pouvez quand même exporter.</span>
-            </span>
+              <span className="text-amber-700/80">Vous pouvez tout de même exporter.</span>
+            </>
           ) : (
-            <span className="flex items-center gap-1.5 text-emerald-700">
+            <span className="flex items-center gap-1.5 font-medium text-emerald-800">
               <CheckCircle2 size={13} />
-              Tous les champs obligatoires sont remplis. Le document s'affiche exactement comme dans le PDF.
+              Tout est rempli. Voici exactement le document qui sera exporté.
             </span>
           )}
         </div>
-        <div className="flex-1 overflow-y-auto bg-slate-200/70 p-8">
-          {mergedTemplate && <DocumentView template={mergedTemplate} />}
+        <div className="min-h-0 flex-1">
+          {mergedTemplate && <PreviewPane template={mergedTemplate} highlightNodeId={hovered} highlightTone="warning" />}
         </div>
       </div>
     </WorkflowLayout>

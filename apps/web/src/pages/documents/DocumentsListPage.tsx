@@ -1,15 +1,30 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Copy, Trash2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { api, type DocumentSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { DocumentStatusBadge } from "@/components/ui/StatusBadge";
+import { DocumentCard } from "@/components/document/DocumentCard";
+import { documentDisplayStatus } from "@template-generator/shared/utils/fields";
+import type { DocumentDisplayStatus } from "@template-generator/shared/types/document";
+
+type StatusFilter = "all" | DocumentDisplayStatus;
+
+const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: "all",                   label: "Tous" },
+  { value: "draft",                 label: "Brouillons" },
+  { value: "finalized",             label: "Finalisés" },
+  { value: "modified-after-export", label: "Modifiés depuis l'export" },
+];
 
 export function DocumentsListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [template, setTemplate] = useState<string>("all");
 
   const { data: documents = [], isLoading, error } = useQuery({
     queryKey: queryKeys.documents.list(),
@@ -29,8 +44,7 @@ export function DocumentsListPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() }),
   });
 
-  const handleDelete = async (e: React.MouseEvent, doc: DocumentSummary) => {
-    e.stopPropagation();
+  const handleDelete = async (doc: DocumentSummary) => {
     const ok = await confirm({
       title: `Supprimer « ${doc.name} » ?`,
       consequences: [
@@ -42,6 +56,22 @@ export function DocumentsListPage() {
     });
     if (ok) deleteMutation.mutate(doc.id);
   };
+
+  const templateNames = Array.from(new Set(documents.map((d) => d.templateName).filter((n): n is string => !!n))).sort();
+  const counts = new Map<StatusFilter, number>([["all", documents.length]]);
+  for (const d of documents) {
+    const s = documentDisplayStatus(d);
+    counts.set(s, (counts.get(s) ?? 0) + 1);
+  }
+
+  const query = search.trim().toLowerCase();
+  const filtered = documents.filter(
+    (d) =>
+      (status === "all" || documentDisplayStatus(d) === status) &&
+      (template === "all" || d.templateName === template) &&
+      (!query || `${d.name} ${d.templateName ?? ""}`.toLowerCase().includes(query))
+  );
+  const filtersActive = status !== "all" || template !== "all" || query !== "";
 
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
@@ -58,7 +88,46 @@ export function DocumentsListPage() {
         </button>
       </div>
 
-      <div className="px-8 py-8">
+      {documents.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 border-b border-gray-100 bg-white px-8 py-2.5">
+          <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-0.5" role="group" aria-label="Filtrer par statut">
+            {STATUS_FILTERS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setStatus(f.value)}
+                aria-pressed={status === f.value}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  status === f.value ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                {f.label} <span className="text-gray-400">{counts.get(f.value) ?? 0}</span>
+              </button>
+            ))}
+          </div>
+          {templateNames.length > 1 && (
+            <select
+              value={template}
+              onChange={(e) => setTemplate(e.target.value)}
+              aria-label="Filtrer par template"
+              className="rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 focus:border-blue-400 focus:outline-none"
+            >
+              <option value="all">Tous les templates</option>
+              {templateNames.map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          )}
+          <label className="ml-auto flex w-64 items-center gap-2 rounded-md border border-gray-200 px-2.5 py-1.5 focus-within:border-blue-400">
+            <Search size={14} className="text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Rechercher un document…"
+              className="min-w-0 flex-1 text-xs focus:outline-none"
+            />
+          </label>
+        </div>
+      )}
+
+      <div className="px-8 py-6">
         {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
         {error && <p className="text-sm text-red-500">Impossible de charger les documents.</p>}
 
@@ -75,52 +144,21 @@ export function DocumentsListPage() {
           </div>
         )}
 
-        <div className="grid max-w-5xl grid-cols-3 gap-4">
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              onClick={() => navigate(`/documents/${doc.id}`)}
-              className="group cursor-pointer rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-blue-300 hover:shadow-sm"
+        {documents.length > 0 && filtered.length === 0 && filtersActive && (
+          <p className="py-16 text-center text-sm text-gray-500">
+            Aucun document ne correspond à ces filtres.{" "}
+            <button
+              onClick={() => { setSearch(""); setStatus("all"); setTemplate("all"); }}
+              className="text-blue-600 hover:underline"
             >
-              <div className="flex items-start justify-between">
-                <div className="min-w-0 flex-1">
-                  <div className="mb-0.5 flex items-center gap-2">
-                    <h3 className="truncate text-sm font-semibold text-gray-900">{doc.name}</h3>
-                    <DocumentStatusBadge document={doc} />
-                  </div>
-                  {doc.templateName && <p className="truncate text-xs text-gray-500">{doc.templateName}</p>}
-                  {doc.status === "draft" && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
-                        <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${doc.completionPercent}%` }} />
-                      </div>
-                      <span className="shrink-0 text-[11px] text-gray-400">{doc.completionPercent}%</span>
-                    </div>
-                  )}
-                </div>
-                <div className="ml-2 flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate(doc.id); }}
-                    className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-blue-600"
-                    title="Dupliquer pour une nouvelle édition"
-                    aria-label={`Dupliquer ${doc.name}`}
-                  >
-                    <Copy size={14} />
-                  </button>
-                  <button
-                    onClick={(e) => handleDelete(e, doc)}
-                    className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                    title="Supprimer"
-                    aria-label={`Supprimer ${doc.name}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-gray-400">
-                Modifié le {new Date(doc.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
-              </p>
-            </div>
+              Réinitialiser les filtres
+            </button>
+          </p>
+        )}
+
+        <div className="grid max-w-6xl grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+          {filtered.map((doc) => (
+            <DocumentCard key={doc.id} doc={doc} onDuplicate={(d) => duplicateMutation.mutate(d.id)} onDelete={handleDelete} />
           ))}
         </div>
       </div>

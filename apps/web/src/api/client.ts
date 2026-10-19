@@ -1,4 +1,4 @@
-import type { Template, EditableField, Theme } from "@template-generator/shared/types/template";
+import type { Template, EditableField, Theme, PageFormat, TemplatePage } from "@template-generator/shared/types/template";
 import type { ComponentPreset, Document } from "@template-generator/shared/types/document";
 
 export interface ThemeRecord {
@@ -26,6 +26,13 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/** Première page seulement : de quoi dessiner une miniature */
+export interface PagePreview {
+  theme: Theme;
+  pageFormat: PageFormat;
+  pages: TemplatePage[];
+}
+
 export interface TemplateSummary {
   id: string;
   name: string;
@@ -33,6 +40,8 @@ export interface TemplateSummary {
   published: boolean;
   publishedAt: string | null;
   editableFields?: EditableField[];
+  /** Version publiée pour le Studio, état de travail pour l'Atelier */
+  preview: PagePreview | null;
   documentCount: number;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +55,8 @@ export interface DocumentSummary {
   status: "draft" | "finalized";
   completionPercent: number;
   exportedAt: string | null;
+  preview: PagePreview & { editableFields: EditableField[] };
+  data: Record<string, unknown>;
   updatedAt: string;
   createdAt: string;
 }

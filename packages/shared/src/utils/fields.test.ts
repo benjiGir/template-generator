@@ -5,6 +5,7 @@ import {
   computeCompletion,
   mergeDocumentData,
   buildDocumentSnapshot,
+  buildPublishedVersion,
   templateStatus,
   documentDisplayStatus,
 } from "./fields";
@@ -84,6 +85,13 @@ describe("buildDocumentSnapshot", () => {
     expect(snap.name).toBe("Publié");
     expect(snap.pages).toEqual([]);
     expect(snap.publishedVersion).toBeNull();
+  });
+});
+
+describe("buildPublishedVersion", () => {
+  it("prend la valeur par défaut des champs dans le composant", () => {
+    const version = buildPublishedVersion(template({ editableFields: [{ ...field("n1", "title"), defaultValue: "" }] }));
+    expect(version.editableFields[0]!.defaultValue).toBe("Défaut");
   });
 });
 

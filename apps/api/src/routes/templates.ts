@@ -14,8 +14,23 @@ const WRITABLE_FIELDS = ["name", "description", "theme", "pageFormat", "pages", 
 // Noms qualifiés explicitement : dans une sous-requête, drizzle ne préfixe pas les colonnes
 const documentCount = sql<number>`(select count(*)::int from "documents" where "documents"."template_id" = "templates"."id")`;
 
+/** Première page de travail, pour les miniatures de l'Atelier */
+const workingPreview = sql<unknown>`jsonb_build_object(
+  'theme', "templates"."theme",
+  'pageFormat', "templates"."page_format",
+  'pages', jsonb_path_query_array("templates"."pages", '$[0]')
+)`;
+
+/** Première page de la version publiée, pour le Studio */
+const publishedPreview = sql<unknown>`case when "templates"."published_version" is null then null else jsonb_build_object(
+  'theme', "templates"."published_version" -> 'theme',
+  'pageFormat', "templates"."published_version" -> 'pageFormat',
+  'pages', jsonb_path_query_array("templates"."published_version" -> 'pages', '$[0]')
+) end`;
+
 router.get("/", async (c) => {
   const publishedFilter = c.req.query("published");
+  const studio = publishedFilter === "true";
   let query = db
     .select({
       id:             templates.id,
@@ -23,14 +38,18 @@ router.get("/", async (c) => {
       description:    templates.description,
       published:      templates.published,
       publishedAt:    templates.publishedAt,
-      editableFields: templates.editableFields,
+      // Le Studio voit les champs de la version publiée, l'Atelier ceux de l'état de travail
+      editableFields: studio
+        ? sql<unknown>`coalesce("templates"."published_version" -> 'editableFields', "templates"."editable_fields")`
+        : templates.editableFields,
+      preview:        studio ? publishedPreview : workingPreview,
       documentCount,
       createdAt:      templates.createdAt,
       updatedAt:      templates.updatedAt,
     })
     .from(templates)
     .$dynamic();
-  if (publishedFilter === "true") {
+  if (studio) {
     query = query.where(eq(templates.published, true));
   }
   const result = await query.orderBy(desc(templates.updatedAt));

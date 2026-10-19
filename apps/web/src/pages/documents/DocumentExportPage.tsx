@@ -5,8 +5,9 @@ import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useDocumentStore } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { DocumentTitle } from "@/components/document/DocumentTitle";
 import { ExportPanel } from "@/components/document/ExportPanel";
-import { DocumentThumbnail } from "@/components/document-view/DocumentView";
+import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { usePrintDocument, type PrintFormat } from "@/components/document-view/usePrintDocument";
 import { useWorkflowSession } from "@/workflow/session";
 import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
@@ -40,7 +41,7 @@ export function DocumentExportPage() {
       workflow={DOCUMENT_WORKFLOW}
       current="export"
       entityId={document.id}
-      title={document.name}
+      title={<DocumentTitle />}
       finalAction={{ label: exportedAt ? "Exporter à nouveau" : "Exporter en PDF", icon: <FileDown size={15} />, onClick: handleExport }}
     >
       <div className="flex h-full overflow-hidden">
@@ -54,8 +55,8 @@ export function DocumentExportPage() {
             editPath={DOCUMENT_WORKFLOW.steps[1]!.path(document.id)}
           />
         </aside>
-        <div className="flex flex-1 justify-center overflow-y-auto bg-slate-200/70 p-8">
-          <DocumentThumbnail template={mergedTemplate} width={520} pages={mergedTemplate.pages.length} fullHeight />
+        <div className="min-w-0 flex-1">
+          <PreviewPane template={mergedTemplate} />
         </div>
       </div>
       {printNode}

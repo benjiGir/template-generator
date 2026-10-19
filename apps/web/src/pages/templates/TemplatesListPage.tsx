@@ -5,6 +5,7 @@ import { api, type TemplateSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
+import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 
 export function TemplatesListPage() {
   const navigate = useNavigate();
@@ -91,8 +92,14 @@ export function TemplatesListPage() {
               onClick={() => navigate(`/templates/${t.id}/build`)}
               className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-sm"
             >
-              <div className="flex aspect-[210/297] w-full items-center justify-center border-b border-gray-100 bg-gray-50">
-                <LayoutTemplate size={32} className="text-gray-200" />
+              <div className="flex h-[200px] w-full justify-center overflow-hidden border-b border-gray-100 bg-slate-100 px-5 pt-4">
+                {t.preview ? (
+                  <div className="overflow-hidden rounded-t shadow-sm">
+                    <DocumentThumbnail template={t.preview} width={240} cropHeight={184} />
+                  </div>
+                ) : (
+                  <LayoutTemplate size={32} className="mt-16 text-gray-200" />
+                )}
               </div>
               <div className="p-3">
                 <div className="flex items-start justify-between">

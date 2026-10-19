@@ -1,64 +1,116 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useDocumentStore } from "@/store/document-store";
-import { DocumentView } from "@/components/document-view/DocumentView";
-import { FormField } from "./FormField";
+import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { FormFieldGroup } from "./FormFieldGroup";
+import { computeCompletion, fieldKey } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
+
+/** Paramètre d'URL pour arriver directement sur un champ (depuis la relecture) */
+export const FOCUS_PARAM = "champ";
 
 export function FormFillMode() {
   const editableFields = useDocumentStore((s) => s.editableFields);
   const data = useDocumentStore((s) => s.data);
   const updateField = useDocumentStore((s) => s.updateField);
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [active, setActive] = useState<EditableField | null>(null);
 
   const mergedTemplate = getMergedTemplate();
+  const completion = computeCompletion(editableFields, data);
 
-  // Group fields
-  const grouped = new Map<string, EditableField[]>();
-  for (const field of editableFields) {
-    const g = field.group ?? "Général";
-    if (!grouped.has(g)) grouped.set(g, []);
-    grouped.get(g)!.push(field);
+  // Arrivée depuis la relecture : on cible le champ demandé
+  useEffect(() => {
+    const target = searchParams.get(FOCUS_PARAM);
+    if (!target) return;
+    const field = editableFields.find((f) => fieldKey(f) === target);
+    if (field) focusField(field);
+    setSearchParams((p) => { p.delete(FOCUS_PARAM); return p; }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function focusField(field: EditableField) {
+    setActive(field);
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`field-${fieldKey(field)}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.querySelector<HTMLElement>("input, textarea, [contenteditable=true]")?.focus({ preventScroll: true });
+    });
   }
 
-  const isGrouped = grouped.size > 1 || !grouped.has("Général");
+  // Clic dans l'aperçu : on remonte au composant cliqué et on ouvre son premier champ
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    let el = e.target as HTMLElement | null;
+    while (el) {
+      const nodeId = el.dataset?.["nodeId"];
+      if (nodeId) {
+        const field = editableFields.find((f) => f.nodeId === nodeId);
+        if (field) return focusField(field);
+      }
+      el = el.parentElement;
+    }
+  };
+
+  // Groupes dans l'ordre du formulaire défini par le concepteur
+  const groups = new Map<string | null, EditableField[]>();
+  for (const field of editableFields) {
+    const g = field.group ?? null;
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g)!.push(field);
+  }
+  const ungroupedOnly = groups.size === 1 && groups.has(null);
+  const remaining = completion.total - completion.filled;
 
   return (
-    <div className="h-full flex overflow-hidden">
-      {/* Left: form */}
-      <div className="w-[420px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-5">
-        {editableFields.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">
-            Ce template n'a aucun champ éditable configuré.
-          </p>
-        ) : isGrouped ? (
-          <div className="space-y-3">
-            {Array.from(grouped.entries()).map(([group, fields]) => (
-              <FormFieldGroup
-                key={group}
-                group={group}
-                fields={fields}
-                data={data}
-                onUpdate={updateField}
-              />
-            ))}
+    <div className="flex h-full overflow-hidden">
+      <aside className="flex w-[420px] shrink-0 flex-col border-r border-gray-200 bg-white">
+        <div className="shrink-0 border-b border-gray-100 px-5 py-3">
+          <div className="mb-1.5 flex items-baseline justify-between text-xs">
+            <span className="font-medium text-gray-700">
+              {remaining === 0 ? "Tous les champs sont remplis" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""} à remplir`}
+            </span>
+            <span className="text-gray-400">{completion.filled}/{completion.total}</span>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {(grouped.get("Général") ?? []).map((field) => (
-              <FormField
-                key={`${field.nodeId}.${field.propKey}`}
-                field={field}
-                value={data[`${field.nodeId}.${field.propKey}`]}
-                onChange={(v) => updateField(`${field.nodeId}.${field.propKey}`, v)}
-              />
-            ))}
+          <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${completion.percent}%` }} />
           </div>
-        )}
-      </div>
+          {completion.missingRequired.length > 0 && (
+            <button
+              type="button"
+              onClick={() => focusField(completion.missingRequired[0]!)}
+              className="mt-2 text-xs text-amber-700 hover:underline"
+            >
+              {completion.missingRequired.length} champ{completion.missingRequired.length > 1 ? "s" : ""} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""} — aller au premier
+            </button>
+          )}
+        </div>
 
-      {/* Right: live preview */}
-      <div className="flex-1 overflow-y-auto bg-slate-200/70 p-8">
-        {mergedTemplate && <DocumentView template={mergedTemplate} />}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {editableFields.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-400">Ce template n'a aucun champ à remplir.</p>
+          ) : (
+            <div className="space-y-3">
+              {Array.from(groups.entries()).map(([group, fields]) => (
+                <FormFieldGroup
+                  key={group ?? "__"}
+                  group={ungroupedOnly ? null : group ?? "Autres champs"}
+                  fields={fields}
+                  data={data}
+                  onUpdate={updateField}
+                  activeKey={active ? fieldKey(active) : null}
+                  onFocusField={setActive}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </aside>
+
+      <div className="min-w-0 flex-1">
+        {mergedTemplate && (
+          <PreviewPane template={mergedTemplate} highlightNodeId={active?.nodeId ?? null} onBackgroundClick={handlePreviewClick} />
+        )}
       </div>
     </div>
   );

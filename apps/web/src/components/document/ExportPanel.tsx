@@ -73,17 +73,43 @@ export function ExportPanel({ filename, onFilenameChange, format, onFormatChange
       <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
         <h3 className="text-xs font-semibold text-gray-800">Ce qui va se passer</h3>
         <p className="mt-1 text-xs text-gray-600">
-          La fenêtre d'impression de votre navigateur va s'ouvrir. Elle ne fait pas partie de DocForge :
+          La fenêtre d'impression de votre navigateur va s'ouvrir. Elle ne fait pas partie de DocForge ; réglez-la ainsi :
         </p>
-        <ol className="mt-2 space-y-1.5 text-xs text-gray-700">
-          <li><span className="font-semibold">1.</span> Destination : <span className="font-semibold">Enregistrer au format PDF</span></li>
-          <li><span className="font-semibold">2.</span> Marges : <span className="font-semibold">Aucune</span> (ou « Par défaut » si l'option n'existe pas)</li>
-          <li><span className="font-semibold">3.</span> Cliquez sur <span className="font-semibold">Enregistrer</span></li>
-        </ol>
-        <p className="mt-2 text-[11px] text-gray-500">
-          Les couleurs de fond sont incluses automatiquement. Le document sera marqué comme finalisé.
+        <PrintDialogIllustration />
+        <p className="mt-3 text-[11px] text-gray-500">
+          Puis cliquez sur <span className="font-semibold">Enregistrer</span>. Les couleurs de fond sont incluses automatiquement,
+          et le document sera marqué comme finalisé.
         </p>
       </section>
+    </div>
+  );
+}
+
+/** Maquette simplifiée de la boîte d'impression, réglages attendus mis en évidence */
+function PrintDialogIllustration() {
+  const row = (label: string, value: string, highlight: boolean, step?: number) => (
+    <div className="flex items-center justify-between gap-3 py-1.5">
+      <span className="flex items-center gap-1.5 text-[11px] text-gray-500">
+        {step && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white">{step}</span>}
+        {label}
+      </span>
+      <span
+        className={`min-w-[150px] rounded border px-2 py-0.5 text-[11px] ${
+          highlight ? "border-blue-500 bg-blue-50 font-semibold text-blue-800 ring-2 ring-blue-200" : "border-gray-200 bg-white text-gray-400"
+        }`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+  return (
+    <div className="mt-3 rounded-md border border-gray-300 bg-white p-3 shadow-sm" aria-label="Réglages à choisir dans la fenêtre d'impression">
+      <div className="mb-1 text-[11px] font-semibold text-gray-700">Imprimer</div>
+      {row("Destination", "Enregistrer au format PDF", true, 1)}
+      {row("Pages", "Toutes", false)}
+      <div className="mt-1 border-t border-gray-100 pt-1 text-[10px] text-gray-400">Plus de paramètres ▾</div>
+      {row("Marges", "Aucune", true, 2)}
+      {row("Échelle", "Par défaut", false)}
     </div>
   );
 }

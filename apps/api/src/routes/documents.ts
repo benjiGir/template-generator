@@ -17,7 +17,15 @@ router.get("/", async (c) => {
     .select({
       id:                documents.id,
       templateId:        documents.templateId,
-      templateName:      sql<string | null>`${documents.templateSnapshot} ->> 'name'`,
+      templateName:      sql<string | null>`"documents"."template_snapshot" ->> 'name'`,
+      // Première page du snapshot et données saisies : de quoi dessiner une miniature fidèle
+      preview:           sql<unknown>`jsonb_build_object(
+        'theme', "documents"."template_snapshot" -> 'theme',
+        'pageFormat', "documents"."template_snapshot" -> 'pageFormat',
+        'pages', jsonb_path_query_array("documents"."template_snapshot" -> 'pages', '$[0]'),
+        'editableFields', "documents"."template_snapshot" -> 'editableFields'
+      )`,
+      data:              documents.data,
       name:              documents.name,
       status:            documents.status,
       completionPercent: documents.completionPercent,

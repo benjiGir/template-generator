@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { mergeDocumentData } from "@template-generator/shared/utils/fields";
+import { isFilled, mergeDocumentData, withNodeDefaults } from "@template-generator/shared/utils/fields";
 import type { Document } from "@template-generator/shared/types/document";
 import type { Template, EditableField } from "@template-generator/shared/types/template";
 
@@ -41,7 +41,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     set({
       document:         doc,
       templateSnapshot: snapshot,
-      editableFields:   [...(snapshot?.editableFields ?? [])].sort((a, b) => a.order - b.order),
+      // Documents antérieurs : la valeur par défaut est relue dans le snapshot
+      editableFields:   withNodeDefaults(snapshot?.editableFields ?? [], snapshot?.pages ?? []).sort((a, b) => a.order - b.order),
       data:             doc.data ?? {},
       revision:         0,
       savedRevision:    0,
@@ -51,8 +52,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   applyServerState: (doc) =>
     set((s) => (s.document?.id === doc.id ? { document: { ...doc, data: s.data } } : s)),
 
+  // Un champ vidé est retiré : le document reprend le contenu du template
   updateField: (fieldKey, value) =>
-    set((s) => ({ data: { ...s.data, [fieldKey]: value }, revision: s.revision + 1 })),
+    set((s) => {
+      const data = { ...s.data };
+      if (isFilled(value)) data[fieldKey] = value;
+      else delete data[fieldKey];
+      return { data, revision: s.revision + 1 };
+    }),
 
   setFillMode: (mode) => set({ fillMode: mode }),
 
