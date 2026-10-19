@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, LayoutTemplate, Loader2, Search, X } from "lucide-react";
+import { Eye, LayoutTemplate, Loader2, Search } from "lucide-react";
 import { api, type TemplateSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
-import { PreviewPane } from "@/components/document-view/PreviewPane";
+import { TemplatePreviewDialog } from "@/components/document-view/TemplatePreviewDialog";
 import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
 
 /** L'effort se lit en taille de formulaire plutôt qu'en nombre brut */
@@ -160,7 +160,7 @@ export function DocumentSelectPage() {
       </div>
 
       {previewed && (
-        <TemplatePreviewDialog
+        <StudioTemplatePreview
           template={previewed}
           onClose={() => setPreviewed(null)}
           onChoose={() => choose(previewed)}
@@ -171,7 +171,7 @@ export function DocumentSelectPage() {
   );
 }
 
-function TemplatePreviewDialog({
+function StudioTemplatePreview({
   template,
   onClose,
   onChoose,
@@ -187,47 +187,19 @@ function TemplatePreviewDialog({
     queryKey: queryKeys.templates.detail(template.id),
     queryFn: () => api.templates.get(template.id),
   });
-  const version = full?.publishedVersion ?? template.preview;
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
-
   const effort = effortOf(template);
 
   return (
-    <div className="fixed inset-0 z-[900] flex bg-slate-900/50 p-6" onMouseDown={onClose}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Aperçu de ${template.name}`}
-        className="mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-4 border-b border-gray-200 px-5 py-3">
-          <div className="min-w-0 flex-1">
-            <h2 className="truncate text-sm font-semibold text-gray-900">{template.name}</h2>
-            <p className="text-xs text-gray-500">
-              {effort.total} champ{effort.total > 1 ? "s" : ""} à remplir
-              {effort.required > 0 && `, dont ${effort.required} obligatoire${effort.required > 1 ? "s" : ""}`} · contenu d'exemple du template
-            </p>
-          </div>
-          <button
-            onClick={onChoose}
-            disabled={creating}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {creating && <Loader2 size={14} className="animate-spin" />}
-            Utiliser ce template
-          </button>
-          <button onClick={onClose} className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Fermer">
-            <X size={18} />
-          </button>
-        </div>
-        <div className="min-h-0 flex-1">{version && <PreviewPane template={version} />}</div>
-      </div>
-    </div>
+    <TemplatePreviewDialog
+      title={template.name}
+      subtitle={`${effort.total} champ${effort.total > 1 ? "s" : ""} à remplir${
+        effort.required > 0 ? `, dont ${effort.required} obligatoire${effort.required > 1 ? "s" : ""}` : ""
+      } · contenu d'exemple du template`}
+      template={full?.publishedVersion ?? template.preview}
+      actionLabel="Utiliser ce template"
+      onAction={onChoose}
+      pending={creating}
+      onClose={onClose}
+    />
   );
 }

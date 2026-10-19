@@ -6,6 +6,7 @@ import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useEditorStore } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useWorkflowSession } from "@/workflow/session";
@@ -102,7 +103,7 @@ export function TemplatePublishPage() {
       workflow={TEMPLATE_WORKFLOW}
       current="publish"
       entityId={template.id}
-      title={template.name}
+      title={<TemplateTitle />}
       finalAction={{
         label: status === "draft" ? "Publier dans le Studio" : status === "published-with-changes" ? "Publier les modifications" : "Republier",
         icon: <Send size={14} />,

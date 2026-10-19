@@ -2,6 +2,7 @@ import { FileDown } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
 import { EditorLayout } from "@/layouts/EditorLayout";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { usePrintDocument } from "@/components/document-view/usePrintDocument";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 
@@ -16,7 +17,7 @@ export function TemplateBuildPage() {
       workflow={TEMPLATE_WORKFLOW}
       current="build"
       entityId={template.id}
-      title={template.name}
+      title={<TemplateTitle />}
       compact
       guard={hasComponents ? { ok: true } : { ok: false, reason: "Ajoutez au moins un composant" }}
       secondaryActions={

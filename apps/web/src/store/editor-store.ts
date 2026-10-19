@@ -42,6 +42,9 @@ interface EditorState {
   duplicateNode: (pageIndex: number, nodeId: string) => void;
 
   selectNode: (nodeId: string | null) => void;
+  /** Composant survolé le plus interne (les poignées ne s'affichent que sur lui) */
+  hoveredNodeId: string | null;
+  hoverNode: (nodeId: string | null) => void;
   selectPage: (pageIndex: number) => void;
 
   inlineEditingNodeId: string | null;
@@ -73,6 +76,7 @@ export const useEditorStore = create<EditorState>()(
     selectedPageIndex: 0,
     inlineEditingNodeId: null,
     inlineEditingPropKey: null,
+    hoveredNodeId: null,
     revision: 0,
     savedRevision: 0,
     history: [],
@@ -257,6 +261,11 @@ export const useEditorStore = create<EditorState>()(
         s.selectedNodeId = nodeId;
         s.inlineEditingNodeId = null;
         s.inlineEditingPropKey = null;
+      }),
+
+    hoverNode: (nodeId) =>
+      set((s) => {
+        s.hoveredNodeId = nodeId;
       }),
 
     startInlineEdit: (nodeId, propKey) =>

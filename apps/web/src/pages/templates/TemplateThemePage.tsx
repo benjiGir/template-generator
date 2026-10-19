@@ -1,21 +1,24 @@
 import { useEditorStore } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { ThemePanel } from "@/components/inspector/ThemePanel";
-import { DocumentView } from "@/components/document-view/DocumentView";
+import { PreviewPane } from "@/components/document-view/PreviewPane";
+import { SAMPLE_PAGE } from "@/components/document-view/samplePage";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 
 export function TemplateThemePage() {
   const template = useEditorStore((s) => s.template)!;
+  const isEmpty = template.pages.every((p) => p.children.length === 0);
 
   return (
     <WorkflowLayout
       workflow={TEMPLATE_WORKFLOW}
       current="theme"
       entityId={template.id}
-      title={template.name}
+      title={<TemplateTitle />}
     >
       <div className="flex h-full overflow-hidden">
-        <aside className="w-[380px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
+        <aside className="w-[400px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
           <div className="border-b border-gray-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-gray-900">Identité visuelle</h2>
             <p className="mt-0.5 text-xs text-gray-500">
@@ -25,14 +28,15 @@ export function TemplateThemePage() {
           <ThemePanel />
         </aside>
 
-        <div className="flex-1 overflow-y-auto bg-slate-200/70 p-8">
-          {template.pages.every((p) => p.children.length === 0) ? (
-            <p className="mt-16 text-center text-sm text-gray-500">
-              Le template est encore vide : l'aperçu du thème apparaîtra dès l'étape « Construire ».
+        <div className="flex min-w-0 flex-1 flex-col">
+          {isEmpty && (
+            <p className="shrink-0 border-b border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-800">
+              Le template est encore vide : le thème s'applique ici à une page d'exemple, qui ne fait pas partie du template.
             </p>
-          ) : (
-            <DocumentView template={template} />
           )}
+          <div className="min-h-0 flex-1">
+            <PreviewPane template={isEmpty ? { ...template, pages: [SAMPLE_PAGE] } : template} />
+          </div>
         </div>
       </div>
     </WorkflowLayout>

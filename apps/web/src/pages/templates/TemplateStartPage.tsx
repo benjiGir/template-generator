@@ -1,184 +1,220 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Copy, Upload, Sparkles, LayoutTemplate } from "lucide-react";
+import { Eye, FilePlus2, LayoutTemplate, Loader2, Search, Sparkles, Upload } from "lucide-react";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
-import { api } from "@/api/client";
+import { api, type TemplateSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { newTemplateDraft } from "@/store/editor-store";
+import { DocumentThumbnail } from "@/components/document-view/DocumentView";
+import { TemplatePreviewDialog } from "@/components/document-view/TemplatePreviewDialog";
+import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
-import type { TemplateSummary } from "@/api/client";
 
-type Mode = "blank" | "model" | "import" | "ai";
-
+/**
+ * Étape 1 de l'Atelier. Le cas courant est de repartir du template du trimestre précédent :
+ * la duplication est donc l'option principale ; page blanche, import et génération sont secondaires.
+ */
 export function TemplateStartPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [creating, setCreating] = useState<string | null>(null);
+  const [previewed, setPreviewed] = useState<TemplateSummary | null>(null);
+  const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const { data: templates = [] } = useQuery({
+  const { data: templates = [], isLoading } = useQuery({
     queryKey: queryKeys.templates.list(),
     queryFn: () => api.templates.list(),
-    enabled: mode === "model",
   });
 
-  const handleModeSelect = (m: Mode) => {
-    setMode(m);
-    setSelectedTemplateId(null);
-  };
-
-  // Le template est créé ici ; on remplace l'URL pour que « retour » ne relance pas une création
-  const handleNext = async () => {
+  // Le template est créé tout de suite ; on remplace l'URL pour que « retour » ne relance pas une création
+  const start = async (source: TemplateSummary | null) => {
+    if (creating) return;
+    setCreating(source?.id ?? "blank");
     setError(null);
     try {
-      const created =
-        mode === "model" && selectedTemplateId
-          ? await api.templates.duplicate(selectedTemplateId)
-          : await api.templates.create(newTemplateDraft());
+      const created = source ? await api.templates.duplicate(source.id) : await api.templates.create(newTemplateDraft());
       navigate(TEMPLATE_WORKFLOW.steps[1]!.path(created.id), { replace: true });
     } catch (e) {
       console.error("Erreur création template:", e);
       setError("La création du template a échoué. Réessayez.");
+      setCreating(null);
     }
   };
 
-  const guard =
-    mode === null
-      ? { ok: false, reason: "Choisissez un point de départ" }
-      : mode === "model" && !selectedTemplateId
-      ? { ok: false, reason: "Sélectionnez le template à dupliquer" }
-      : { ok: true };
+  const query = search.trim().toLowerCase();
+  const visible = query ? templates.filter((t) => `${t.name} ${t.description ?? ""}`.toLowerCase().includes(query)) : templates;
 
   return (
     <WorkflowLayout
       workflow={TEMPLATE_WORKFLOW}
       current="start"
       title="Nouveau template"
-      guard={guard}
-      onNext={handleNext}
-      nextLabel="Créer le template"
+      guard={{ ok: false, reason: "Choisissez un point de départ" }}
     >
-      <div className="h-full overflow-y-auto bg-gray-50 p-8">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Choisissez un point de départ</h2>
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-        <div className="grid grid-cols-4 gap-3 max-w-4xl mb-8">
-          <ModeCard
-            icon={<FileText size={22} />}
-            label="Vierge"
-            description="Commencer avec une page blanche"
-            active={mode === "blank"}
-            onClick={() => handleModeSelect("blank")}
-          />
-          <ModeCard
-            icon={<Copy size={22} />}
-            label="Depuis un modèle"
-            description="Dupliquer un template existant"
-            active={mode === "model"}
-            onClick={() => handleModeSelect("model")}
-          />
-          <ModeCard
-            icon={<Upload size={22} />}
-            label="Importer"
-            description="Importer un fichier DOCX"
-            active={mode === "import"}
-            disabled
-            badge="Bientôt"
-            onClick={() => {}}
-          />
-          <ModeCard
-            icon={<Sparkles size={22} />}
-            label="Générer avec l'IA"
-            description="Créer un template via l'IA"
-            active={mode === "ai"}
-            disabled
-            badge="Bientôt"
-            onClick={() => {}}
-          />
-        </div>
+      <div className="h-full overflow-y-auto bg-gray-50 px-8 py-6">
+        <div className="mx-auto max-w-5xl space-y-8">
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
-        {mode === "model" && (
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Sélectionnez un template</h3>
-            {templates.length === 0 ? (
-              <p className="text-sm text-gray-400">Aucun template disponible.</p>
-            ) : (
-              <div className="grid grid-cols-4 gap-3 max-w-4xl">
-                {templates.map((t) => (
-                  <TemplateCard
+          {(isLoading || templates.length > 0) && (
+            <section>
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">Repartir d'un template existant</h2>
+                  <p className="mt-0.5 text-sm text-gray-500">
+                    La copie reprend le thème, la mise en page et les champs. Vous l'ajustez ensuite.
+                  </p>
+                </div>
+                {templates.length > 6 && (
+                  <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-blue-400">
+                    <Search size={14} className="text-gray-400" />
+                    <input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Rechercher un template…"
+                      className="min-w-0 flex-1 text-sm focus:outline-none"
+                    />
+                  </label>
+                )}
+              </div>
+
+              {isLoading && <p className="text-sm text-gray-400">Chargement…</p>}
+              {!isLoading && visible.length === 0 && (
+                <p className="py-6 text-center text-sm text-gray-500">
+                  Aucun template ne correspond à « {search} ».{" "}
+                  <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">Effacer la recherche</button>
+                </p>
+              )}
+
+              <div className="grid grid-cols-4 gap-4">
+                {visible.map((t) => (
+                  <div
                     key={t.id}
-                    template={t}
-                    selected={selectedTemplateId === t.id}
-                    onClick={() => setSelectedTemplateId(t.id)}
-                  />
+                    className={`group relative overflow-hidden rounded-xl border bg-white transition-all ${
+                      creating === t.id ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-blue-400 hover:shadow-md"
+                    }`}
+                  >
+                    <button
+                      onClick={() => start(t)}
+                      disabled={creating !== null}
+                      className="block w-full text-left disabled:cursor-wait"
+                      aria-label={`Dupliquer ${t.name}`}
+                    >
+                      <div className="flex justify-center border-b border-gray-100 bg-slate-100 px-4 pt-4">
+                        {t.preview ? (
+                          <div className="overflow-hidden rounded-t shadow-sm">
+                            <DocumentThumbnail template={t.preview} width={180} cropHeight={170} />
+                          </div>
+                        ) : (
+                          <div className="flex h-[170px] w-[180px] items-center justify-center bg-white">
+                            <LayoutTemplate size={28} className="text-gray-200" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="min-w-0 flex-1 truncate text-xs font-semibold text-gray-900">{t.name}</h3>
+                          <TemplateStatusBadge template={t} />
+                        </div>
+                        <p className="mt-1 text-[11px] text-gray-400">
+                          Modifié le {new Date(t.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                        </p>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setPreviewed(t)}
+                      className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-gray-700 opacity-0 shadow-sm ring-1 ring-gray-200 transition-opacity hover:text-blue-700 focus:opacity-100 group-hover:opacity-100"
+                    >
+                      <Eye size={13} />
+                      Aperçu
+                    </button>
+                    {creating === t.id && (
+                      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/70 text-xs font-medium text-blue-700">
+                        <Loader2 size={14} className="animate-spin" /> Copie en cours…
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
-            )}
-          </div>
-        )}
+            </section>
+          )}
+
+          <section>
+            <h2 className="mb-3 text-sm font-semibold text-gray-700">
+              {templates.length > 0 ? "Ou partir d'autre chose" : "Créer votre premier template"}
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => start(null)}
+                disabled={creating !== null}
+                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 text-left transition-all hover:border-blue-400 hover:shadow-sm disabled:cursor-wait"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  {creating === "blank" ? <Loader2 size={18} className="animate-spin" /> : <FilePlus2 size={18} />}
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-gray-900">Page blanche</span>
+                  <span className="mt-0.5 block text-xs text-gray-500">Choisir un thème puis assembler les composants.</span>
+                </span>
+              </button>
+              <SoonOption icon={<Upload size={18} />} label="Importer un document Word" hint="Reprendre la structure d'un .docx" />
+              <SoonOption icon={<Sparkles size={18} />} label="Générer à partir d'une description" hint="Décrire le document en quelques phrases" />
+            </div>
+          </section>
+        </div>
       </div>
+
+      {previewed && (
+        <AtelierTemplatePreview
+          template={previewed}
+          creating={creating === previewed.id}
+          onChoose={() => start(previewed)}
+          onClose={() => setPreviewed(null)}
+        />
+      )}
     </WorkflowLayout>
   );
 }
 
-function ModeCard({
-  icon, label, description, active, disabled, badge, onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  active: boolean;
-  disabled?: boolean;
-  badge?: string;
-  onClick: () => void;
-}) {
+function SoonOption({ icon, label, hint }: { icon: React.ReactNode; label: string; hint: string }) {
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`relative text-left p-4 rounded-lg border-2 transition-all ${
-        active
-          ? "border-blue-500 bg-blue-50"
-          : disabled
-          ? "border-gray-200 bg-white opacity-50 cursor-not-allowed"
-          : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer"
-      }`}
-    >
-      {badge && (
-        <span className="absolute top-2 right-2 text-[10px] font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
-          {badge}
+    <div className="flex items-start gap-3 rounded-lg border border-dashed border-gray-200 bg-white/60 p-4 text-left" aria-disabled="true">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400">{icon}</span>
+      <span>
+        <span className="flex items-center gap-1.5 text-sm font-semibold text-gray-500">
+          {label}
+          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">Bientôt</span>
         </span>
-      )}
-      <div className={`mb-2 ${active ? "text-blue-600" : "text-gray-500"}`}>{icon}</div>
-      <p className="text-sm font-semibold text-gray-900">{label}</p>
-      <p className="text-xs text-gray-500 mt-1">{description}</p>
-    </button>
+        <span className="mt-0.5 block text-xs text-gray-400">{hint}</span>
+      </span>
+    </div>
   );
 }
 
-function TemplateCard({
-  template, selected, onClick,
+function AtelierTemplatePreview({
+  template,
+  creating,
+  onChoose,
+  onClose,
 }: {
   template: TemplateSummary;
-  selected: boolean;
-  onClick: () => void;
+  creating: boolean;
+  onChoose: () => void;
+  onClose: () => void;
 }) {
+  const { data: full } = useQuery({
+    queryKey: queryKeys.templates.detail(template.id),
+    queryFn: () => api.templates.get(template.id),
+  });
   return (
-    <button
-      onClick={onClick}
-      className={`text-left rounded-lg border-2 transition-all overflow-hidden ${
-        selected ? "border-blue-500" : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
-      }`}
-    >
-      <div className={`w-full aspect-[210/297] flex items-center justify-center ${selected ? "bg-blue-50" : "bg-gray-50"}`}>
-        <LayoutTemplate size={28} className={selected ? "text-blue-200" : "text-gray-200"} />
-      </div>
-      <div className="p-2.5 bg-white">
-        <p className="text-xs font-semibold text-gray-900 truncate">{template.name}</p>
-        <p className="text-[10px] text-gray-400 mt-1">
-          {new Date(template.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-        </p>
-      </div>
-    </button>
+    <TemplatePreviewDialog
+      title={template.name}
+      subtitle={template.description ?? undefined}
+      template={full ?? null}
+      actionLabel="Dupliquer ce template"
+      onAction={onChoose}
+      pending={creating}
+      onClose={onClose}
+    />
   );
 }

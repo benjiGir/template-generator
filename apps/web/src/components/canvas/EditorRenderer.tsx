@@ -5,7 +5,7 @@ import type { ComponentNode, Theme } from "@template-generator/shared/types/temp
 import { useEditorStore } from "@/store/editor-store";
 import { SelectableWrapper } from "./SelectableWrapper";
 import { DropZone } from "./DropZone";
-import { InlineEditor } from "@/components/inspector/InlineEditor";
+import { InlineEditor, InlineTextEditor } from "@/components/inspector/InlineEditor";
 import { useDroppable, useDndContext } from "@dnd-kit/core";
 import type { DropZoneData } from "@/hooks/useDragAndDrop";
 
@@ -90,13 +90,20 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
       <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
         <div style={{ position: "relative" }}>
           <Component {...mergedProps} />
-          {isInlineEditing && (
-            <InlineEditor
-              nodeId={node.id}
-              propKey={inlineEditingPropKey!}
-              value={String(node.props[inlineEditingPropKey!] ?? "")}
-            />
-          )}
+          {isInlineEditing &&
+            (definition.schema.find((p) => p.key === inlineEditingPropKey)?.type === "text" ? (
+              <InlineTextEditor
+                nodeId={node.id}
+                propKey={inlineEditingPropKey!}
+                value={String(node.props[inlineEditingPropKey!] ?? "")}
+              />
+            ) : (
+              <InlineEditor
+                nodeId={node.id}
+                propKey={inlineEditingPropKey!}
+                value={String(node.props[inlineEditingPropKey!] ?? "")}
+              />
+            ))}
         </div>
       </SelectableWrapper>
     );

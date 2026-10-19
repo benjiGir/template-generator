@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { DndContext, closestCenter, pointerWithin, type CollisionDetection } from "@dnd-kit/core";
 import { ComponentLibrary } from "@/components/sidebar/ComponentLibrary";
 import { Canvas } from "@/components/canvas/Canvas";
 import { Inspector } from "@/components/inspector/Inspector";
@@ -9,6 +9,12 @@ import { useEditorStore } from "@/store/editor-store";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { useWorkflowSession } from "@/workflow/session";
 import { findNode } from "@template-generator/shared/utils/tree";
+
+/** Zone sous le pointeur d'abord (précis dans les structures imbriquées), la plus proche sinon */
+const collisionDetection: CollisionDetection = (args) => {
+  const within = pointerWithin(args);
+  return within.length > 0 ? within : closestCenter(args);
+};
 
 export function EditorLayout() {
   const template = useEditorStore((s) => s.template);
@@ -73,7 +79,7 @@ export function EditorLayout() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={collisionDetection}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >

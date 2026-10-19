@@ -129,3 +129,41 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
     </div>
   );
 }
+
+/** Édition sur place d'un texte simple (titre, libellé) : pas de mise en forme, Entrée valide */
+export function InlineTextEditor({ nodeId, propKey, value }: Props) {
+  const updateNodeProps = useEditorStore((s) => s.updateNodeProps);
+  const stopInlineEdit = useEditorStore((s) => s.stopInlineEdit);
+  const initial = useRef(value);
+
+  return (
+    <div style={{ position: "absolute", inset: -2, zIndex: 200, display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+      <input
+        autoFocus
+        defaultValue={value}
+        onFocus={(e) => e.currentTarget.select()}
+        onChange={(e) => updateNodeProps(nodeId, { [propKey]: e.target.value })}
+        onBlur={stopInlineEdit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") stopInlineEdit();
+          if (e.key === "Escape") {
+            updateNodeProps(nodeId, { [propKey]: initial.current });
+            stopInlineEdit();
+          }
+        }}
+        aria-label="Modifier le texte"
+        style={{
+          width: "100%",
+          padding: "4px 6px",
+          fontSize: 14,
+          fontFamily: "system-ui, sans-serif",
+          border: "2px solid #2563EB",
+          borderRadius: 4,
+          outline: "none",
+          background: "#fff",
+          boxShadow: "0 4px 12px rgba(37,99,235,0.15)",
+        }}
+      />
+    </div>
+  );
+}

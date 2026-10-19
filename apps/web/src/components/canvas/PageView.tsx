@@ -4,6 +4,7 @@ import { EditorRenderer } from "./EditorRenderer";
 import { DropZone } from "./DropZone";
 import { DocumentPage } from "@/components/document-view/DocumentPage";
 import { useEditorStore } from "@/store/editor-store";
+import { useDropTarget } from "@/hooks/useDragAndDrop";
 
 interface Props {
   page: TemplatePage;
@@ -16,10 +17,13 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
   const selectedPageIndex = useEditorStore((s) => s.selectedPageIndex);
   const selectPage = useEditorStore((s) => s.selectPage);
   const selectNode = useEditorStore((s) => s.selectNode);
+  const hoverNode = useEditorStore((s) => s.hoverNode);
   const isActivePage = selectedPageIndex === pageIndex;
+  const { drop } = useDropTarget();
+  const isDropTarget = drop !== null && drop.parentId === null && drop.pageIndex === pageIndex;
 
   return (
-    <div data-page-wrapper style={{ marginBottom: 24 }}>
+    <div data-page-wrapper style={{ marginBottom: 24 }} onMouseOver={() => hoverNode(null)}>
       {/* Onglet */}
       <button
         data-page-tab
@@ -45,7 +49,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       <DocumentPage
         theme={theme}
         format={pageFormat}
-        chromeStyle={{ outline: isActivePage ? "2px solid #BFDBFE" : "none" }}
+        chromeStyle={{ outline: isDropTarget ? "2px dashed #2563EB" : isActivePage ? "2px solid #BFDBFE" : "none", outlineOffset: 2 }}
         onClick={() => { selectPage(pageIndex); selectNode(null); }}
       >
         {/* DropZones entre chaque composant racine */}
