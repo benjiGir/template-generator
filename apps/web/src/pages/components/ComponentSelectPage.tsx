@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getAll } from "@template-generator/component-registry/registry";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
+import { ComponentPreview } from "@/components/document-view/ComponentPreview";
+import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import { PRESET_WORKFLOW } from "@/workflow/definitions";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 
@@ -35,12 +37,12 @@ export function ComponentSelectPage() {
     return acc;
   }, {});
 
-  const handleNext = () => {
-    if (!selected) return;
-    const def = allComponents.find((c) => c.type === selected);
+  const choose = (type: string) => {
+    setSelected(type);
+    const def = allComponents.find((c) => c.type === type);
     if (!def) return;
     // Revenir à cette étape sans changer de composant conserve la configuration
-    if (selected !== currentBaseType) setBaseType(selected, def.defaultProps, def.category, def.label);
+    if (type !== currentBaseType) setBaseType(type, def.defaultProps, def.category, def.label);
     navigate(PRESET_WORKFLOW.steps[1]!.path("new"));
   };
 
@@ -51,8 +53,8 @@ export function ComponentSelectPage() {
       entityId="new"
       firstNavigableStep={0}
       title="Nouveau preset"
-      guard={selected ? { ok: true } : { ok: false, reason: "Choisissez un composant de base" }}
-      onNext={handleNext}
+      guard={selected ? { ok: true } : { ok: false, reason: "Cliquez sur un composant pour le configurer" }}
+      onNext={() => { if (selected) choose(selected); }}
     >
       <div className="h-full flex flex-col overflow-hidden bg-gray-50">
         {/* Category filter */}
@@ -84,16 +86,22 @@ export function ComponentSelectPage() {
                 {components.map((def) => (
                   <button
                     key={def.type}
-                    onClick={() => setSelected(def.type)}
-                    className={`text-left p-3 rounded-lg border-2 transition-all bg-white ${
+                    onClick={() => choose(def.type)}
+                    className={`overflow-hidden rounded-lg border-2 bg-white text-left transition-all ${
                       selected === def.type
                         ? "border-blue-500 shadow-sm"
                         : "border-gray-200 hover:border-blue-300 hover:shadow-sm"
                     }`}
                   >
-                    <div className="text-xl mb-1">{def.icon}</div>
-                    <p className="text-xs font-semibold text-gray-900">{def.label}</p>
-                    <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{def.description}</p>
+                    <div className="h-[110px] overflow-hidden border-b border-gray-100 bg-slate-100 p-2">
+                      <div className="overflow-hidden rounded-sm bg-white shadow-sm">
+                        <ComponentPreview type={def.type} props={def.defaultProps} theme={DEFAULT_THEME} maxHeight={94} compact />
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <p className="text-xs font-semibold text-gray-900">{def.label}</p>
+                      <p className="mt-0.5 line-clamp-2 text-[11px] text-gray-500">{def.description}</p>
+                    </div>
                   </button>
                 ))}
               </div>

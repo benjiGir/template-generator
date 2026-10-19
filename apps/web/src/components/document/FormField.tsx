@@ -47,6 +47,14 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
     group:        field.group,
   };
 
+  const requiredBadge = field.required ? (
+    filled ? (
+      <span className="text-[10px] font-medium text-emerald-600">✓ obligatoire</span>
+    ) : (
+      <span className="text-[10px] font-medium text-amber-700">obligatoire</span>
+    )
+  ) : null;
+
   const startFromDefault = () => {
     onChange(field.defaultValue);
     setResetKey((k) => k + 1);
@@ -59,11 +67,10 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
       onMouseDown={onFocus}
       className={`relative -mx-2 rounded-md px-2 py-1.5 transition-colors ${active ? "bg-blue-50/70 ring-1 ring-blue-200" : ""}`}
     >
-      <div className="absolute right-2 top-1.5 flex items-center gap-1.5">
-        {field.required && !filled && <span className="text-[10px] font-medium text-amber-700">obligatoire</span>}
-        {field.required && filled && <span className="text-[10px] font-medium text-emerald-600">✓</span>}
-      </div>
+      {/* Les listes ont leur propre action en haut à droite : le statut passe sous le champ */}
+      {field.type !== "list" && <div className="absolute right-2 top-1.5">{requiredBadge}</div>}
       <PropField key={resetKey} schema={schema} value={value} onChange={onChange} />
+      {field.type === "list" && requiredBadge && <div className="mt-1">{requiredBadge}</div>}
       {usesPlaceholder && !filled && defaultText && (
         <p className="mt-1 text-[11px] text-gray-400">
           Vide : le document garde le contenu du template.{" "}

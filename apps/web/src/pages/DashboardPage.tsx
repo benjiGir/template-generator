@@ -6,26 +6,30 @@ import { queryKeys } from "@/api/queryKeys";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { DocumentCard } from "@/components/document/DocumentCard";
+import { GettingStarted } from "@/components/ui/GettingStarted";
 
 export function DashboardPage() {
   const navigate = useNavigate();
 
-  const { data: templateSummaries = [] } = useQuery({
+  const { data: allTemplates = [], isSuccess: templatesLoaded } = useQuery({
     queryKey: queryKeys.templates.list(),
     queryFn: () => api.templates.list(),
-    select: (list) => list.slice(0, 4),
   });
+  const templateSummaries = allTemplates.slice(0, 4);
 
   // Le dashboard est un point de reprise : les brouillons d'abord, puis les plus récents
-  const { data: recentDocuments = [] } = useQuery({
+  const { data: allDocuments = [], isSuccess: documentsLoaded } = useQuery({
     queryKey: queryKeys.documents.list(),
     queryFn: () => api.documents.list(),
-    select: (list) => [...list].sort((a, b) => Number(b.status === "draft") - Number(a.status === "draft")).slice(0, 6),
   });
+  const recentDocuments = [...allDocuments]
+    .sort((a, b) => Number(b.status === "draft") - Number(a.status === "draft"))
+    .slice(0, 6);
 
   return (
     <div className="h-full bg-gray-50 overflow-y-auto">
       <div className="max-w-5xl mx-auto px-8 py-10 space-y-10">
+        {templatesLoaded && documentsLoaded && <GettingStarted templates={allTemplates} documentCount={allDocuments.length} />}
 
         {/* Section 1 — Actions rapides */}
         <section>
@@ -101,12 +105,6 @@ export function DashboardPage() {
               })}
             </div>
           </section>
-        )}
-
-        {templateSummaries.length === 0 && recentDocuments.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-sm">Aucun contenu pour l'instant. Commencez par créer un template.</p>
-          </div>
         )}
 
       </div>

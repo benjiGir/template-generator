@@ -67,6 +67,12 @@ export function ComponentLibrary() {
           </div>
         )}
 
+        {presets.length === 0 && q === "" && (
+          <p className="mx-3 mt-3 rounded bg-gray-50 px-2.5 py-2 text-[11px] text-gray-500">
+            Vos presets apparaîtront ici. Créez-les dans l'espace Bibliothèque.
+          </p>
+        )}
+
         {byCategory.length === 0 && filteredPresets.length === 0 ? (
           <p className="text-xs text-gray-400 text-center mt-8 px-4">Aucun composant trouvé</p>
         ) : (

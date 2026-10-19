@@ -13,6 +13,9 @@ interface ComponentDraftState {
   category: ComponentCategory;
   /** Des changements non sauvegardés existent */
   dirty: boolean;
+  /** Thème utilisé pour l'aperçu (un preset n'a pas de thème propre) */
+  previewTheme: string;
+  setPreviewTheme: (name: string) => void;
   setBaseType: (type: string, defaultProps: Record<string, unknown>, category: ComponentCategory, label: string) => void;
   updateProp: (key: string, value: unknown) => void;
   resetProps: (defaultProps: Record<string, unknown>) => void;
@@ -36,6 +39,9 @@ export const useComponentDraftStore = create<ComponentDraftState>()(
   persist(
     (set) => ({
       ...EMPTY,
+      previewTheme: "",
+
+      setPreviewTheme: (name) => set({ previewTheme: name }),
 
       setBaseType: (type, defaultProps, category, label) =>
         set({ baseType: type, props: { ...defaultProps }, category, label, dirty: true }),

@@ -28,6 +28,12 @@ export function DocumentSelectPage() {
     queryKey: queryKeys.templates.list({ published: true }),
     queryFn: () => api.templates.list({ published: true }),
   });
+  // Pour distinguer « aucun template » de « aucun template publié »
+  const { data: allTemplates = [] } = useQuery({
+    queryKey: queryKeys.templates.list(),
+    queryFn: () => api.templates.list(),
+    enabled: !isLoading && templates.length === 0,
+  });
 
   // Choisir un template crée le document ; on remplace l'URL pour ne pas recréer au retour
   const choose = async (template: TemplateSummary) => {
@@ -79,18 +85,7 @@ export function DocumentSelectPage() {
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
-          {!isLoading && templates.length === 0 && (
-            <div className="mx-auto max-w-md py-16 text-center">
-              <p className="text-sm font-medium text-gray-700">Aucun template n'est encore publié</p>
-              <p className="mt-1 text-sm text-gray-500">
-                Un document part toujours d'un template publié. Le concepteur des templates doit en publier un
-                depuis l'Atelier pour qu'il apparaisse ici.
-              </p>
-              <button onClick={() => navigate("/templates")} className="mt-3 text-sm text-blue-600 hover:underline">
-                Ouvrir l'Atelier
-              </button>
-            </div>
-          )}
+          {!isLoading && templates.length === 0 && <NoPublishedTemplate draftCount={allTemplates.length} />}
 
           {!isLoading && templates.length > 0 && visible.length === 0 && (
             <p className="py-10 text-center text-sm text-gray-500">
@@ -201,5 +196,25 @@ function StudioTemplatePreview({
       pending={creating}
       onClose={onClose}
     />
+  );
+}
+
+/** Le Studio dépend de l'Atelier : on explique pourquoi la liste est vide et qui peut y remédier */
+function NoPublishedTemplate({ draftCount }: { draftCount: number }) {
+  const navigate = useNavigate();
+  return (
+    <div className="mx-auto max-w-md py-16 text-center">
+      <p className="text-sm font-medium text-gray-700">
+        {draftCount === 0 ? "Aucun template n'existe encore" : "Aucun template n'est encore publié"}
+      </p>
+      <p className="mt-1 text-sm text-gray-500">
+        {draftCount === 0
+          ? "Un document part toujours d'un template. Le concepteur des templates doit d'abord en créer un dans l'Atelier, puis le publier."
+          : `${draftCount} template${draftCount > 1 ? "s sont" : " est"} en préparation dans l'Atelier, mais aucun n'est publié. Le concepteur des templates doit en publier un pour qu'il apparaisse ici.`}
+      </p>
+      <button onClick={() => navigate("/templates")} className="mt-3 text-sm text-blue-600 hover:underline">
+        Ouvrir l'Atelier
+      </button>
+    </div>
   );
 }

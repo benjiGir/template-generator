@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { get } from "@template-generator/component-registry/registry";
-import { ComponentRenderer } from "@template-generator/component-registry/renderer";
-import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { PropField } from "@/components/inspector/PropField";
+import { PresetPreviewPane } from "./PresetPreviewPane";
 import { useComponentDraftStore } from "@/store/component-draft-store";
 import { PRESET_WORKFLOW } from "@/workflow/definitions";
 import { NotFoundState } from "@/workflow/EntityState";
@@ -30,14 +29,6 @@ export function ComponentEditPage() {
       </div>
     );
   }
-
-  // Build the preview node
-  const previewNode = {
-    id:       "preview",
-    type:     baseType,
-    props:    props,
-    children: [],
-  };
 
   // Group and filter props by condition
   const visibleSchema = def.schema.filter((s) => {
@@ -105,20 +96,8 @@ export function ComponentEditPage() {
         </div>
 
         {/* Right: live preview */}
-        <div className="flex-1 overflow-y-auto bg-gray-100 flex items-start justify-center p-8">
-          <div className="w-full max-w-2xl">
-            <p className="text-xs text-gray-400 text-center mb-4">Aperçu</p>
-            <div
-              className="bg-white shadow-md rounded-lg p-6 overflow-hidden"
-              style={{
-                fontFamily: DEFAULT_THEME.typography.fontFamily,
-                fontSize:   DEFAULT_THEME.typography.baseFontSize,
-                color:      DEFAULT_THEME.colors.text,
-              }}
-            >
-              <ComponentRenderer node={previewNode} theme={DEFAULT_THEME} />
-            </div>
-          </div>
+        <div className="min-w-0 flex-1">
+          <PresetPreviewPane type={baseType} props={props} />
         </div>
       </div>
     </WorkflowLayout>

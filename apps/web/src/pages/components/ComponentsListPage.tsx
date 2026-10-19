@@ -6,6 +6,9 @@ import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { ComponentPreview } from "@/components/document-view/ComponentPreview";
+import { get } from "@template-generator/component-registry/registry";
+import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
@@ -122,11 +125,15 @@ export function ComponentsListPage() {
         {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
         {!isLoading && presets.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-sm mb-4">Aucun preset. Créez-en un pour commencer.</p>
+          <div className="mx-auto max-w-md py-20 text-center">
+            <p className="text-sm font-medium text-gray-700">Aucun preset pour l'instant</p>
+            <p className="mb-4 mt-1 text-sm text-gray-500">
+              Un preset est un composant réglé une fois (couleur de la charte, structure habituelle) et rangé ici.
+              Il apparaît ensuite dans la bibliothèque de l'éditeur, à côté des composants de base.
+            </p>
             <button
               onClick={handleNew}
-              className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+              className="rounded bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Créer mon premier preset
             </button>
@@ -134,10 +141,15 @@ export function ComponentsListPage() {
         )}
 
         {!isLoading && presets.length > 0 && filtered.length === 0 && (
-          <p className="text-sm text-gray-400">Aucun preset ne correspond aux filtres.</p>
+          <p className="py-16 text-center text-sm text-gray-500">
+            Aucun preset ne correspond à ces filtres.{" "}
+            <button onClick={() => { setSearch(""); setCategoryFilter("all"); }} className="text-blue-600 hover:underline">
+              Réinitialiser les filtres
+            </button>
+          </p>
         )}
 
-        <div className="grid grid-cols-3 gap-4 max-w-5xl">
+        <div className="grid max-w-6xl grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
           {filtered.map((p) => (
             <PresetCard key={p.id} preset={p} onEdit={handleEdit} onDuplicate={(id) => duplicateMutation.mutate(id)} onDelete={handleDelete} />
           ))}
@@ -158,54 +170,42 @@ function PresetCard({
   onDuplicate: (id: string) => void;
   onDelete: (e: React.MouseEvent, preset: ComponentPreset) => void;
 }) {
+  const base = get(preset.baseType);
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all group">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-semibold text-gray-900 truncate">{preset.label}</h3>
+    <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-md">
+      <button onClick={() => onEdit(preset)} className="block text-left" aria-label={`Modifier ${preset.label}`}>
+        <div className="h-[130px] overflow-hidden border-b border-gray-100 bg-slate-100 p-3">
+          <div className="overflow-hidden rounded-sm bg-white shadow-sm">
+            <ComponentPreview type={preset.baseType} props={{ ...(base?.defaultProps ?? {}), ...preset.defaultProps }} theme={DEFAULT_THEME} maxHeight={106} compact />
+          </div>
+        </div>
+        <div className="px-4 pb-1 pt-3">
+          <div className="flex items-center gap-2">
+            <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-900">{preset.label}</h3>
             {preset.category && (
-              <span className="shrink-0 text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+              <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
                 {CATEGORY_LABELS[preset.category] ?? preset.category}
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-500 truncate">{preset.baseType}</p>
-          {preset.description && (
-            <p className="text-xs text-gray-400 mt-1 line-clamp-2">{preset.description}</p>
-          )}
+          <p className="truncate text-xs text-gray-500">{base?.label ?? preset.baseType}</p>
+          {preset.description && <p className="mt-1 line-clamp-2 text-xs text-gray-400">{preset.description}</p>}
         </div>
-        <div className="ml-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onEdit(preset)}
-            className="text-gray-400 hover:text-blue-500 text-xs px-1.5 py-1 rounded hover:bg-blue-50 transition-colors"
-            title="Modifier"
-          >
-            Modifier
-          </button>
-          <button
-            onClick={() => onDuplicate(preset.id)}
-            className="text-gray-400 hover:text-blue-500 text-xs px-1.5 py-1 rounded hover:bg-blue-50 transition-colors"
-            title="Dupliquer"
-          >
-            Dupliquer
-          </button>
-          <button
-            onClick={(e) => onDelete(e, preset)}
-            className="text-gray-400 hover:text-red-500 text-xs px-1.5 py-1 rounded hover:bg-red-50"
-            title="Supprimer"
-          >
-            Supprimer
-          </button>
-        </div>
+      </button>
+      <div className="mt-auto flex items-center justify-end gap-0.5 px-3 pb-2.5 pt-1">
+        <button
+          onClick={() => onDuplicate(preset.id)}
+          className="rounded px-1.5 py-1 text-xs text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+        >
+          Dupliquer
+        </button>
+        <button
+          onClick={(e) => onDelete(e, preset)}
+          className="rounded px-1.5 py-1 text-xs text-gray-500 hover:bg-red-50 hover:text-red-600"
+        >
+          Supprimer
+        </button>
       </div>
-      <p className="text-xs text-gray-400 mt-3">
-        {new Date(preset.createdAt).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })}
-      </p>
     </div>
   );
 }

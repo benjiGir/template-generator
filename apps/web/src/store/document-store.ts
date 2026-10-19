@@ -32,9 +32,20 @@ const EMPTY = {
   savedRevision:    0,
 };
 
+const FILL_MODE_KEY = "docforge-fill-mode";
+
+/** Préférence de remplissage mémorisée dans ce navigateur (absente en navigation privée : formulaire) */
+function storedFillMode(): "form" | "inline" {
+  try {
+    return localStorage.getItem(FILL_MODE_KEY) === "inline" ? "inline" : "form";
+  } catch {
+    return "form";
+  }
+}
+
 export const useDocumentStore = create<DocumentState>((set, get) => ({
   ...EMPTY,
-  fillMode: "form",
+  fillMode: storedFillMode(),
 
   loadDocument: (doc) => {
     const snapshot = doc.templateSnapshot;
@@ -61,7 +72,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       return { data, revision: s.revision + 1 };
     }),
 
-  setFillMode: (mode) => set({ fillMode: mode }),
+  setFillMode: (mode) => {
+    try {
+      localStorage.setItem(FILL_MODE_KEY, mode);
+    } catch {
+      // stockage indisponible : la préférence ne vaut que pour cette session
+    }
+    set({ fillMode: mode });
+  },
 
   markSaved: (revision) => set((s) => ({ savedRevision: Math.max(s.savedRevision, revision) })),
 

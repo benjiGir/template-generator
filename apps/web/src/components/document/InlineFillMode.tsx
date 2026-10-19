@@ -1,259 +1,175 @@
-import { useState, useCallback } from "react";
-import { Check } from "lucide-react";
-import { get } from "@template-generator/component-registry/registry";
-import { resolveThemeVars } from "@template-generator/component-registry/renderer";
-import { computeCompletion, fieldKey, isFilled } from "@template-generator/shared/utils/fields";
-import { DocumentView } from "@/components/document-view/DocumentView";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, EyeOff, Lock, SkipForward, X } from "lucide-react";
 import { useDocumentStore } from "@/store/document-store";
+import { PreviewPane } from "@/components/document-view/PreviewPane";
+import { computeCompletion, fieldKey, isFilled } from "@template-generator/shared/utils/fields";
 import { FormField } from "./FormField";
-import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
 import type { EditableField } from "@template-generator/shared/types/template";
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
-function scrollToNode(nodeId: string) {
-  document
-    .querySelector(`[data-inline-node="${nodeId}"]`)
-    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+/** Le composant le plus proche (vers le haut) sous l'élément cliqué ou survolé */
+function nodeIdFrom(target: EventTarget | null): string | null {
+  let el = target as HTMLElement | null;
+  while (el) {
+    const id = el.dataset?.["nodeId"];
+    if (id) return id;
+    el = el.parentElement;
+  }
+  return null;
 }
 
-// ── Inline renderer ──────────────────────────────────────────────────────────
-
-interface RendererProps {
-  nodes: ComponentNode[];
-  theme: Theme;
-  editableMap: Map<string, EditableField[]>;
-  data: Record<string, unknown>;
-  selectedNodeId: string | null;
-  onSelect: (nodeId: string) => void;
-}
-
-function InlineNodeRenderer({ nodes, theme, editableMap, data, selectedNodeId, onSelect }: RendererProps) {
-  return (
-    <>
-      {nodes.map((node) => {
-        const def = get(node.type);
-        if (!def) return null;
-
-        const nodeFields = editableMap.get(node.id) ?? [];
-        const isEditable = nodeFields.length > 0;
-        const isSelected = selectedNodeId === node.id;
-
-        const mergedProps: Record<string, unknown> & { theme: Theme } = {
-          ...def.defaultProps,
-          ...resolveThemeVars(node.props, theme),
-          theme,
-        };
-        for (const field of nodeFields) {
-          const key = `${field.nodeId}.${field.propKey}`;
-          if (key in data) mergedProps[field.propKey] = data[key];
-        }
-
-        const Component = def.render;
-
-        const rendered =
-          def.acceptsChildren && node.children?.length ? (
-            <Component {...mergedProps}>
-              <InlineNodeRenderer
-                nodes={node.children}
-                theme={theme}
-                editableMap={editableMap}
-                data={data}
-                selectedNodeId={selectedNodeId}
-                onSelect={onSelect}
-              />
-            </Component>
-          ) : (
-            <Component {...mergedProps} />
-          );
-
-        if (!isEditable) return <div key={node.id}>{rendered}</div>;
-
-        return (
-          <div
-            key={node.id}
-            data-inline-node={node.id}
-            onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}
-            style={{
-              outline: isSelected
-                ? "2px solid #3B82F6"
-                : undefined,
-              outlineOffset: 2,
-              borderRadius: 4,
-              cursor: "pointer",
-              position: "relative",
-            }}
-            onMouseEnter={(e) => {
-              if (!isSelected) e.currentTarget.style.outline = "1px dashed #93C5FD";
-            }}
-            onMouseLeave={(e) => {
-              if (!isSelected) e.currentTarget.style.outline = "";
-            }}
-          >
-            {rendered}
-          </div>
-        );
-      })}
-    </>
-  );
-}
-
-// ── Completion panel ─────────────────────────────────────────────────────────
-
-function CompletionPanel({
-  editableFields,
-  data,
-  selectedNodeId,
-  onSelectNode,
-}: {
-  editableFields: EditableField[];
-  data: Record<string, unknown>;
-  selectedNodeId: string | null;
-  onSelectNode: (nodeId: string) => void;
-}) {
-  const { percent: pct } = computeCompletion(editableFields, data);
-
-  return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 shrink-0">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-semibold text-gray-700">Progression</span>
-          <span className="text-xs font-bold text-gray-900">{pct}%</span>
-        </div>
-        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all"
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Field list */}
-      <div className="flex-1 overflow-y-auto">
-        {editableFields.map((field) => {
-          const key = fieldKey(field);
-          const filled = isFilled(data[key]);
-          const isActive = selectedNodeId === field.nodeId;
-          return (
-            <button
-              key={key}
-              onClick={() => {
-                onSelectNode(field.nodeId);
-                scrollToNode(field.nodeId);
-              }}
-              className={`w-full flex items-center gap-2 px-4 py-2.5 text-left transition-colors border-b border-gray-50 ${
-                isActive ? "bg-blue-50" : "hover:bg-gray-50"
-              }`}
-            >
-              <div
-                className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
-                  filled ? "bg-green-500" : "bg-gray-200"
-                }`}
-              >
-                {filled && <Check size={9} className="text-white" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-800 truncate">{field.label}</p>
-                <p className="text-[10px] text-gray-400 truncate">
-                  {field.type}
-                  {field.required && " · requis"}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── Main ─────────────────────────────────────────────────────────────────────
-
+/**
+ * Remplir directement dans la page : le document occupe tout l'espace,
+ * les zones remplissables s'ouvrent sur place, le reste est verrouillé.
+ */
 export function InlineFillMode() {
   const editableFields = useDocumentStore((s) => s.editableFields);
   const data = useDocumentStore((s) => s.data);
   const updateField = useDocumentStore((s) => s.updateField);
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [reveal, setReveal] = useState(false);
+  const [lockedNotice, setLockedNotice] = useState(false);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const mergedTemplate = getMergedTemplate();
+  const completion = computeCompletion(editableFields, data);
 
-  // Build a map of nodeId → EditableField[]
-  const editableMap = new Map<string, EditableField[]>();
-  for (const field of editableFields) {
-    if (!editableMap.has(field.nodeId)) editableMap.set(field.nodeId, []);
-    editableMap.get(field.nodeId)!.push(field);
-  }
+  // Champs par composant ; un composant est remplissable s'il porte au moins un champ
+  const fieldsByNode = useMemo(() => {
+    const map = new Map<string, EditableField[]>();
+    for (const f of editableFields) map.set(f.nodeId, [...(map.get(f.nodeId) ?? []), f]);
+    return map;
+  }, [editableFields]);
+  const editableIds = useMemo(() => Array.from(fieldsByNode.keys()), [fieldsByNode]);
 
-  const selectedNodeFields = selectedNodeId ? (editableMap.get(selectedNodeId) ?? []) : [];
+  /** Remonte jusqu'au composant remplissable qui contient la cible (une carte dans sa rangée…) */
+  const editableAncestor = (target: EventTarget | null): string | null => {
+    let el = target as HTMLElement | null;
+    while (el) {
+      const id = nodeIdFrom(el);
+      if (!id) return null;
+      if (fieldsByNode.has(id)) return id;
+      el = (el.closest(`[data-node-id="${CSS.escape(id)}"]`)?.parentElement as HTMLElement | null) ?? null;
+    }
+    return null;
+  };
 
-  const handleSelect = useCallback((nodeId: string) => {
-    setSelectedNodeId((prev) => (prev === nodeId ? null : nodeId));
+  const handleClick = (e: React.MouseEvent) => {
+    const id = editableAncestor(e.target);
+    if (id) {
+      setSelected(id);
+      setLockedNotice(false);
+      return;
+    }
+    setSelected(null);
+    // Un clic sur une partie verrouillée reçoit une réponse, pas le silence
+    if (nodeIdFrom(e.target)) {
+      setLockedNotice(true);
+      clearTimeout(noticeTimer.current);
+      noticeTimer.current = setTimeout(() => setLockedNotice(false), 2500);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => e.key === "Escape" && setSelected(null);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  useEffect(() => () => clearTimeout(noticeTimer.current), []);
+
+  // Prochain champ vide, dans l'ordre du formulaire, après le composant ouvert
+  const goToNextEmpty = () => {
+    const empty = editableFields.filter((f) => !isFilled(data[fieldKey(f)]));
+    if (empty.length === 0) return;
+    const currentOrder = selected ? Math.max(...(fieldsByNode.get(selected) ?? []).map((f) => f.order)) : -1;
+    const next = empty.find((f) => f.order > currentOrder) ?? empty[0]!;
+    setSelected(next.nodeId);
+  };
 
   if (!mergedTemplate) return null;
 
+  const selectedFields = selected ? fieldsByNode.get(selected) ?? [] : [];
+  const remaining = completion.total - completion.filled;
+
+  const panel = selected && selectedFields.length > 0 && (
+    <div className="rounded-lg border border-gray-200 bg-white shadow-xl">
+      <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2">
+        <span className="text-xs font-semibold text-gray-700">
+          {selectedFields.length > 1 ? `Modifier ces ${selectedFields.length} contenus` : "Modifier ce contenu"}
+        </span>
+        <button onClick={() => setSelected(null)} className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Fermer (Échap)">
+          <X size={14} />
+        </button>
+      </div>
+      <div className="max-h-[360px] space-y-2 overflow-y-auto px-3 py-2">
+        {selectedFields.map((field) => (
+          <FormField
+            key={fieldKey(field)}
+            field={field}
+            value={data[fieldKey(field)]}
+            onChange={(v) => updateField(fieldKey(field), v)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="h-full flex overflow-hidden">
-      {/* Canvas */}
-      <div
-        className="flex-1 overflow-y-auto bg-slate-200/70 p-8"
-        onClick={() => setSelectedNodeId(null)}
-      >
-        <p className="text-xs text-gray-400 text-center mb-3">
-          Cliquez sur une zone en surbrillance pour l'éditer
-        </p>
-        <DocumentView
-          template={mergedTemplate}
-          renderNodes={(nodes, theme) => (
-            <InlineNodeRenderer
-              nodes={nodes}
-              theme={theme}
-              editableMap={editableMap}
-              data={data}
-              selectedNodeId={selectedNodeId}
-              onSelect={handleSelect}
-            />
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-5 py-2 text-xs">
+        <div className="flex w-56 items-center gap-2">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${completion.percent}%` }} />
+          </div>
+          <span className="shrink-0 text-gray-500">{completion.filled}/{completion.total}</span>
+        </div>
+        <span className="text-gray-600">
+          {remaining === 0 ? "Tout est rempli" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""}`}
+          {completion.missingRequired.length > 0 && (
+            <span className="text-amber-700"> · {completion.missingRequired.length} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""}</span>
           )}
-        />
+        </span>
+        {remaining > 0 && (
+          <button onClick={goToNextEmpty} className="flex items-center gap-1 rounded px-2 py-1 font-medium text-blue-700 hover:bg-blue-50">
+            <SkipForward size={13} />
+            Champ vide suivant
+          </button>
+        )}
+        <button
+          onClick={() => setReveal((r) => !r)}
+          aria-pressed={reveal}
+          className={`ml-auto flex items-center gap-1.5 rounded px-2 py-1 ${reveal ? "bg-emerald-50 text-emerald-800" : "text-gray-600 hover:bg-gray-100"}`}
+        >
+          {reveal ? <EyeOff size={13} /> : <Eye size={13} />}
+          {reveal ? "Masquer les zones modifiables" : "Révéler les zones modifiables"}
+        </button>
       </div>
 
-      {/* Right panel */}
-      <div className="w-[260px] shrink-0 border-l border-gray-200 bg-white overflow-hidden flex flex-col">
-        {selectedNodeId && selectedNodeFields.length > 0 ? (
-          <>
-            <div className="px-4 py-2.5 border-b border-gray-200 flex items-center justify-between shrink-0">
-              <span className="text-xs font-semibold text-gray-700">Éditer</span>
-              <button
-                onClick={() => setSelectedNodeId(null)}
-                className="text-xs text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {selectedNodeFields.map((field) => (
-                <FormField
-                  key={`${field.nodeId}.${field.propKey}`}
-                  field={field}
-                  value={data[`${field.nodeId}.${field.propKey}`]}
-                  onChange={(v) => updateField(`${field.nodeId}.${field.propKey}`, v)}
-                />
-              ))}
-            </div>
-          </>
-        ) : (
-          <CompletionPanel
-            editableFields={editableFields}
-            data={data}
-            selectedNodeId={selectedNodeId}
-            onSelectNode={(nodeId) => {
-              setSelectedNodeId(nodeId);
-              scrollToNode(nodeId);
-            }}
-          />
+      <div
+        className="relative min-h-0 flex-1"
+        onMouseOver={(e) => setHovered(editableAncestor(e.target))}
+        onMouseLeave={() => setHovered(null)}
+      >
+        <PreviewPane
+          template={mergedTemplate}
+          highlightNodeId={selected ?? hovered}
+          outlineNodeIds={reveal ? editableIds : undefined}
+          onBackgroundClick={handleClick}
+          anchoredPanel={panel || undefined}
+        />
+        {lockedNotice && (
+          <div role="status" className="pointer-events-none absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-xs text-white shadow-lg">
+            <Lock size={12} />
+            Cette partie fait partie du template : elle ne se modifie pas ici.
+          </div>
+        )}
+        {!selected && !reveal && hovered === null && (
+          <p className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-3 py-1 text-[11px] text-gray-500 shadow ring-1 ring-gray-200">
+            Survolez le document : les zones modifiables s'encadrent. Cliquez pour les modifier.
+          </p>
         )}
       </div>
     </div>

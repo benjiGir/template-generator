@@ -26,6 +26,8 @@ interface Props {
   onBackgroundClick?: MouseEventHandler<HTMLDivElement>;
   /** Contenu affiché au-dessus du document, dans la zone de défilement */
   header?: ReactNode;
+  /** Panneau ancré sous la zone mise en évidence (édition sur place) */
+  anchoredPanel?: ReactNode;
 }
 
 /**
@@ -45,7 +47,7 @@ function measureNode(el: HTMLElement, nodeId: string): Rect | null {
   return { top: top - container.top + el.scrollTop, left: left - container.left + el.scrollLeft, width: right - left, height: bottom - top };
 }
 
-export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, pickable = false, renderNodes, onBackgroundClick, header }: Props) {
+export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, pickable = false, renderNodes, onBackgroundClick, header, anchoredPanel }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -96,6 +98,16 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
     if (!highlightNodeId) scrolledFor.current = null;
   }, [highlightNodeId]);
 
+  // Le panneau ancré doit être visible, même sous une zone plus haute que l'écran
+  const panelRef = useRef<HTMLDivElement>(null);
+  const hasPanel = Boolean(anchoredPanel);
+  useEffect(() => {
+    if (!hasPanel || !rect) return;
+    const timer = setTimeout(() => panelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 120);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPanel, highlightNodeId, rect !== null]);
+
   return (
     <div
       ref={scrollRef}
@@ -115,6 +127,19 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
           style={{ top: r.top, left: r.left, width: r.width, height: r.height }}
         />
       ))}
+      {rect && anchoredPanel && (
+        <div
+          ref={panelRef}
+          className="absolute z-20 w-[380px]"
+          style={{
+            top: rect.top + rect.height + 10,
+            left: Math.max(8, Math.min(rect.left, (scrollRef.current?.scrollWidth ?? 0) - 388)),
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {anchoredPanel}
+        </div>
+      )}
       {rect && (
         <div
           aria-hidden

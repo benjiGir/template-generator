@@ -5,6 +5,11 @@
   cursor: pointer;
 }
 
+/* Aperçu de composant : les voisins d'exemple sont estompés */
+[data-component-preview] [data-node-id^="ghost-"]:not([data-node-id="ghost-parent"]) > * {
+  opacity: 0.3;
+}
+
 /*
  * Impression : seul le portail d'impression (usePrintDocument) est imprimé.
  * Il contient le document rendu à l'échelle 1 avec les mêmes composants qu'à l'écran.
