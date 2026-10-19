@@ -12,6 +12,7 @@ import {
   BUILTIN_THEMES,
 } from "@template-generator/shared/themes/presets";
 import type { Template } from "@template-generator/shared/types/template";
+import { buildPublishedVersion, buildDocumentSnapshot, computeCompletion } from "@template-generator/shared/utils/fields";
 
 const pool = new Pool({ connectionString: process.env["DATABASE_URL"] });
 const db = drizzle(pool);
@@ -281,7 +282,14 @@ const insertedTemplates: Array<{ id: string; template: TemplateInsert }> = [];
 for (const tpl of TEMPLATES) {
   const existing = await db.select({ id: templates.id }).from(templates).where(eq(templates.name, tpl.name));
   if (existing.length === 0) {
-    const [row] = await db.insert(templates).values(tpl as typeof templates.$inferInsert).returning({ id: templates.id });
+    const [row] = await db
+      .insert(templates)
+      .values({
+        ...tpl,
+        publishedAt:      tpl.published ? new Date() : null,
+        publishedVersion: tpl.published ? buildPublishedVersion(tpl) : null,
+      } as typeof templates.$inferInsert)
+      .returning({ id: templates.id });
     insertedTemplates.push({ id: row!.id, template: tpl });
     console.log(`  ✓ Template inséré : ${tpl.name}`);
   } else {
@@ -388,16 +396,16 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Janvier 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: chantiersSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
     data: {
-      "tb-1__subtitle": "Bilan mensuel — Janvier 2025",
-      "ib-1__content": "Ce document présente l'avancement des **chantiers techniques** de janvier 2025. Toutes les livraisons planifiées ont été réalisées.",
-      "kc-1__description": "12/12 tâches livrées dans les délais.",
-      "kc-2__description": "+18% vs décembre 2024.",
-      "kc-3__description": "12 bugs critiques corrigés en production.",
-      "kc-4__description": "4 déploiements réussis sans rollback.",
-      "db-1__result": "Livré en production le 15 janvier. Aucun incident signalé.",
-      "pf-1__text": "KOMITY — Document confidentiel — Janvier 2025",
+      "tb-1.subtitle": "Bilan mensuel — Janvier 2025",
+      "ib-1.content": "Ce document présente l'avancement des **chantiers techniques** de janvier 2025. Toutes les livraisons planifiées ont été réalisées.",
+      "kc-1.description": "12/12 tâches livrées dans les délais.",
+      "kc-2.description": "+18% vs décembre 2024.",
+      "kc-3.description": "12 bugs critiques corrigés en production.",
+      "kc-4.description": "4 déploiements réussis sans rollback.",
+      "db-1.result": "Livré en production le 15 janvier. Aucun incident signalé.",
+      "pf-1.text": "KOMITY — Document confidentiel — Janvier 2025",
     },
   },
   // Chantiers Techniques — Février 2025 (finalisé)
@@ -406,16 +414,16 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Février 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: chantiersSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
     data: {
-      "tb-1__subtitle": "Bilan mensuel — Février 2025",
-      "ib-1__content": "Bilan de février 2025 : mois dense marqué par la finalisation de l'optimisation API et le démarrage de la migration K8s.",
-      "kc-1__description": "9/10 tâches livrées — 1 reportée.",
-      "kc-2__description": "+7% vs janvier 2025.",
-      "kc-3__description": "8 bugs corrigés, 2 en cours d'investigation.",
-      "kc-4__description": "3 déploiements — 1 rollback partiel.",
-      "db-1__result": "Optimisation API finalisée. P99 < 180ms.",
-      "pf-1__text": "KOMITY — Document confidentiel — Février 2025",
+      "tb-1.subtitle": "Bilan mensuel — Février 2025",
+      "ib-1.content": "Bilan de février 2025 : mois dense marqué par la finalisation de l'optimisation API et le démarrage de la migration K8s.",
+      "kc-1.description": "9/10 tâches livrées — 1 reportée.",
+      "kc-2.description": "+7% vs janvier 2025.",
+      "kc-3.description": "8 bugs corrigés, 2 en cours d'investigation.",
+      "kc-4.description": "3 déploiements — 1 rollback partiel.",
+      "db-1.result": "Optimisation API finalisée. P99 < 180ms.",
+      "pf-1.text": "KOMITY — Document confidentiel — Février 2025",
     },
   },
   // Chantiers Techniques — Mars 2025 (brouillon en cours)
@@ -424,10 +432,10 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Mars 2025",
     status: "draft" as const,
     completionPercent: 40,
-    templateSnapshot: chantiersSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
     data: {
-      "tb-1__subtitle": "Bilan mensuel — Mars 2025",
-      "kc-1__description": "En cours de saisie...",
+      "tb-1.subtitle": "Bilan mensuel — Mars 2025",
+      "kc-1.description": "En cours de saisie...",
     },
   },
   // RH — Janvier 2025 (finalisé)
@@ -436,14 +444,14 @@ const DOCUMENTS = [
     name: "Bilan RH — Janvier 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: rhSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
     data: {
-      "rh-tb-1__subtitle": "Janvier 2025",
-      "rh-kc-1__description": "142 collaborateurs actifs.",
-      "rh-kc-2__description": "3 postes pourvus ce mois.",
-      "rh-kc-3__description": "3,2% — en baisse vs décembre.",
-      "rh-kc-4__description": "eNPS : +42 (enquête jan.)",
-      "rh-ns-1__items": ["Finaliser le recrutement Backend ouvert", "Lancer les entretiens annuels", "Déployer le module de formation"],
+      "rh-tb-1.subtitle": "Janvier 2025",
+      "rh-kc-1.description": "142 collaborateurs actifs.",
+      "rh-kc-2.description": "3 postes pourvus ce mois.",
+      "rh-kc-3.description": "3,2% — en baisse vs décembre.",
+      "rh-kc-4.description": "eNPS : +42 (enquête jan.)",
+      "rh-ns-1.items": ["Finaliser le recrutement Backend ouvert", "Lancer les entretiens annuels", "Déployer le module de formation"],
     },
   },
   // RH — Février 2025 (finalisé)
@@ -452,14 +460,14 @@ const DOCUMENTS = [
     name: "Bilan RH — Février 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: rhSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
     data: {
-      "rh-tb-1__subtitle": "Février 2025",
-      "rh-kc-1__description": "145 collaborateurs actifs (+3).",
-      "rh-kc-2__description": "2 postes pourvus, 1 en cours.",
-      "rh-kc-3__description": "2,8% — objectif 3% atteint.",
-      "rh-kc-4__description": "eNPS : +47 (post-onboarding).",
-      "rh-ns-1__items": ["Finaliser l'onboarding des 2 nouvelles recrues", "Lancer la campagne de formation Q2", "Préparer le bilan social"],
+      "rh-tb-1.subtitle": "Février 2025",
+      "rh-kc-1.description": "145 collaborateurs actifs (+3).",
+      "rh-kc-2.description": "2 postes pourvus, 1 en cours.",
+      "rh-kc-3.description": "2,8% — objectif 3% atteint.",
+      "rh-kc-4.description": "eNPS : +47 (post-onboarding).",
+      "rh-ns-1.items": ["Finaliser l'onboarding des 2 nouvelles recrues", "Lancer la campagne de formation Q2", "Préparer le bilan social"],
     },
   },
   // RH — Mars 2025 (brouillon)
@@ -468,9 +476,9 @@ const DOCUMENTS = [
     name: "Bilan RH — Mars 2025",
     status: "draft" as const,
     completionPercent: 25,
-    templateSnapshot: rhSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
     data: {
-      "rh-tb-1__subtitle": "Mars 2025",
+      "rh-tb-1.subtitle": "Mars 2025",
     },
   },
   // Finance — Q1 2025 (finalisé)
@@ -479,15 +487,15 @@ const DOCUMENTS = [
     name: "Rapport Financier — Q1 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: financeSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0] as unknown as Template),
     data: {
-      "fi-tb-1__subtitle": "Q1 2025 — Janvier · Février · Mars",
-      "fi-kc-1__description": "€ 1,24M — +12% vs Q1 2024.",
-      "fi-kc-2__description": "67% — stable vs objectif.",
-      "fi-kc-3__description": "14 comptes signés ce trimestre.",
-      "fi-kc-4__description": "€ 98K — objectif Q2 : € 115K.",
-      "fi-db-1__result": "Objectif CA Q1 atteint à 103%.",
-      "fi-db-2__result": "Ratio dépenses/CA : 61% (vs 63% Q1 2024).",
+      "fi-tb-1.subtitle": "Q1 2025 — Janvier · Février · Mars",
+      "fi-kc-1.description": "€ 1,24M — +12% vs Q1 2024.",
+      "fi-kc-2.description": "67% — stable vs objectif.",
+      "fi-kc-3.description": "14 comptes signés ce trimestre.",
+      "fi-kc-4.description": "€ 98K — objectif Q2 : € 115K.",
+      "fi-db-1.result": "Objectif CA Q1 atteint à 103%.",
+      "fi-db-2.result": "Ratio dépenses/CA : 61% (vs 63% Q1 2024).",
     },
   },
   // Finance — Q2 2025 (brouillon)
@@ -496,9 +504,9 @@ const DOCUMENTS = [
     name: "Rapport Financier — Q2 2025",
     status: "draft" as const,
     completionPercent: 15,
-    templateSnapshot: financeSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0] as unknown as Template),
     data: {
-      "fi-tb-1__subtitle": "Q2 2025 — Avril · Mai · Juin",
+      "fi-tb-1.subtitle": "Q2 2025 — Avril · Mai · Juin",
     },
   },
   // Post-Mortem INC-2025-0042 (finalisé)
@@ -507,15 +515,15 @@ const DOCUMENTS = [
     name: "Post-Mortem — INC-2025-0042",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: pmSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0] as unknown as Template),
     data: {
-      "pm-tb-1__subtitle": "INC-2025-0042 — 8 février 2025",
-      "pm-kc-1__description": "2h14 d'interruption partielle.",
-      "pm-kc-2__description": "API Gateway + Auth Service.",
-      "pm-kc-3__description": "~340 comptes Enterprise.",
-      "pm-kc-4__description": "SEV-2 (dégradation partielle).",
-      "pm-db-1__result": "Certificat TLS interne expiré — alerte désactivée lors migration nov. 2024.",
-      "pm-ns-1__items": ["Automatiser renouvellement (cert-manager)", "Alerte J-30 et J-7 sur tous les certs", "Mettre à jour le runbook Auth", "Check validité cert en CI"],
+      "pm-tb-1.subtitle": "INC-2025-0042 — 8 février 2025",
+      "pm-kc-1.description": "2h14 d'interruption partielle.",
+      "pm-kc-2.description": "API Gateway + Auth Service.",
+      "pm-kc-3.description": "~340 comptes Enterprise.",
+      "pm-kc-4.description": "SEV-2 (dégradation partielle).",
+      "pm-db-1.result": "Certificat TLS interne expiré — alerte désactivée lors migration nov. 2024.",
+      "pm-ns-1.items": ["Automatiser renouvellement (cert-manager)", "Alerte J-30 et J-7 sur tous les certs", "Mettre à jour le runbook Auth", "Check validité cert en CI"],
     },
   },
   // Post-Mortem INC-2025-0067 (brouillon)
@@ -524,13 +532,13 @@ const DOCUMENTS = [
     name: "Post-Mortem — INC-2025-0067",
     status: "draft" as const,
     completionPercent: 30,
-    templateSnapshot: pmSnapshot[0],
+    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0] as unknown as Template),
     data: {
-      "pm-tb-1__subtitle": "INC-2025-0067 — 2 mars 2025",
-      "pm-kc-1__description": "45 min de latence dégradée.",
-      "pm-kc-2__description": "Service de notifications.",
-      "pm-kc-3__description": "~80 comptes affectés.",
-      "pm-kc-4__description": "SEV-3 (impact limité).",
+      "pm-tb-1.subtitle": "INC-2025-0067 — 2 mars 2025",
+      "pm-kc-1.description": "45 min de latence dégradée.",
+      "pm-kc-2.description": "Service de notifications.",
+      "pm-kc-3.description": "~80 comptes affectés.",
+      "pm-kc-4.description": "SEV-3 (impact limité).",
     },
   },
 ];
@@ -538,7 +546,12 @@ const DOCUMENTS = [
 for (const doc of DOCUMENTS) {
   const existing = await db.select({ id: documents.id }).from(documents).where(eq(documents.name, doc.name));
   if (existing.length === 0) {
-    await db.insert(documents).values(doc as typeof documents.$inferInsert);
+    const { percent } = computeCompletion(doc.templateSnapshot.editableFields, doc.data);
+    await db.insert(documents).values({
+      ...doc,
+      completionPercent: percent,
+      exportedAt:        doc.status === "finalized" ? new Date() : null,
+    } as typeof documents.$inferInsert);
     console.log(`  ✓ Document inséré : ${doc.name}`);
   } else {
     console.log(`  — Document déjà présent : ${doc.name}`);

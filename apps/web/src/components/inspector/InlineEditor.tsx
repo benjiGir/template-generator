@@ -57,7 +57,7 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
   const stopInlineEdit = useEditorStore((s) => s.stopInlineEdit);
   const containerRef = useRef<HTMLDivElement>(null);
   const savedRef = useRef(value);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Escape → annule
   useEffect(() => {

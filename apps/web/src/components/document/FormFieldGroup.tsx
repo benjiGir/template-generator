@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FormField } from "./FormField";
+import { fieldKey, isFilled } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
 
 interface Props {
@@ -11,10 +12,7 @@ interface Props {
 
 export function FormFieldGroup({ group, fields, data, onUpdate }: Props) {
   const [open, setOpen] = useState(true);
-  const filled = fields.filter((f) => {
-    const val = data[`${f.nodeId}.${f.propKey}`];
-    return val !== undefined && val !== null && val !== "";
-  }).length;
+  const filled = fields.filter((f) => isFilled(data[fieldKey(f)])).length;
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">

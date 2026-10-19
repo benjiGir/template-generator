@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { LayoutTemplate } from "lucide-react";
-import { api } from "@/api/client";
+import { Copy, LayoutTemplate, Trash2 } from "lucide-react";
+import { api, type TemplateSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
-import { duplicateTemplate } from "@/store/templates-store";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 
 export function TemplatesListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   const { data: templates = [], isLoading, error } = useQuery({
     queryKey: queryKeys.templates.list(),
@@ -15,33 +17,49 @@ export function TemplatesListPage() {
   });
 
   const duplicateMutation = useMutation({
-    mutationFn: (id: string) => duplicateTemplate(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.templates.list() }),
+    mutationFn: (id: string) => api.templates.duplicate(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["templates", "list"] }),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.templates.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.templates.list() }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["templates", "list"] }),
   });
 
-  const handleDuplicate = (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, t: TemplateSummary) => {
     e.stopPropagation();
-    duplicateMutation.mutate(id);
-  };
-
-  const handleDelete = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (!confirm("Supprimer ce template ?")) return;
-    deleteMutation.mutate(id);
+    const consequences = [
+      t.published
+        ? "Il ne sera plus proposé dans le Studio : plus aucun document ne pourra être créé à partir de lui."
+        : "Ce brouillon n'a jamais été publié.",
+    ];
+    if (t.documentCount > 0) {
+      consequences.push(
+        `${t.documentCount} document${t.documentCount > 1 ? "s ont" : " a"} été créé${t.documentCount > 1 ? "s" : ""} à partir de ce template. ${
+          t.documentCount > 1 ? "Ils restent" : "Il reste"
+        } consultable${t.documentCount > 1 ? "s" : ""}, modifiable${t.documentCount > 1 ? "s" : ""} et exportable${t.documentCount > 1 ? "s" : ""}.`
+      );
+    }
+    consequences.push("Cette action est irréversible.");
+    const ok = await confirm({
+      title: `Supprimer le template « ${t.name} » ?`,
+      consequences,
+      confirmLabel: "Supprimer le template",
+      tone: "danger",
+    });
+    if (ok) deleteMutation.mutate(t.id);
   };
 
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Atelier Templates</h1>
+      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-8 py-4">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Atelier</h1>
+          <p className="text-xs text-gray-500">Concevez les templates que le Studio utilisera pour produire les documents.</p>
+        </div>
         <button
           onClick={() => navigate("/templates/new")}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           + Nouveau template
         </button>
@@ -49,68 +67,64 @@ export function TemplatesListPage() {
 
       <div className="px-8 py-8">
         {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
-        {error && <p className="text-sm text-red-500">Erreur : {String(error)}</p>}
+        {error && <p className="text-sm text-red-500">Impossible de charger les templates.</p>}
 
-        {!isLoading && templates.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-sm mb-4">Aucun template. Créez-en un pour commencer.</p>
+        {!isLoading && !error && templates.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="text-sm font-medium text-gray-700">Aucun template pour l'instant</p>
+            <p className="mb-4 mt-1 text-sm text-gray-500">
+              Un template définit la mise en page d'un type de document ; le Studio le remplit à chaque édition.
+            </p>
             <button
               onClick={() => navigate("/templates/new")}
-              className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+              className="rounded bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Créer mon premier template
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4 max-w-5xl">
+        <div className="grid max-w-5xl grid-cols-3 gap-4">
           {templates.map((t) => (
             <div
               key={t.id}
-              onClick={() => navigate(`/templates/${t.id}/edit`)}
-              className="bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 hover:shadow-sm transition-all group overflow-hidden"
+              onClick={() => navigate(`/templates/${t.id}/build`)}
+              className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-sm"
             >
-              <div className="w-full aspect-[210/297] bg-gray-50 flex items-center justify-center border-b border-gray-100">
+              <div className="flex aspect-[210/297] w-full items-center justify-center border-b border-gray-100 bg-gray-50">
                 <LayoutTemplate size={32} className="text-gray-200" />
               </div>
               <div className="p-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <h3 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h3>
-                      {t.published && (
-                        <span className="shrink-0 text-[9px] font-medium px-1 py-0.5 rounded bg-green-100 text-green-700">
-                          Publié
-                        </span>
-                      )}
+                      <h3 className="truncate text-sm font-semibold text-gray-900">{t.name}</h3>
+                      <TemplateStatusBadge template={t} />
                     </div>
-                    {t.description && (
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">{t.description}</p>
-                    )}
+                    {t.description && <p className="mt-1 line-clamp-1 text-xs text-gray-500">{t.description}</p>}
                   </div>
-                  <div className="ml-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <div className="ml-2 flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                     <button
-                      onClick={(e) => handleDuplicate(e, t.id)}
-                      className="text-gray-400 hover:text-blue-500 text-xs p-1"
+                      onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate(t.id); }}
+                      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-blue-600"
                       title="Dupliquer"
+                      aria-label={`Dupliquer ${t.name}`}
                     >
-                      ⧉
+                      <Copy size={14} />
                     </button>
                     <button
-                      onClick={(e) => handleDelete(e, t.id)}
-                      className="text-gray-400 hover:text-red-500 text-xs p-1"
+                      onClick={(e) => handleDelete(e, t)}
+                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
                       title="Supprimer"
+                      aria-label={`Supprimer ${t.name}`}
                     >
-                      ✕
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                <p className="mt-2 text-xs text-gray-400">
+                  Modifié le {new Date(t.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                  {t.documentCount > 0 && ` · ${t.documentCount} document${t.documentCount > 1 ? "s" : ""}`}
                 </p>
               </div>
             </div>

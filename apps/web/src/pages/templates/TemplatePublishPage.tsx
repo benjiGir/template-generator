@@ -1,20 +1,21 @@
-import { useEffect, useRef, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { Check, Send } from "lucide-react";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
+import { useEditorStore } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
+import { useWorkflowSession } from "@/workflow/session";
+import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 import { get } from "@template-generator/component-registry/registry";
-import { buildWorkflowSteps, useTemplateWorkflow } from "./hooks/useTemplateWorkflow";
-import type { Template, EditableField } from "@template-generator/shared/types/template";
-import type { ComponentNode } from "@template-generator/shared/types/template";
+import { fieldKey, templateStatus } from "@template-generator/shared/utils/fields";
+import type { Template, EditableField, ComponentNode } from "@template-generator/shared/types/template";
 import type { PropType } from "@template-generator/shared/types/component";
-
-const CURRENT_STEP = 3;
 
 const EDITABLE_PROP_TYPES: PropType[] = ["text", "textarea", "richtext", "list", "emoji", "number", "image"];
 
+/** Tous les contenus modifiables du template, dans l'ordre du document */
 function detectEditableFields(template: Template): EditableField[] {
   const fields: EditableField[] = [];
   let order = 0;
@@ -47,181 +48,140 @@ function detectEditableFields(template: Template): EditableField[] {
 }
 
 export function TemplatePublishPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { goToStep } = useTemplateWorkflow();
   const queryClient = useQueryClient();
+  const session = useWorkflowSession();
+  const template = useEditorStore((s) => s.template)!;
+  const updateTemplateMeta = useEditorStore((s) => s.updateTemplateMeta);
+  const setEditableFields = useEditorStore((s) => s.setEditableFields);
+  const applyServerState = useEditorStore((s) => s.applyServerState);
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [enabledFields, setEnabledFields] = useState<Set<string>>(new Set());
-  const initialized = useRef(false);
+  const detectedFields = useMemo(() => detectEditableFields(template), [template]);
+  const selected = useMemo(() => new Map(template.editableFields.map((f) => [fieldKey(f), f])), [template.editableFields]);
 
-  const { data: template, isLoading, isError } = useQuery({
-    queryKey: queryKeys.templates.detail(id!),
-    queryFn: () => api.templates.get(id!),
-    enabled: !!id,
-  });
-
-  const detectedFields = useMemo(
-    () => (template ? detectEditableFields(template) : []),
-    [template]
-  );
-
+  // Première visite : pré-sélection de tous les contenus détectés
   useEffect(() => {
-    if (template && !initialized.current) {
-      initialized.current = true;
-      setName(template.name);
-      setDescription(template.description ?? "");
-      const existing = new Set(
-        (template.editableFields ?? []).map((f) => `${f.nodeId}.${f.propKey}`)
-      );
-      const fields = detectEditableFields(template);
-      setEnabledFields(
-        existing.size > 0
-          ? existing
-          : new Set(fields.map((f) => `${f.nodeId}.${f.propKey}`))
-      );
+    if (template.editableFields.length === 0 && !template.published && detectedFields.length > 0) {
+      setEditableFields(detectedFields);
     }
-  }, [template]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const publishMutation = useMutation({
-    mutationFn: async () => {
-      await api.templates.update(id!, { name, description });
-      const selectedFields = detectedFields
-        .filter((f) => enabledFields.has(`${f.nodeId}.${f.propKey}`))
-        .map((f, i) => ({ ...f, order: i }));
-      return api.templates.publish(id!, { editableFields: selectedFields });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.templates.list() });
-      navigate("/templates");
-    },
-  });
+  // Les champs retenus suivent l'ordre du document ; ceux dont le composant a disparu sont ignorés
+  const orderedSelection = detectedFields
+    .filter((f) => selected.has(fieldKey(f)))
+    .map((f, i) => ({ ...f, ...selected.get(fieldKey(f)), order: i }));
 
-  const toggleField = (key: string) => {
-    setEnabledFields((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+  const toggleField = (field: EditableField) => {
+    const key = fieldKey(field);
+    const next = selected.has(key)
+      ? orderedSelection.filter((f) => fieldKey(f) !== key)
+      : detectedFields.filter((f) => selected.has(fieldKey(f)) || fieldKey(f) === key).map((f) => selected.get(fieldKey(f)) ?? f);
+    setEditableFields(next);
   };
 
-  const steps = buildWorkflowSteps(CURRENT_STEP);
+  const status = templateStatus(template);
 
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center bg-gray-50">
-        <p className="text-sm text-gray-400">Chargement...</p>
-      </div>
-    );
-  }
+  const publish = async () => {
+    await session?.flush();
+    const result = await api.templates.publish(template.id, { editableFields: orderedSelection });
+    applyServerState(result);
+    queryClient.setQueryData(queryKeys.templates.detail(result.id), result);
+    await queryClient.invalidateQueries({ queryKey: ["templates", "list"] });
+    navigate("/templates");
+  };
 
-  if (isError || !template) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-red-500">Template introuvable</p>
-        <button onClick={() => navigate("/templates")} className="text-sm text-blue-600 hover:underline">
-          ← Retour aux templates
-        </button>
-      </div>
-    );
-  }
+  const nameMissing = template.name.trim().length === 0;
 
   return (
     <WorkflowLayout
-      title="Atelier Templates"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={!publishMutation.isPending && name.trim().length > 0}
-      nextLabel="Publier"
-      onPrevious={() => navigate(`/templates/${id}/edit`)}
-      onNext={() => publishMutation.mutate()}
-      onStepClick={(i) => {
-        const key = steps[i]?.key;
-        if (key && id) goToStep(key, id);
+      workflow={TEMPLATE_WORKFLOW}
+      current="publish"
+      entityId={template.id}
+      title={template.name}
+      finalAction={{
+        label: status === "draft" ? "Publier dans le Studio" : status === "published-with-changes" ? "Publier les modifications" : "Republier",
+        icon: <Send size={14} />,
+        onClick: publish,
+        disabled: nameMissing,
       }}
+      guard={nameMissing ? { ok: false, reason: "Donnez un nom au template" } : undefined}
     >
       <div className="h-full overflow-y-auto bg-gray-50 p-8">
-        <div className="max-w-2xl">
-          <h2 className="text-base font-semibold text-gray-900 mb-6">Finaliser le template</h2>
+        <div className="mx-auto max-w-3xl space-y-4">
+          {status !== "draft" && (
+            <p className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-2.5 text-xs text-blue-800">
+              {status === "published-with-changes"
+                ? "Ce template est publié, mais vos modifications récentes ne sont pas encore visibles dans le Studio. Les documents existants ne changent pas."
+                : "Ce template est publié et à jour dans le Studio."}
+            </p>
+          )}
 
-          <section className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">Informations</h3>
+          <section className="rounded-lg border border-gray-200 bg-white p-5">
+            <h3 className="mb-4 text-sm font-semibold text-gray-700">Informations</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="mb-1 block text-xs font-medium text-gray-600">
                   Nom <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400"
+                  value={template.name}
+                  onChange={(e) => updateTemplateMeta(e.target.value)}
+                  className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                <label className="mb-1 block text-xs font-medium text-gray-600">Description</label>
                 <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={template.description ?? ""}
+                  onChange={(e) => updateTemplateMeta(template.name, e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400 resize-none"
+                  className="w-full resize-none rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                 />
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-lg border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-semibold text-gray-700">Champs éditables</h3>
+          <section className="rounded-lg border border-gray-200 bg-white p-5">
+            <div className="mb-1 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-700">Champs à remplir dans le Studio</h3>
               <span className="text-xs text-gray-400">
-                {enabledFields.size} / {detectedFields.length} champs activés
+                {orderedSelection.length} / {detectedFields.length} retenus
               </span>
             </div>
-            <p className="text-xs text-gray-500 mb-4">
-              Ces champs seront exposés aux utilisateurs dans le Studio de Publication.
+            <p className="mb-4 text-xs text-gray-500">
+              Les champs cochés formeront le formulaire du Studio. Tout le reste du template est verrouillé.
             </p>
 
             {detectedFields.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-6">
-                Aucun champ éditable détecté dans ce template.
-              </p>
+              <p className="py-6 text-center text-sm text-gray-400">Aucun contenu modifiable détecté dans ce template.</p>
             ) : (
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="text-left py-2 pr-3 text-gray-500 font-medium w-8"></th>
-                    <th className="text-left py-2 pr-3 text-gray-500 font-medium">Label</th>
-                    <th className="text-left py-2 pr-3 text-gray-500 font-medium">Type</th>
-                    <th className="text-left py-2 text-gray-500 font-medium">Groupe</th>
+                    <th className="w-8 py-2 pr-3 text-left font-medium text-gray-500"></th>
+                    <th className="py-2 pr-3 text-left font-medium text-gray-500">Libellé</th>
+                    <th className="py-2 pr-3 text-left font-medium text-gray-500">Type</th>
+                    <th className="py-2 text-left font-medium text-gray-500">Groupe</th>
                   </tr>
                 </thead>
                 <tbody>
                   {detectedFields.map((field) => {
-                    const key = `${field.nodeId}.${field.propKey}`;
-                    const enabled = enabledFields.has(key);
+                    const enabled = selected.has(fieldKey(field));
+                    const stored = selected.get(fieldKey(field)) ?? field;
                     return (
-                      <tr
-                        key={key}
-                        onClick={() => toggleField(key)}
-                        className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer"
-                      >
+                      <tr key={fieldKey(field)} onClick={() => toggleField(field)} className="cursor-pointer border-b border-gray-50 hover:bg-gray-50">
                         <td className="py-2 pr-3">
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                            enabled ? "bg-blue-600 border-blue-600" : "border-gray-300"
-                          }`}>
+                          <div className={`flex h-4 w-4 items-center justify-center rounded border-2 transition-colors ${enabled ? "border-blue-600 bg-blue-600" : "border-gray-300"}`}>
                             {enabled && <Check size={10} className="text-white" />}
                           </div>
                         </td>
-                        <td className="py-2 pr-3 font-medium text-gray-900">{field.label}</td>
+                        <td className="py-2 pr-3 font-medium text-gray-900">{stored.label}</td>
                         <td className="py-2 pr-3">
-                          <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 text-[10px]">
-                            {field.type}
-                          </span>
+                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600">{field.type}</span>
                         </td>
-                        <td className="py-2 text-gray-400">{field.group ?? "—"}</td>
+                        <td className="py-2 text-gray-400">{stored.group ?? "—"}</td>
                       </tr>
                     );
                   })}

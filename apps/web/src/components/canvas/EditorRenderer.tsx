@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { get } from "@template-generator/component-registry/registry";
+import { resolveThemeVars } from "@template-generator/component-registry/renderer";
 import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
 import { useEditorStore } from "@/store/editor-store";
 import { SelectableWrapper } from "./SelectableWrapper";
@@ -81,7 +82,7 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
   }
 
   const Component = definition.render;
-  const mergedProps = { ...definition.defaultProps, ...node.props, theme };
+  const mergedProps = { ...definition.defaultProps, ...resolveThemeVars(node.props, theme), theme };
 
   if (!definition.acceptsChildren) {
     const isInlineEditing = inlineEditingNodeId === node.id && !!inlineEditingPropKey;

@@ -1,59 +1,49 @@
 @import "tailwindcss";
 
+/*
+ * Impression : seul le portail d'impression (usePrintDocument) est imprimé.
+ * Il contient le document rendu à l'échelle 1 avec les mêmes composants qu'à l'écran.
+ */
+@media screen {
+  [data-print-portal] {
+    position: fixed;
+    top: 0;
+    left: -100000px;
+    pointer-events: none;
+  }
+}
+
 @media print {
   html,
   body {
     height: auto !important;
     overflow: visible !important;
-  }
-
-  /* Masquer tout, ne montrer que le contenu du canvas */
-  body * {
-    visibility: hidden;
-  }
-
-  [data-print-root],
-  [data-print-root] * {
-    visibility: visible;
-  }
-
-  [data-print-root] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: auto;
-    height: auto !important;
-    overflow: visible !important;
-    background: none !important;
-    padding: 0 !important;
-  }
-
-  /* Conteneur des pages : supprimer le style éditeur */
-  [data-print-root] > div {
-    display: block !important;
-    background: none !important;
-    padding: 0 !important;
     margin: 0 !important;
+    background: #fff !important;
   }
 
-  /* Onglets de page : masqués à l'impression */
-  [data-page-tab] {
+  /* Les fonds de couleur sont imprimés sans avoir à cocher « Graphiques d'arrière-plan » */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body > *:not([data-print-portal]) {
     display: none !important;
-    visibility: hidden !important;
   }
 
-  /* Wrapper par page : supprimer l'espacement éditeur */
-  [data-page-wrapper] {
-    margin-bottom: 0 !important;
+  [data-print-portal] > div {
+    display: block !important;
+    gap: 0 !important;
   }
 
-  /* Styles des pages */
-  [data-doc-page] {
-    break-after: page;
-    break-inside: avoid;
+  [data-print-portal] [data-doc-page] {
     box-shadow: none !important;
-    border-radius: 0 !important;
-    outline: none !important;
     margin: 0 !important;
+    break-after: page;
+  }
+
+  [data-print-portal] [data-doc-page]:last-child {
+    break-after: auto;
   }
 }

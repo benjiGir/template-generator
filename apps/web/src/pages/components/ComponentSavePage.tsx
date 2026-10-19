@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { get } from "@template-generator/component-registry/registry";
 import { ComponentRenderer } from "@template-generator/component-registry/renderer";
@@ -8,10 +7,9 @@ import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
-import { buildComponentWorkflowSteps, useComponentWorkflow } from "./hooks/useComponentWorkflow";
+import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { NotFoundState } from "@/workflow/EntityState";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
-
-const CURRENT_STEP = 2;
 
 const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
   { value: "layout",     label: "Mise en page" },
@@ -22,22 +20,21 @@ const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
 
 export function ComponentSavePage() {
   const navigate = useNavigate();
-  const { goToStep } = useComponentWorkflow();
+  const { presetId } = useParams<{ presetId: string }>();
   const queryClient = useQueryClient();
   const baseType = useComponentDraftStore((s) => s.baseType);
   const props = useComponentDraftStore((s) => s.props);
   const editingId = useComponentDraftStore((s) => s.editingId);
-  const editingLabel = useComponentDraftStore((s) => s.editingLabel);
-  const editingDescription = useComponentDraftStore((s) => s.editingDescription);
-  const editingCategory = useComponentDraftStore((s) => s.editingCategory);
+  const label = useComponentDraftStore((s) => s.label);
+  const description = useComponentDraftStore((s) => s.description);
+  const category = useComponentDraftStore((s) => s.category);
+  const setMeta = useComponentDraftStore((s) => s.setMeta);
   const reset = useComponentDraftStore((s) => s.reset);
 
   const def = baseType ? get(baseType) : null;
-  const [label, setLabel] = useState(editingId ? editingLabel : (def ? `${def.label} preset` : ""));
-  const [description, setDescription] = useState(editingId ? editingDescription : "");
-  const [category, setCategory] = useState<ComponentCategory>(editingId ? editingCategory : (def?.category ?? "content"));
-
-  const steps = buildComponentWorkflowSteps(CURRENT_STEP);
+  const setLabel = (v: string) => setMeta({ label: v });
+  const setDescription = (v: string) => setMeta({ description: v });
+  const setCategory = (v: ComponentCategory) => setMeta({ category: v });
 
   const saveMutation = useMutation({
     mutationFn: () => {
@@ -60,30 +57,23 @@ export function ComponentSavePage() {
   });
 
   if (!baseType || !def) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-gray-500">Aucun composant en cours de création.</p>
-        <button onClick={() => navigate("/components/new")} className="text-sm text-blue-600 hover:underline">
-          ← Recommencer
-        </button>
-      </div>
-    );
+    return <NotFoundState message="Aucun composant en cours de création." backTo={PRESET_WORKFLOW.steps[0]!.path("new")} backLabel="Recommencer" />;
   }
 
   const previewNode = { id: "preview", type: baseType, props, children: [] };
 
   return (
     <WorkflowLayout
-      title="Bibliothèque Composants"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={label.trim().length > 0 && !saveMutation.isPending}
-      nextLabel={editingId ? "Mettre à jour" : "Sauvegarder"}
-      onPrevious={() => navigate("/components/new/edit")}
-      onNext={() => saveMutation.mutate()}
-      onStepClick={(i) => {
-        const key = steps[i]?.key;
-        if (key) goToStep(key);
+      workflow={PRESET_WORKFLOW}
+      current="save"
+      entityId={presetId}
+      firstNavigableStep={presetId === "new" ? 0 : 1}
+      title={editingId ? label : `Nouveau preset — ${def.label}`}
+      guard={label.trim() ? undefined : { ok: false, reason: "Donnez un nom au preset" }}
+      finalAction={{
+        label: editingId ? "Enregistrer les modifications" : "Ranger dans la bibliothèque",
+        onClick: async () => { await saveMutation.mutateAsync(); },
+        disabled: !label.trim(),
       }}
     >
       <div className="h-full flex overflow-hidden bg-gray-50">

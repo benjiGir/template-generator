@@ -10,6 +10,7 @@ export const queryKeys = {
   },
   presets: {
     list: () => ["presets", "list"] as const,
+    detail: (id: string) => ["presets", "detail", id] as const,
   },
   themes: {
     list: () => ["themes", "list"] as const,

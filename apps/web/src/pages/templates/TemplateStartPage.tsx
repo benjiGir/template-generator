@@ -5,22 +5,17 @@ import { FileText, Copy, Upload, Sparkles, LayoutTemplate } from "lucide-react";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
-import { DEFAULT_NEW_TEMPLATE } from "@/store/editor-store";
-import { buildWorkflowSteps, useTemplateWorkflow } from "./hooks/useTemplateWorkflow";
+import { newTemplateDraft } from "@/store/editor-store";
+import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 import type { TemplateSummary } from "@/api/client";
-
-const CURRENT_STEP = 0;
 
 type Mode = "blank" | "model" | "import" | "ai";
 
 export function TemplateStartPage() {
   const navigate = useNavigate();
-  const { goToStep } = useTemplateWorkflow();
   const [mode, setMode] = useState<Mode | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const steps = buildWorkflowSteps(CURRENT_STEP);
+  const [error, setError] = useState<string | null>(null);
 
   const { data: templates = [] } = useQuery({
     queryKey: queryKeys.templates.list(),
@@ -33,58 +28,40 @@ export function TemplateStartPage() {
     setSelectedTemplateId(null);
   };
 
+  // Le template est créé ici ; on remplace l'URL pour que « retour » ne relance pas une création
   const handleNext = async () => {
-    if (!mode) return;
-    setLoading(true);
+    setError(null);
     try {
-      if (mode === "blank") {
-        const created = await api.templates.create({
-          ...DEFAULT_NEW_TEMPLATE,
-          published: false,
-          editableFields: [],
-          tags: [],
-        });
-        navigate(`/templates/${created.id}/theme`);
-      } else if (mode === "model" && selectedTemplateId) {
-        const source = await api.templates.get(selectedTemplateId);
-        const created = await api.templates.create({
-          name:           `${source.name} (copie)`,
-          description:    source.description,
-          theme:          source.theme,
-          pageFormat:     source.pageFormat,
-          pages:          source.pages,
-          published:      false,
-          editableFields: [],
-          tags:           [],
-        });
-        navigate(`/templates/${created.id}/theme`);
-      }
+      const created =
+        mode === "model" && selectedTemplateId
+          ? await api.templates.duplicate(selectedTemplateId)
+          : await api.templates.create(newTemplateDraft());
+      navigate(TEMPLATE_WORKFLOW.steps[1]!.path(created.id), { replace: true });
     } catch (e) {
       console.error("Erreur création template:", e);
-    } finally {
-      setLoading(false);
+      setError("La création du template a échoué. Réessayez.");
     }
   };
 
-  const canGoNext =
-    mode === "blank" ||
-    (mode === "model" && selectedTemplateId !== null);
+  const guard =
+    mode === null
+      ? { ok: false, reason: "Choisissez un point de départ" }
+      : mode === "model" && !selectedTemplateId
+      ? { ok: false, reason: "Sélectionnez le template à dupliquer" }
+      : { ok: true };
 
   return (
     <WorkflowLayout
-      title="Atelier Templates"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={canGoNext && !loading}
-      onPrevious={() => navigate("/templates")}
+      workflow={TEMPLATE_WORKFLOW}
+      current="start"
+      title="Nouveau template"
+      guard={guard}
       onNext={handleNext}
-      onStepClick={(i) => {
-        const key = steps[i]?.key;
-        if (key && canGoNext) goToStep(key, "");
-      }}
+      nextLabel="Créer le template"
     >
       <div className="h-full overflow-y-auto bg-gray-50 p-8">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Choisissez un point de départ</h2>
+        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
         <div className="grid grid-cols-4 gap-3 max-w-4xl mb-8">
           <ModeCard
             icon={<FileText size={22} />}

@@ -5,64 +5,56 @@ import { LayoutTemplate } from "lucide-react";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
-import { buildDocumentWorkflowSteps } from "./hooks/useDocumentWorkflow";
+import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
 import type { TemplateSummary } from "@/api/client";
-
-const CURRENT_STEP = 0;
 
 export function DocumentSelectPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<TemplateSummary | null>(null);
-  const [creating, setCreating] = useState(false);
-
-  const steps = buildDocumentWorkflowSteps(CURRENT_STEP);
+  const [error, setError] = useState<string | null>(null);
 
   const { data: templates = [], isLoading } = useQuery({
     queryKey: queryKeys.templates.list({ published: true }),
     queryFn: () => api.templates.list({ published: true }),
   });
 
+  // Le serveur crée le document à partir de la version publiée ; on remplace l'URL pour ne pas recréer au retour
   const handleNext = async () => {
-    if (!selected || creating) return;
-    setCreating(true);
+    if (!selected) return;
+    setError(null);
     try {
-      const fullTemplate = await api.templates.get(selected.id);
-      const doc = await api.documents.create({
-        templateId:       selected.id,
-        name:             `${selected.name} — ${new Date().toLocaleDateString("fr-FR")}`,
-        data:             {},
-        templateSnapshot: fullTemplate,
-      });
-      navigate(`/documents/${doc.id}/fill`);
+      const doc = await api.documents.create({ templateId: selected.id });
+      navigate(DOCUMENT_WORKFLOW.steps[1]!.path(doc.id), { replace: true });
     } catch (e) {
       console.error("Erreur création document:", e);
-      setCreating(false);
+      setError("La création du document a échoué. Réessayez.");
     }
   };
 
   return (
     <WorkflowLayout
-      title="Studio de Publication"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={selected !== null && !creating}
-      onPrevious={() => navigate("/documents")}
+      workflow={DOCUMENT_WORKFLOW}
+      current="select"
+      title="Nouveau document"
+      guard={selected ? { ok: true } : { ok: false, reason: "Choisissez un template" }}
       onNext={handleNext}
-      onStepClick={() => {}}
+      nextLabel="Commencer le remplissage"
     >
       <div className="h-full overflow-y-auto bg-gray-50 p-8">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Choisissez un template</h2>
+        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
         {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
         {!isLoading && templates.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-sm mb-3">Aucun template publié disponible.</p>
-            <button
-              onClick={() => navigate("/templates")}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              → Publier un template dans l'Atelier
+          <div className="mx-auto max-w-md py-16 text-center">
+            <p className="text-sm font-medium text-gray-700">Aucun template n'est encore publié</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Un document part toujours d'un template publié. Le concepteur des templates doit en publier un
+              depuis l'Atelier pour qu'il apparaisse ici.
+            </p>
+            <button onClick={() => navigate("/templates")} className="mt-3 text-sm text-blue-600 hover:underline">
+              Ouvrir l'Atelier
             </button>
           </div>
         )}

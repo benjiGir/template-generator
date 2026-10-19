@@ -21,6 +21,10 @@ export interface Document {
   templateSnapshot: Template;
   status: "draft" | "finalized";
   completionPercent: number;
+  exportedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
+
+/** Statut affiché d'un document : un document finalisé puis modifié n'est plus « à jour » */
+export type DocumentDisplayStatus = "draft" | "finalized" | "modified-after-export";

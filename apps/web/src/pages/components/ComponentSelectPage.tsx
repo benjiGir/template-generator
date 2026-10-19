@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getAll } from "@template-generator/component-registry/registry";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { buildComponentWorkflowSteps, useComponentWorkflow } from "./hooks/useComponentWorkflow";
+import { PRESET_WORKFLOW } from "@/workflow/definitions";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
-
-const CURRENT_STEP = 0;
 
 const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   layout:     "Mise en page",
@@ -19,14 +17,12 @@ const CATEGORY_ORDER: ComponentCategory[] = ["layout", "content", "data", "decor
 
 export function ComponentSelectPage() {
   const navigate = useNavigate();
-  const { goToStep } = useComponentWorkflow();
   const setBaseType = useComponentDraftStore((s) => s.setBaseType);
   const currentBaseType = useComponentDraftStore((s) => s.baseType);
 
   const [selected, setSelected] = useState<string | null>(currentBaseType);
   const [categoryFilter, setCategoryFilter] = useState<ComponentCategory | "all">("all");
 
-  const steps = buildComponentWorkflowSteps(CURRENT_STEP);
   const allComponents = getAll();
 
   const filtered = categoryFilter === "all"
@@ -43,22 +39,20 @@ export function ComponentSelectPage() {
     if (!selected) return;
     const def = allComponents.find((c) => c.type === selected);
     if (!def) return;
-    setBaseType(selected, def.defaultProps);
-    navigate("/components/new/edit");
+    // Revenir à cette étape sans changer de composant conserve la configuration
+    if (selected !== currentBaseType) setBaseType(selected, def.defaultProps, def.category, def.label);
+    navigate(PRESET_WORKFLOW.steps[1]!.path("new"));
   };
 
   return (
     <WorkflowLayout
-      title="Bibliothèque Composants"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={selected !== null}
-      onPrevious={() => navigate("/components")}
+      workflow={PRESET_WORKFLOW}
+      current="select"
+      entityId="new"
+      firstNavigableStep={0}
+      title="Nouveau preset"
+      guard={selected ? { ok: true } : { ok: false, reason: "Choisissez un composant de base" }}
       onNext={handleNext}
-      onStepClick={(i) => {
-        const key = steps[i]?.key;
-        if (key) goToStep(key);
-      }}
     >
       <div className="h-full flex flex-col overflow-hidden bg-gray-50">
         {/* Category filter */}

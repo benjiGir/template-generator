@@ -100,6 +100,19 @@ export interface EditableField {
   order: number;
 }
 
+/**
+ * Version figée d'un template au moment de sa publication.
+ * C'est elle — et non l'état de travail de l'Atelier — qui sert à créer les documents du Studio.
+ */
+export interface PublishedVersion {
+  name: string;
+  description?: string;
+  theme: Theme;
+  pageFormat: PageFormat;
+  pages: TemplatePage[];
+  editableFields: EditableField[];
+}
+
 /** Le template complet */
 export interface Template {
   id: string;
@@ -109,11 +122,16 @@ export interface Template {
   pageFormat: PageFormat;
   pages: TemplatePage[];
   published: boolean;
+  publishedAt?: string | null;
+  publishedVersion?: PublishedVersion | null;
   editableFields: EditableField[];
   tags: string[];
   createdAt: string;
   updatedAt: string;
 }
+
+/** Statut affiché d'un template dans les listes */
+export type TemplateStatus = "draft" | "published" | "published-with-changes";
 
 /** Thème par défaut (KOMITY Blue) */
 export const DEFAULT_THEME: Theme = {

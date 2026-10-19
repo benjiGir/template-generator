@@ -1,146 +1,89 @@
-import { useState } from "react";
-import { Download, CheckCircle } from "lucide-react";
-import type { Template } from "@template-generator/shared/types/template";
+import { Link } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
+import type { PrintFormat } from "@/components/document-view/usePrintDocument";
 
 interface ExportPanelProps {
-  documentName: string;
-  mergedTemplate: Template | null;
-  onFinalize: () => Promise<void>;
+  filename: string;
+  onFilenameChange: (value: string) => void;
+  format: PrintFormat;
+  onFormatChange: (value: PrintFormat) => void;
+  /** Date du dernier export de cette session, s'il a eu lieu */
+  exportedAt: Date | null;
+  editPath: string;
 }
 
-export function ExportPanel({ documentName, mergedTemplate, onFinalize }: ExportPanelProps) {
-  const [filename, setFilename] = useState(documentName);
-  const [pageFormat, setPageFormat] = useState<"auto" | "a4">("auto");
-  const [exporting, setExporting] = useState(false);
-  const [finalizing, setFinalizing] = useState(false);
-  const [finalized, setFinalized] = useState(false);
-
-  const handleExport = () => {
-    if (!mergedTemplate) return;
-    setExporting(true);
-
-    const pages = window.document.querySelectorAll<HTMLElement>("[data-doc-page]");
-
-    let styleContent: string;
-    if (pageFormat === "a4") {
-      styleContent = `@page { size: A4; margin: 0; }`;
-    } else {
-      let maxHeight = 0;
-      pages.forEach((p) => {
-        if (p.offsetHeight > maxHeight) maxHeight = p.offsetHeight;
-      });
-      const heightMM = Math.ceil(maxHeight * 0.2646) + 2;
-      const widthStr = mergedTemplate.pageFormat.width;
-      styleContent = `@page { size: ${widthStr} ${heightMM}mm; margin: 0; }`;
-    }
-
-    // Inject title for the PDF filename
-    const prevTitle = window.document.title;
-    window.document.title = filename || documentName;
-
-    window.document.getElementById("print-page-size")?.remove();
-    const styleEl = window.document.createElement("style");
-    styleEl.id = "print-page-size";
-    styleEl.textContent = styleContent;
-    window.document.head.appendChild(styleEl);
-
-    window.print();
-
-    setTimeout(() => {
-      window.document.getElementById("print-page-size")?.remove();
-      window.document.title = prevTitle;
-      setExporting(false);
-    }, 1000);
-  };
-
-  const handleFinalize = async () => {
-    setFinalizing(true);
-    try {
-      await onFinalize();
-      setFinalized(true);
-    } finally {
-      setFinalizing(false);
-    }
-  };
-
+export function ExportPanel({ filename, onFilenameChange, format, onFormatChange, exportedAt, editPath }: ExportPanelProps) {
   return (
-    <div className="h-full overflow-y-auto p-6 space-y-6">
-      <div>
-        <h2 className="text-sm font-semibold text-gray-900 mb-4">Options d'export</h2>
-
-        {/* Filename */}
-        <div className="space-y-1.5 mb-4">
-          <label className="text-xs font-medium text-gray-700">Nom du fichier</label>
-          <input
-            type="text"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="nom-du-document"
-          />
-        </div>
-
-        {/* Page format */}
-        <div className="space-y-1.5 mb-6">
-          <label className="text-xs font-medium text-gray-700">Format de page</label>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPageFormat("auto")}
-              className={`flex-1 py-2 text-xs font-medium rounded-md border transition-colors ${
-                pageFormat === "auto"
-                  ? "bg-blue-50 border-blue-500 text-blue-700"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              Adapté au contenu
-            </button>
-            <button
-              onClick={() => setPageFormat("a4")}
-              className={`flex-1 py-2 text-xs font-medium rounded-md border transition-colors ${
-                pageFormat === "a4"
-                  ? "bg-blue-50 border-blue-500 text-blue-700"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              Forcer A4
-            </button>
-          </div>
-        </div>
-
-        {/* Export button */}
-        <button
-          onClick={handleExport}
-          disabled={exporting || !mergedTemplate}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <Download size={14} />
-          {exporting ? "Génération..." : "Exporter en PDF"}
-        </button>
-      </div>
-
-      <hr className="border-gray-100" />
-
-      {/* Finalize */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-900 mb-1">Finaliser le document</h2>
-        <p className="text-xs text-gray-500 mb-3">
-          Marque le document comme finalisé. Vous pourrez toujours l'éditer ensuite.
-        </p>
-        {finalized ? (
-          <div className="flex items-center gap-2 text-green-600 text-sm">
-            <CheckCircle size={15} />
+    <div className="h-full space-y-6 overflow-y-auto p-6">
+      {exportedAt && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <p className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
+            <CheckCircle2 size={16} />
             Document finalisé
+          </p>
+          <p className="mt-1 text-xs text-emerald-800/80">
+            Si le PDF n'a pas été enregistré, relancez simplement l'export. Vous pouvez toujours modifier le document.
+          </p>
+          <div className="mt-3 flex gap-3 text-xs font-medium">
+            <Link to={editPath} className="text-emerald-800 underline hover:no-underline">Revenir à l'édition</Link>
+            <Link to="/documents" className="text-emerald-800 underline hover:no-underline">Retour aux documents</Link>
           </div>
-        ) : (
-          <button
-            onClick={handleFinalize}
-            disabled={finalizing}
-            className="w-full px-4 py-2.5 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {finalizing ? "En cours..." : "Marquer comme finalisé"}
-          </button>
-        )}
-      </div>
+        </div>
+      )}
+
+      <section className="space-y-4">
+        <h2 className="text-sm font-semibold text-gray-900">Options d'export</h2>
+
+        <div className="space-y-1.5">
+          <label htmlFor="export-filename" className="text-xs font-medium text-gray-700">Nom du fichier</label>
+          <div className="flex items-center rounded-md border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+            <input
+              id="export-filename"
+              type="text"
+              value={filename}
+              onChange={(e) => onFilenameChange(e.target.value)}
+              className="min-w-0 flex-1 rounded-md px-3 py-2 text-sm focus:outline-none"
+            />
+            <span className="pr-3 text-sm text-gray-400">.pdf</span>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-xs font-medium text-gray-700">Format de page</span>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              ["auto", "Adapté au contenu", "Chaque page garde sa hauteur, sans découpe"],
+              ["a4", "A4 standard", "Les pages longues sont découpées"],
+            ] as const).map(([value, label, hint]) => (
+              <button
+                key={value}
+                onClick={() => onFormatChange(value)}
+                className={`rounded-md border px-3 py-2 text-left transition-colors ${
+                  format === value ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <span className={`block text-xs font-medium ${format === value ? "text-blue-700" : "text-gray-700"}`}>{label}</span>
+                <span className="block text-[11px] text-gray-500">{hint}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <h3 className="text-xs font-semibold text-gray-800">Ce qui va se passer</h3>
+        <p className="mt-1 text-xs text-gray-600">
+          La fenêtre d'impression de votre navigateur va s'ouvrir. Elle ne fait pas partie de DocForge :
+        </p>
+        <ol className="mt-2 space-y-1.5 text-xs text-gray-700">
+          <li><span className="font-semibold">1.</span> Destination : <span className="font-semibold">Enregistrer au format PDF</span></li>
+          <li><span className="font-semibold">2.</span> Marges : <span className="font-semibold">Aucune</span> (ou « Par défaut » si l'option n'existe pas)</li>
+          <li><span className="font-semibold">3.</span> Cliquez sur <span className="font-semibold">Enregistrer</span></li>
+        </ol>
+        <p className="mt-2 text-[11px] text-gray-500">
+          Les couleurs de fond sont incluses automatiquement. Le document sera marqué comme finalisé.
+        </p>
+      </section>
     </div>
   );
 }

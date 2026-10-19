@@ -3,7 +3,8 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { LayoutTemplate, Puzzle, FileText } from "lucide-react";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
-import { TemplateThumbnail } from "@/components/shared/TemplateThumbnail";
+import { DocumentThumbnail } from "@/components/document-view/DocumentView";
+import { DocumentStatusBadge, TemplateStatusBadge } from "@/components/ui/StatusBadge";
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -73,18 +74,12 @@ export function DashboardPage() {
               {recentDocuments.map((doc) => (
                 <button
                   key={doc.id}
-                  onClick={() => navigate(`/documents/${doc.id}/fill`)}
+                  onClick={() => navigate(`/documents/${doc.id}`)}
                   className="text-left bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm font-semibold text-gray-900 truncate flex-1">{doc.name}</span>
-                    <span className={`shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                      doc.status === "finalized"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}>
-                      {doc.status === "finalized" ? "Finalisé" : "Brouillon"}
-                    </span>
+                    <DocumentStatusBadge document={doc} />
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
@@ -117,12 +112,12 @@ export function DashboardPage() {
                 return (
                   <button
                     key={summary.id}
-                    onClick={() => navigate(`/templates/${summary.id}/edit`)}
+                    onClick={() => navigate(`/templates/${summary.id}/build`)}
                     className="text-left bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all overflow-hidden"
                   >
                     <div className="w-full overflow-hidden border-b border-gray-100 bg-gray-50">
                       {fullTemplate ? (
-                        <TemplateThumbnail template={fullTemplate} width={220} />
+                        <DocumentThumbnail template={fullTemplate} width={220} />
                       ) : (
                         <div className="aspect-[210/297] flex items-center justify-center">
                           <LayoutTemplate size={24} className="text-gray-200" />
@@ -131,11 +126,7 @@ export function DashboardPage() {
                     </div>
                     <div className="p-2.5 flex items-center gap-1.5">
                       <p className="text-xs font-semibold text-gray-900 truncate flex-1">{summary.name}</p>
-                      {summary.published && (
-                        <span className="shrink-0 text-[9px] font-medium px-1 py-0.5 rounded bg-green-100 text-green-700">
-                          Publié
-                        </span>
-                      )}
+                      <TemplateStatusBadge template={summary} />
                     </div>
                   </button>
                 );

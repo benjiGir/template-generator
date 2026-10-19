@@ -20,7 +20,21 @@ interface Props {
   onChange: (value: unknown) => void;
 }
 
-export function PropField({ schema, value, onChange }: Props) {
+/** Types dont le composant de saisie n'affiche pas son propre libellé */
+const UNLABELLED = new Set(["text", "textarea", "number", "boolean", "select", "emoji"]);
+
+export function PropField(props: Props) {
+  const field = <PropInput {...props} />;
+  if (!UNLABELLED.has(props.schema.type)) return field;
+  return (
+    <div>
+      <label className="mb-1 block text-xs font-medium text-gray-600">{props.schema.label}</label>
+      {field}
+    </div>
+  );
+}
+
+function PropInput({ schema, value, onChange }: Props) {
   const str = (value as string | undefined) ?? String(schema.defaultValue ?? "");
   const num = (value as number | undefined) ?? (schema.defaultValue as number) ?? 0;
   const bool = (value as boolean | undefined) ?? (schema.defaultValue as boolean) ?? false;
@@ -30,7 +44,6 @@ export function PropField({ schema, value, onChange }: Props) {
     case "text":
       return (
         <TextPropField
-          label={schema.label}
           value={str}
           placeholder={schema.placeholder}
           onChange={onChange}
@@ -40,7 +53,6 @@ export function PropField({ schema, value, onChange }: Props) {
     case "textarea":
       return (
         <TextareaPropField
-          label={schema.label}
           value={str}
           placeholder={schema.placeholder}
           onChange={onChange}
@@ -58,15 +70,14 @@ export function PropField({ schema, value, onChange }: Props) {
       );
 
     case "number":
-      return <NumberPropField label={schema.label} value={num} onChange={onChange} />;
+      return <NumberPropField value={num} onChange={onChange} />;
 
     case "boolean":
-      return <BooleanPropField label={schema.label} value={bool} onChange={onChange} />;
+      return <BooleanPropField value={bool} onChange={onChange} />;
 
     case "select":
       return (
         <SelectPropField
-          label={schema.label}
           value={str}
           options={schema.options ?? []}
           onChange={onChange}
@@ -80,7 +91,7 @@ export function PropField({ schema, value, onChange }: Props) {
       return <ListPropField label={schema.label} value={list} onChange={onChange} />;
 
     case "emoji":
-      return <EmojiPropField label={schema.label} value={str} onChange={onChange} />;
+      return <EmojiPropField value={str} onChange={onChange} />;
 
     case "spacing":
       return (

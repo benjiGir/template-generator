@@ -9,11 +9,10 @@ export function Canvas() {
 
   return (
     <div
-      data-print-root
-      className="flex-1 overflow-y-auto bg-gray-100 py-8 px-6"
+      className="flex-1 overflow-y-auto bg-slate-200/70 py-8 px-6"
       onClick={() => selectNode(null)}
     >
-      <div className="flex flex-col items-center">
+      <div className="mx-auto flex w-fit flex-col">
         {template.pages.map((page, i) => (
           <PageView
             key={page.id}

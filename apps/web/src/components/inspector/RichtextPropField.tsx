@@ -104,7 +104,7 @@ interface Props {
 }
 
 export function RichtextPropField({ label, value, onChange, placeholder }: Props) {
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleChange = useCallback((editorState: import("lexical").EditorState) => {
     clearTimeout(timerRef.current);

@@ -1,35 +1,25 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { get } from "@template-generator/component-registry/registry";
 import { ComponentRenderer } from "@template-generator/component-registry/renderer";
 import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { PropField } from "@/components/inspector/PropField";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { buildComponentWorkflowSteps, useComponentWorkflow } from "./hooks/useComponentWorkflow";
+import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { NotFoundState } from "@/workflow/EntityState";
 import type { PropSchema } from "@template-generator/shared/types/component";
 
-const CURRENT_STEP = 1;
-
 export function ComponentEditPage() {
-  const navigate = useNavigate();
-  const { goToStep } = useComponentWorkflow();
+  const { presetId } = useParams<{ presetId: string }>();
   const baseType = useComponentDraftStore((s) => s.baseType);
   const props = useComponentDraftStore((s) => s.props);
   const updateProp = useComponentDraftStore((s) => s.updateProp);
-  const setBaseType = useComponentDraftStore((s) => s.setBaseType);
-
-  const steps = buildComponentWorkflowSteps(CURRENT_STEP);
+  const resetProps = useComponentDraftStore((s) => s.resetProps);
+  const editingLabel = useComponentDraftStore((s) => s.label);
 
   if (!baseType) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <p className="text-sm text-gray-500">Aucun composant sélectionné.</p>
-        <button onClick={() => navigate("/components/new")} className="text-sm text-blue-600 hover:underline">
-          ← Choisir un composant
-        </button>
-      </div>
-    );
+    return <NotFoundState message="Aucun composant choisi." backTo={PRESET_WORKFLOW.steps[0]!.path("new")} backLabel="Choisir un composant" />;
   }
 
   const def = get(baseType);
@@ -63,21 +53,16 @@ export function ComponentEditPage() {
   }
 
   const handleReset = () => {
-    setBaseType(baseType, def.defaultProps);
+    resetProps(def.defaultProps);
   };
 
   return (
     <WorkflowLayout
-      title="Bibliothèque Composants"
-      steps={steps}
-      currentStep={CURRENT_STEP}
-      canGoNext={true}
-      onPrevious={() => navigate("/components/new")}
-      onNext={() => navigate("/components/new/save")}
-      onStepClick={(i) => {
-        const key = steps[i]?.key;
-        if (key) goToStep(key);
-      }}
+      workflow={PRESET_WORKFLOW}
+      current="configure"
+      entityId={presetId}
+      firstNavigableStep={presetId === "new" ? 0 : 1}
+      title={presetId === "new" ? `Nouveau preset — ${def.label}` : editingLabel}
     >
       <div className="h-full flex overflow-hidden">
         {/* Left: prop panel */}

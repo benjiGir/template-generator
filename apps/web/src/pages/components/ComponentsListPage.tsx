@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useComponentDraftStore } from "@/store/component-draft-store";
 import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { PRESET_WORKFLOW } from "@/workflow/definitions";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
@@ -17,7 +19,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function ComponentsListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const resetDraft = useComponentDraftStore((s) => s.reset);
+  const confirm = useConfirm();
+  const draftInProgress = useComponentDraftStore((s) => s.baseType !== null && s.editingId === null);
 
   const [categoryFilter, setCategoryFilter] = useState<ComponentCategory | "all">("all");
   const [search, setSearch] = useState("");
@@ -32,22 +35,28 @@ export function ComponentsListPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
   });
 
-  const handleNew = () => {
-    resetDraft();
-    navigate("/components/new");
-  };
+  const duplicateMutation = useMutation({
+    mutationFn: (id: string) => api.presets.duplicate(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
+  });
 
-  const loadPreset = useComponentDraftStore((s) => s.loadPreset);
+  // Un brouillon de création interrompu est repris là où il en était
+  const handleNew = () => navigate(PRESET_WORKFLOW.steps[draftInProgress ? 1 : 0]!.path("new"));
 
-  const handleEdit = (preset: ComponentPreset) => {
-    loadPreset(preset);
-    navigate("/components/new/edit");
-  };
+  const handleEdit = (preset: ComponentPreset) => navigate(PRESET_WORKFLOW.steps[1]!.path(preset.id));
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, preset: ComponentPreset) => {
     e.stopPropagation();
-    if (!confirm("Supprimer ce preset ?")) return;
-    deleteMutation.mutate(id);
+    const ok = await confirm({
+      title: `Supprimer le preset « ${preset.label} » ?`,
+      consequences: [
+        "Il disparaîtra de la bibliothèque de l'éditeur de templates.",
+        "Les templates qui l'utilisent déjà ne changent pas : le composant y reste tel quel.",
+      ],
+      confirmLabel: "Supprimer le preset",
+      tone: "danger",
+    });
+    if (ok) deleteMutation.mutate(preset.id);
   };
 
   const filtered = presets.filter((p) => {
@@ -63,12 +72,15 @@ export function ComponentsListPage() {
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
       <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Bibliothèque Composants</h1>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Bibliothèque</h1>
+          <p className="text-xs text-gray-500">Des composants configurés une fois, réutilisables dans tous les templates.</p>
+        </div>
         <button
           onClick={handleNew}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
         >
-          + Nouveau preset
+          {draftInProgress ? "Reprendre le preset en cours" : "+ Nouveau preset"}
         </button>
       </div>
 
@@ -127,7 +139,7 @@ export function ComponentsListPage() {
 
         <div className="grid grid-cols-3 gap-4 max-w-5xl">
           {filtered.map((p) => (
-            <PresetCard key={p.id} preset={p} onEdit={handleEdit} onDelete={handleDelete} />
+            <PresetCard key={p.id} preset={p} onEdit={handleEdit} onDuplicate={(id) => duplicateMutation.mutate(id)} onDelete={handleDelete} />
           ))}
         </div>
       </div>
@@ -138,11 +150,13 @@ export function ComponentsListPage() {
 function PresetCard({
   preset,
   onEdit,
+  onDuplicate,
   onDelete,
 }: {
   preset: ComponentPreset;
   onEdit: (preset: ComponentPreset) => void;
-  onDelete: (e: React.MouseEvent, id: string) => void;
+  onDuplicate: (id: string) => void;
+  onDelete: (e: React.MouseEvent, preset: ComponentPreset) => void;
 }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all group">
@@ -170,11 +184,18 @@ function PresetCard({
             Modifier
           </button>
           <button
-            onClick={(e) => onDelete(e, preset.id)}
-            className="text-gray-400 hover:text-red-500 text-xs p-1"
+            onClick={() => onDuplicate(preset.id)}
+            className="text-gray-400 hover:text-blue-500 text-xs px-1.5 py-1 rounded hover:bg-blue-50 transition-colors"
+            title="Dupliquer"
+          >
+            Dupliquer
+          </button>
+          <button
+            onClick={(e) => onDelete(e, preset)}
+            className="text-gray-400 hover:text-red-500 text-xs px-1.5 py-1 rounded hover:bg-red-50"
             title="Supprimer"
           >
-            ✕
+            Supprimer
           </button>
         </div>
       </div>

@@ -6,7 +6,7 @@ export function PageSettings() {
   const selectedPageIndex = useEditorStore((s) => s.selectedPageIndex);
   const addPage = useEditorStore((s) => s.addPage);
   const removePage = useEditorStore((s) => s.removePage);
-  const updateTemplateMeta = useEditorStore((s) => s.updateTemplateMeta);
+  const renamePage = useEditorStore((s) => s.renamePage);
 
   const page = template?.pages[selectedPageIndex];
 
@@ -15,22 +15,7 @@ export function PageSettings() {
 
   if (!template || !page) return null;
 
-  const handleLabelBlur = () => {
-    if (!template) return;
-    // Mettre à jour le label de la page via une mutation du template
-    const updatedPages = template.pages.map((p, i) =>
-      i === selectedPageIndex ? { ...p, label } : p
-    );
-    // On passe par updateTemplateMeta pour déclencher un snapshot d'historique
-    // mais on a besoin d'un accès direct. On utilise le store directement.
-    useEditorStore.setState((s) => {
-      if (!s.template) return s;
-      const pages = s.template.pages.map((p, i) =>
-        i === selectedPageIndex ? { ...p, label } : p
-      );
-      return { template: { ...s.template, pages }, isDirty: true };
-    });
-  };
+  const handleLabelBlur = () => renamePage(selectedPageIndex, label);
 
   const canDelete = template.pages.length > 1;
 

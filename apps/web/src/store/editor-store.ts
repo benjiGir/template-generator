@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { Template, ComponentNode, TemplatePage, Theme, PageFormat } from "@template-generator/shared/types/template";
+import type { Template, ComponentNode, TemplatePage, Theme, PageFormat, EditableField } from "@template-generator/shared/types/template";
 import { DEFAULT_THEME, DEFAULT_PAGE_FORMAT } from "@template-generator/shared/types/template";
 import {
   findNode,
@@ -15,18 +15,25 @@ interface EditorState {
   template: Template | null;
   selectedNodeId: string | null;
   selectedPageIndex: number;
-  isDirty: boolean;
+  /** Incrémenté à chaque modification ; comparé à savedRevision pour savoir s'il reste à sauvegarder */
+  revision: number;
+  savedRevision: number;
   history: Template[];
   historyIndex: number;
 
   loadTemplate: (template: Template) => void;
+  markSaved: (revision: number) => void;
+  /** Applique un état venu du serveur (publication) sans toucher à l'historique */
+  applyServerState: (template: Template) => void;
   updateTemplateMeta: (name: string, description?: string) => void;
   updateTheme: (theme: Partial<Theme>) => void;
   updatePageFormat: (format: Partial<PageFormat>) => void;
 
   addPage: () => void;
   removePage: (pageIndex: number) => void;
+  renamePage: (pageIndex: number, label: string) => void;
   reorderPages: (fromIndex: number, toIndex: number) => void;
+  setEditableFields: (fields: EditableField[]) => void;
 
   addNode: (pageIndex: number, parentId: string | null, index: number, node: ComponentNode) => void;
   removeNode: (pageIndex: number, nodeId: string) => void;
@@ -66,7 +73,8 @@ export const useEditorStore = create<EditorState>()(
     selectedPageIndex: 0,
     inlineEditingNodeId: null,
     inlineEditingPropKey: null,
-    isDirty: false,
+    revision: 0,
+    savedRevision: 0,
     history: [],
     historyIndex: -1,
 
@@ -84,9 +92,24 @@ export const useEditorStore = create<EditorState>()(
         s.template = normalized;
         s.selectedNodeId = null;
         s.selectedPageIndex = 0;
-        s.isDirty = false;
+        s.revision = 0;
+        s.savedRevision = 0;
         s.history = [cloneTemplate(normalized)];
         s.historyIndex = 0;
+      }),
+
+    markSaved: (revision) =>
+      set((s) => {
+        s.savedRevision = Math.max(s.savedRevision, revision);
+      }),
+
+    applyServerState: (template) =>
+      set((s) => {
+        if (!s.template || s.template.id !== template.id) return;
+        s.template.published = template.published;
+        s.template.publishedAt = template.publishedAt;
+        s.template.publishedVersion = template.publishedVersion;
+        s.template.updatedAt = template.updatedAt;
       }),
 
     updateTemplateMeta: (name, description) =>
@@ -95,7 +118,7 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         s.template.name = name;
         if (description !== undefined) s.template.description = description;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     updateTheme: (theme) =>
@@ -110,7 +133,7 @@ export const useEditorStore = create<EditorState>()(
           spacing:    { ...s.template.theme.spacing,    ...(theme.spacing    ?? {}) },
           borders:    { ...s.template.theme.borders,    ...(theme.borders    ?? {}) },
         };
-        s.isDirty = true;
+        s.revision++;
       }),
 
     updatePageFormat: (format) =>
@@ -118,7 +141,7 @@ export const useEditorStore = create<EditorState>()(
         if (!s.template) return;
         pushHistory(s, s.template);
         s.template.pageFormat = { ...s.template.pageFormat, ...format };
-        s.isDirty = true;
+        s.revision++;
       }),
 
     addPage: () =>
@@ -132,7 +155,7 @@ export const useEditorStore = create<EditorState>()(
         };
         s.template.pages.push(newPage);
         s.selectedPageIndex = s.template.pages.length - 1;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     removePage: (pageIndex) =>
@@ -141,7 +164,23 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         s.template.pages.splice(pageIndex, 1);
         s.selectedPageIndex = Math.min(s.selectedPageIndex, s.template.pages.length - 1);
-        s.isDirty = true;
+        s.revision++;
+      }),
+
+    renamePage: (pageIndex, label) =>
+      set((s) => {
+        const page = s.template?.pages[pageIndex];
+        if (!s.template || !page || page.label === label) return;
+        pushHistory(s, s.template);
+        page.label = label;
+        s.revision++;
+      }),
+
+    setEditableFields: (fields) =>
+      set((s) => {
+        if (!s.template) return;
+        s.template.editableFields = fields;
+        s.revision++;
       }),
 
     reorderPages: (fromIndex, toIndex) =>
@@ -150,7 +189,7 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         const [page] = s.template.pages.splice(fromIndex, 1);
         if (page) s.template.pages.splice(toIndex, 0, page);
-        s.isDirty = true;
+        s.revision++;
       }),
 
     addNode: (pageIndex, parentId, index, node) =>
@@ -161,7 +200,7 @@ export const useEditorStore = create<EditorState>()(
         if (!page) return;
         page.children = insertNode(page.children as ComponentNode[], parentId, index, node) as typeof page.children;
         s.selectedNodeId = node.id;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     removeNode: (pageIndex, nodeId) =>
@@ -172,7 +211,7 @@ export const useEditorStore = create<EditorState>()(
         if (!page) return;
         page.children = treeRemoveNode(page.children as ComponentNode[], nodeId) as typeof page.children;
         if (s.selectedNodeId === nodeId) s.selectedNodeId = null;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     moveNode: (fromPageIndex, toPageIndex, nodeId, newParentId, newIndex) =>
@@ -186,7 +225,7 @@ export const useEditorStore = create<EditorState>()(
         fromPage.children = treeRemoveNode(fromPage.children as ComponentNode[], nodeId) as typeof fromPage.children;
         const toPage = s.template.pages[toPageIndex] ?? fromPage;
         toPage.children = insertNode(toPage.children as ComponentNode[], newParentId, newIndex, node) as typeof toPage.children;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     updateNodeProps: (nodeId, props) =>
@@ -200,7 +239,7 @@ export const useEditorStore = create<EditorState>()(
             break;
           }
         }
-        s.isDirty = true;
+        s.revision++;
       }),
 
     duplicateNode: (pageIndex, nodeId) =>
@@ -210,7 +249,7 @@ export const useEditorStore = create<EditorState>()(
         const page = s.template.pages[pageIndex];
         if (!page) return;
         page.children = treeDuplicateNode(page.children as ComponentNode[], nodeId) as typeof page.children;
-        s.isDirty = true;
+        s.revision++;
       }),
 
     selectNode: (nodeId) =>
@@ -246,7 +285,7 @@ export const useEditorStore = create<EditorState>()(
         const snap = s.history[s.historyIndex];
         if (snap) {
           s.template = cloneTemplate(snap);
-          s.isDirty = true;
+          s.revision++;
         }
       }),
 
@@ -257,25 +296,21 @@ export const useEditorStore = create<EditorState>()(
         const snap = s.history[s.historyIndex];
         if (snap) {
           s.template = cloneTemplate(snap);
-          s.isDirty = true;
+          s.revision++;
         }
       }),
   }))
 );
 
-export const DEFAULT_NEW_TEMPLATE: Omit<Template, "id" | "createdAt" | "updatedAt"> = {
-  name: "Nouveau template",
-  description: "",
-  theme: DEFAULT_THEME,
-  pageFormat: DEFAULT_PAGE_FORMAT,
-  pages: [
-    {
-      id: generateNodeId(),
-      label: "Page 1",
-      children: [],
-    },
-  ],
-  published:      false,
-  editableFields: [],
-  tags:           [],
-};
+/** Contenu d'un template vierge (identifiant de page neuf à chaque appel) */
+export function newTemplateDraft(): Omit<Template, "id" | "createdAt" | "updatedAt" | "published"> {
+  return {
+    name: "Nouveau template",
+    description: "",
+    theme: DEFAULT_THEME,
+    pageFormat: DEFAULT_PAGE_FORMAT,
+    pages: [{ id: generateNodeId(), label: "Page 1", children: [] }],
+    editableFields: [],
+    tags: [],
+  };
+}

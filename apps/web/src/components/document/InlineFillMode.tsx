@@ -1,23 +1,15 @@
 import { useState, useCallback } from "react";
 import { Check } from "lucide-react";
 import { get } from "@template-generator/component-registry/registry";
+import { resolveThemeVars } from "@template-generator/component-registry/renderer";
+import { computeCompletion, fieldKey, isFilled } from "@template-generator/shared/utils/fields";
+import { DocumentView } from "@/components/document-view/DocumentView";
 import { useDocumentStore } from "@/store/document-store";
 import { FormField } from "./FormField";
 import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
 import type { EditableField } from "@template-generator/shared/types/template";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-function resolveThemeVars(props: Record<string, unknown>, theme: Theme): Record<string, unknown> {
-  const resolved = { ...props };
-  for (const [key, value] of Object.entries(resolved)) {
-    if (typeof value === "string" && value.startsWith("theme.")) {
-      const path = value.slice(6) as keyof typeof theme.colors;
-      resolved[key] = theme.colors[path] ?? value;
-    }
-  }
-  return resolved;
-}
 
 function scrollToNode(nodeId: string) {
   document
@@ -47,7 +39,7 @@ function InlineNodeRenderer({ nodes, theme, editableMap, data, selectedNodeId, o
         const isEditable = nodeFields.length > 0;
         const isSelected = selectedNodeId === node.id;
 
-        const mergedProps: Record<string, unknown> = {
+        const mergedProps: Record<string, unknown> & { theme: Theme } = {
           ...def.defaultProps,
           ...resolveThemeVars(node.props, theme),
           theme,
@@ -119,12 +111,7 @@ function CompletionPanel({
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
 }) {
-  const total = editableFields.length;
-  const filled = editableFields.filter((f) => {
-    const val = data[`${f.nodeId}.${f.propKey}`];
-    return val !== undefined && val !== null && val !== "";
-  }).length;
-  const pct = total > 0 ? Math.round((filled / total) * 100) : 100;
+  const { percent: pct } = computeCompletion(editableFields, data);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -145,9 +132,8 @@ function CompletionPanel({
       {/* Field list */}
       <div className="flex-1 overflow-y-auto">
         {editableFields.map((field) => {
-          const key = `${field.nodeId}.${field.propKey}`;
-          const val = data[key];
-          const isFilled = val !== undefined && val !== null && val !== "";
+          const key = fieldKey(field);
+          const filled = isFilled(data[key]);
           const isActive = selectedNodeId === field.nodeId;
           return (
             <button
@@ -162,10 +148,10 @@ function CompletionPanel({
             >
               <div
                 className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
-                  isFilled ? "bg-green-500" : "bg-gray-200"
+                  filled ? "bg-green-500" : "bg-gray-200"
                 }`}
               >
-                {isFilled && <Check size={9} className="text-white" />}
+                {filled && <Check size={9} className="text-white" />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-800 truncate">{field.label}</p>
@@ -213,37 +199,25 @@ export function InlineFillMode() {
     <div className="h-full flex overflow-hidden">
       {/* Canvas */}
       <div
-        className="flex-1 overflow-y-auto bg-gray-100 p-6"
+        className="flex-1 overflow-y-auto bg-slate-200/70 p-8"
         onClick={() => setSelectedNodeId(null)}
       >
         <p className="text-xs text-gray-400 text-center mb-3">
           Cliquez sur une zone en surbrillance pour l'éditer
         </p>
-        {mergedTemplate.pages.map((page) => (
-          <div
-            key={page.id}
-            data-doc-page
-            className="mx-auto bg-white shadow-md mb-6 overflow-hidden"
-            style={{
-              width:           mergedTemplate.pageFormat.width,
-              minHeight:       mergedTemplate.pageFormat.height,
-              padding:         mergedTemplate.pageFormat.padding,
-              fontFamily:      mergedTemplate.theme.typography.fontFamily,
-              fontSize:        mergedTemplate.theme.typography.baseFontSize,
-              color:           mergedTemplate.theme.colors.text,
-              backgroundColor: mergedTemplate.theme.colors.background,
-            }}
-          >
+        <DocumentView
+          template={mergedTemplate}
+          renderNodes={(nodes, theme) => (
             <InlineNodeRenderer
-              nodes={page.children}
-              theme={mergedTemplate.theme}
+              nodes={nodes}
+              theme={theme}
               editableMap={editableMap}
               data={data}
               selectedNodeId={selectedNodeId}
               onSelect={handleSelect}
             />
-          </div>
-        ))}
+          )}
+        />
       </div>
 
       {/* Right panel */}

@@ -1,30 +1,7 @@
 import { create } from "zustand";
-import { api } from "@/api/client";
-import { findNode } from "@template-generator/shared/utils/tree";
+import { mergeDocumentData } from "@template-generator/shared/utils/fields";
 import type { Document } from "@template-generator/shared/types/document";
 import type { Template, EditableField } from "@template-generator/shared/types/template";
-
-function mergeDocumentData(
-  snapshot: Template,
-  editableFields: EditableField[],
-  data: Record<string, unknown>,
-): Template {
-  const merged = JSON.parse(JSON.stringify(snapshot)) as Template;
-
-  for (const field of editableFields) {
-    const key = `${field.nodeId}.${field.propKey}`;
-    if (!(key in data)) continue;
-    for (const page of merged.pages) {
-      const node = findNode(page.children, field.nodeId);
-      if (node) {
-        node.props[field.propKey] = data[key];
-        break;
-      }
-    }
-  }
-
-  return merged;
-}
 
 interface DocumentState {
   document: Document | null;
@@ -32,72 +9,60 @@ interface DocumentState {
   editableFields: EditableField[];
   data: Record<string, unknown>;
   fillMode: "form" | "inline";
-  isDirty: boolean;
+  /** Incrémenté à chaque saisie ; comparé à savedRevision pour savoir s'il reste à sauvegarder */
+  revision: number;
+  savedRevision: number;
 
   loadDocument: (doc: Document) => void;
+  /** Met à jour les métadonnées venues du serveur (statut, progression) sans toucher à la saisie */
+  applyServerState: (doc: Document) => void;
   updateField: (fieldKey: string, value: unknown) => void;
   setFillMode: (mode: "form" | "inline") => void;
-  getCompletionPercent: () => number;
+  markSaved: (revision: number) => void;
   getMergedTemplate: () => Template | null;
-  save: () => Promise<void>;
   reset: () => void;
 }
 
-export const useDocumentStore = create<DocumentState>((set, get) => ({
+const EMPTY = {
   document:         null,
   templateSnapshot: null,
   editableFields:   [],
   data:             {},
-  fillMode:         "form",
-  isDirty:          false,
+  revision:         0,
+  savedRevision:    0,
+};
+
+export const useDocumentStore = create<DocumentState>((set, get) => ({
+  ...EMPTY,
+  fillMode: "form",
 
   loadDocument: (doc) => {
-    const snapshot = doc.templateSnapshot as Template;
-    const fields = (snapshot?.editableFields ?? []) as EditableField[];
+    const snapshot = doc.templateSnapshot;
     set({
       document:         doc,
       templateSnapshot: snapshot,
-      editableFields:   fields,
-      data:             (doc.data ?? {}) as Record<string, unknown>,
-      isDirty:          false,
+      editableFields:   [...(snapshot?.editableFields ?? [])].sort((a, b) => a.order - b.order),
+      data:             doc.data ?? {},
+      revision:         0,
+      savedRevision:    0,
     });
   },
 
+  applyServerState: (doc) =>
+    set((s) => (s.document?.id === doc.id ? { document: { ...doc, data: s.data } } : s)),
+
   updateField: (fieldKey, value) =>
-    set((s) => ({ data: { ...s.data, [fieldKey]: value }, isDirty: true })),
+    set((s) => ({ data: { ...s.data, [fieldKey]: value }, revision: s.revision + 1 })),
 
   setFillMode: (mode) => set({ fillMode: mode }),
 
-  getCompletionPercent: () => {
-    const { editableFields, data } = get();
-    if (editableFields.length === 0) return 100;
-    const filled = editableFields.filter((f) => {
-      const val = data[`${f.nodeId}.${f.propKey}`];
-      return val !== undefined && val !== null && val !== "";
-    }).length;
-    return Math.round((filled / editableFields.length) * 100);
-  },
+  markSaved: (revision) => set((s) => ({ savedRevision: Math.max(s.savedRevision, revision) })),
 
   getMergedTemplate: () => {
-    const { templateSnapshot, editableFields, data } = get();
+    const { templateSnapshot, data } = get();
     if (!templateSnapshot) return null;
-    return mergeDocumentData(templateSnapshot, editableFields, data);
+    return mergeDocumentData(templateSnapshot, data);
   },
 
-  save: async () => {
-    const { document, data } = get();
-    if (!document) return;
-    await api.documents.updateData(document.id, data);
-    set({ isDirty: false });
-  },
-
-  reset: () =>
-    set({
-      document:         null,
-      templateSnapshot: null,
-      editableFields:   [],
-      data:             {},
-      isDirty:          false,
-      fillMode:         "form",
-    }),
+  reset: () => set(EMPTY),
 }));

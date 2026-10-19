@@ -7,8 +7,7 @@ import { EditorToolbar } from "@/components/toolbar/EditorToolbar";
 import { DragOverlay } from "@/components/canvas/DragOverlay";
 import { useEditorStore } from "@/store/editor-store";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
-import { useAutoSave } from "@/hooks/useAutoSave";
-import { useTemplateSave } from "@/hooks/useTemplateSave";
+import { useWorkflowSession } from "@/workflow/session";
 import { findNode } from "@template-generator/shared/utils/tree";
 
 export function EditorLayout() {
@@ -20,8 +19,7 @@ export function EditorLayout() {
   const redo = useEditorStore((s) => s.redo);
 
   const { sensors, activeDragData, handleDragStart, handleDragEnd } = useDragAndDrop();
-  const { saving } = useAutoSave();
-  const { save } = useTemplateSave();
+  const session = useWorkflowSession();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -41,7 +39,7 @@ export function EditorLayout() {
 
       if (ctrl && e.key === "s") {
         e.preventDefault();
-        save();
+        void session?.flush();
         return;
       }
 
@@ -70,7 +68,7 @@ export function EditorLayout() {
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [undo, redo, save, selectedNodeId, template, removeNode, selectNode]);
+  }, [undo, redo, session, selectedNodeId, template, removeNode, selectNode]);
 
   return (
     <DndContext
@@ -80,7 +78,7 @@ export function EditorLayout() {
       onDragEnd={handleDragEnd}
     >
       <div className="h-full flex flex-col overflow-hidden">
-        <EditorToolbar saving={saving} />
+        <EditorToolbar />
         <div className="flex flex-1 overflow-hidden">
           <div className="w-[280px] shrink-0 overflow-hidden">
             <ComponentLibrary />

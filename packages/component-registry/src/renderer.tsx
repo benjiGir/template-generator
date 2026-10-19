@@ -7,7 +7,8 @@ interface Props {
   isEditor?: boolean;
 }
 
-function resolveThemeVars(props: Record<string, unknown>, theme: Theme): Record<string, unknown> {
+/** Remplace les références `theme.<couleur>` des props par la valeur du thème */
+export function resolveThemeVars(props: Record<string, unknown>, theme: Theme): Record<string, unknown> {
   const resolved = { ...props };
   for (const [key, value] of Object.entries(resolved)) {
     if (typeof value === "string" && value.startsWith("theme.")) {

@@ -27,7 +27,7 @@ function CalloutBox({ theme, icon = "Info", title = "", content = "", color, var
   const bgColor = color ? `${color}12` : palette.bg;
   const textColor = palette.text;
 
-  const IconComponent = (LucideIcons as Record<string, ElementType>)[icon] ?? LucideIcons.Info;
+  const IconComponent = (LucideIcons as unknown as Record<string, ElementType>)[icon] ?? LucideIcons.Info;
 
   return (
     <div

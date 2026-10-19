@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import type { TemplatePage, Theme, PageFormat } from "@template-generator/shared/types/template";
 import { EditorRenderer } from "./EditorRenderer";
 import { DropZone } from "./DropZone";
+import { DocumentPage } from "@/components/document-view/DocumentPage";
 import { useEditorStore } from "@/store/editor-store";
 
 interface Props {
@@ -41,22 +42,10 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       </button>
 
       {/* Page */}
-      <div
-        data-doc-page
-        style={{
-          width: pageFormat.width,
-          minHeight: pageFormat.height,
-          padding: pageFormat.padding,
-          backgroundColor: theme.colors.background,
-          fontFamily: theme.typography.fontFamily,
-          fontSize: theme.typography.baseFontSize,
-          color: theme.colors.text,
-          boxSizing: "border-box",
-          position: "relative",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
-          borderRadius: 2,
-          outline: isActivePage ? "2px solid #BFDBFE" : "none",
-        }}
+      <DocumentPage
+        theme={theme}
+        format={pageFormat}
+        chromeStyle={{ outline: isActivePage ? "2px solid #BFDBFE" : "none" }}
         onClick={() => { selectPage(pageIndex); selectNode(null); }}
       >
         {/* DropZones entre chaque composant racine */}
@@ -85,7 +74,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
             Page vide — glissez des composants ici
           </div>
         )}
-      </div>
+      </DocumentPage>
     </div>
   );
 }

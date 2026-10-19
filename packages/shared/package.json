@@ -15,7 +15,8 @@
     "./types/document": "./src/types/document.ts",
     "./utils/tree": "./src/utils/tree.ts",
     "./utils/markdown": "./src/utils/markdown.ts",
-    "./themes/presets": "./src/themes/presets.ts"
+    "./themes/presets": "./src/themes/presets.ts",
+    "./utils/fields": "./src/utils/fields.ts"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

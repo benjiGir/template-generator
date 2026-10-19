@@ -9,7 +9,7 @@ Outil privé de création de documents techniques (présentations, rapports, rev
 | Monorepo | pnpm workspaces |
 | Frontend | React 19 + Vite + Tailwind CSS 4 |
 | Drag & drop | dnd-kit |
-| State | Zustand + immer |
+| State | TanStack Query (serveur) + Zustand/immer (édition en cours) |
 | Backend | Hono + Node.js + tsx |
 | ORM | Drizzle ORM |
 | Base de données | PostgreSQL 17 |
@@ -104,18 +104,31 @@ Au premier démarrage, les migrations et le seed sont appliqués automatiquement
 ## API
 
 ```
-GET    /api/templates           Liste les templates
-GET    /api/templates/:id       Récupère un template
-POST   /api/templates           Crée un template
-PUT    /api/templates/:id       Met à jour un template
-DELETE /api/templates/:id       Supprime un template
+GET    /api/templates                 Liste les templates (avec documentCount)
+GET    /api/templates/:id             Récupère un template
+POST   /api/templates                 Crée un template (brouillon)
+POST   /api/templates/:id/duplicate   Duplique un template
+PUT    /api/templates/:id             Met à jour l'état de travail
+PUT    /api/templates/:id/publish     Fige une version publiée (utilisée par le Studio)
+DELETE /api/templates/:id             Supprime un template (les documents sont conservés)
 
-GET    /api/presets             Liste les presets de composants
-POST   /api/presets             Crée un preset
-PUT    /api/presets/:id         Met à jour un preset
-DELETE /api/presets/:id         Supprime un preset
+GET    /api/documents                 Liste les documents (avec templateName)
+GET    /api/documents/:id             Récupère un document
+POST   /api/documents                 Crée un document depuis la version publiée d'un template
+POST   /api/documents/:id/duplicate   Duplique un document
+PUT    /api/documents/:id             Renomme un document
+PUT    /api/documents/:id/data        Remplace les données saisies
+PUT    /api/documents/:id/export      Marque le document comme exporté (finalisé)
+DELETE /api/documents/:id             Supprime un document
 
-GET    /api/health              Health check
+GET    /api/presets                   Liste les presets de composants
+GET    /api/presets/:id               Récupère un preset
+POST   /api/presets                   Crée un preset
+POST   /api/presets/:id/duplicate     Duplique un preset
+PUT    /api/presets/:id               Met à jour un preset
+DELETE /api/presets/:id               Supprime un preset
+
+GET    /api/health                    Health check
 ```
 
 ## Composants disponibles
@@ -152,15 +165,18 @@ GET    /api/health              Health check
 |---|---|
 | `Ctrl+Z` | Annuler |
 | `Ctrl+Shift+Z` | Rétablir |
-| `Ctrl+S` | Sauvegarder |
+| `Ctrl+S` | Sauvegarder immédiatement (la sauvegarde est automatique) |
 | `Delete` | Supprimer le composant sélectionné |
 
 ## Export PDF
 
-Cliquer sur "Export PDF" dans la toolbar, puis dans la boîte de dialogue d'impression du navigateur :
-- Imprimante : **Enregistrer en PDF**
+L'export passe par l'impression du navigateur. Le document est rendu à l'échelle 1 dans un portail dédié
+(`usePrintDocument`), avec les mêmes composants qu'à l'écran ; chaque page reçoit sa propre taille `@page`.
+Dans la boîte d'impression :
+- Destination : **Enregistrer au format PDF**
 - Marges : **Aucune**
-- Cocher **Graphiques d'arrière-plan**
+
+Les fonds de couleur sont forcés par `print-color-adjust: exact`.
 
 ## Scripts
 
