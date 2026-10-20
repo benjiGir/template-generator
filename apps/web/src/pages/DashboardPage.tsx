@@ -37,6 +37,7 @@ export function DashboardPage() {
           <div className="grid grid-cols-3 gap-4">
             <ActionCard
               icon={<LayoutTemplate size={20} />}
+              tour="action-template"
               title="Créer un template"
               description="Construisez la structure et le style d'un nouveau template."
               action="Nouveau template"
@@ -44,6 +45,7 @@ export function DashboardPage() {
             />
             <ActionCard
               icon={<Puzzle size={20} />}
+              tour="action-preset"
               title="Créer un preset"
               description="Configurez un composant réutilisable et sauvegardez-le."
               action="Nouveau preset"
@@ -51,6 +53,7 @@ export function DashboardPage() {
             />
             <ActionCard
               icon={<FileText size={20} />}
+              tour="action-document"
               title="Nouveau document"
               description="Choisissez un template publié et remplissez vos données."
               action="Nouveau document"
@@ -61,7 +64,7 @@ export function DashboardPage() {
 
         {/* Section 2 — Documents récents */}
         {recentDocuments.length > 0 && (
-          <section>
+          <section data-tour="recent-documents">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Documents récents</h2>
               <Link to="/documents" className="text-xs text-blue-600 hover:underline">Voir tous</Link>
@@ -113,8 +116,9 @@ export function DashboardPage() {
 }
 
 function ActionCard({
-  icon, title, description, action, to,
+  icon, title, description, action, to, tour,
 }: {
+  tour: string;
   icon: React.ReactNode;
   title: string;
   description: string;
@@ -122,7 +126,7 @@ function ActionCard({
   to: string;
 }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
+    <div data-tour={tour} className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3">
       <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
         {icon}
       </div>
