@@ -1,12 +1,12 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: docforge
       POSTGRES_USER: docforge
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata18:/var/lib/postgresql
     ports:
       - "5432:5432"
     healthcheck:
@@ -41,4 +41,4 @@ services:
       - api
 
 volumes:
-  pgdata:
+  pgdata18:

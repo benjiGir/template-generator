@@ -12,7 +12,7 @@ Outil privé de création de documents techniques (présentations, rapports, rev
 | State | TanStack Query (serveur) + Zustand/immer (édition en cours) |
 | Backend | Hono + Node.js + tsx |
 | ORM | Drizzle ORM |
-| Base de données | PostgreSQL 17 |
+| Base de données | PostgreSQL 18 |
 | Export PDF | `window.print()` + `@page` dynamique |
 | Déploiement | Docker + nginx |
 
@@ -90,6 +90,24 @@ docker-compose up --build
 L'application est accessible sur http://localhost:8080 (ou le port défini dans `WEB_PORT`).
 
 Au premier démarrage, les migrations et le seed sont appliqués automatiquement.
+
+### Passer de PostgreSQL 17 à 18
+
+Une version majeure de PostgreSQL ne relit pas les fichiers de données d'une autre : il faut exporter puis réimporter.
+Avec PostgreSQL 18, l'image Docker range aussi ses données sous `/var/lib/postgresql/18/docker` ; le volume
+se monte désormais sur `/var/lib/postgresql` et s'appelle `pgdata18`. L'ancien volume `pgdata` (données v17)
+n'est pas touché, ce qui permet de l'exporter :
+
+```bash
+# 1. Exporter depuis la base v17 encore en marche (avant de la relancer avec la nouvelle configuration)
+docker compose exec db pg_dump -U docforge -d docforge -Fc > docforge-v17.dump
+
+# 2. Démarrer la base v18 (nouveau volume vide), puis réimporter
+docker compose up db -d
+docker compose exec -T db pg_restore -U docforge -d docforge --no-owner < docforge-v17.dump
+```
+
+Une fois les données vérifiées, l'ancien volume peut être supprimé (`docker volume rm <projet>_pgdata`).
 
 ## Variables d'environnement
 
