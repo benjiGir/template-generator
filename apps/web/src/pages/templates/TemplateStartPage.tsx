@@ -9,6 +9,7 @@ import { newTemplateDraft } from "@/store/editor-store";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 import { TemplatePreviewDialog } from "@/components/document-view/TemplatePreviewDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
+import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 
 /**
@@ -60,13 +61,13 @@ export function TemplateStartPage() {
             <section>
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900">Repartir d'un template existant</h2>
+                  <h2 className="text-lg font-bold text-ink">Repartir d'un template existant</h2>
                   <p className="mt-0.5 text-sm text-gray-500">
                     La copie reprend le thème, la mise en page et les champs. Vous l'ajustez ensuite.
                   </p>
                 </div>
                 {templates.length > 6 && (
-                  <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-blue-400">
+                  <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-ink">
                     <Search size={14} className="text-gray-400" />
                     <input
                       value={search}
@@ -90,8 +91,8 @@ export function TemplateStartPage() {
                 {visible.map((t) => (
                   <div
                     key={t.id}
-                    className={`group relative overflow-hidden rounded-xl border bg-white transition-all ${
-                      creating === t.id ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-blue-400 hover:shadow-md"
+                    className={`group relative overflow-hidden border bg-white transition-colors ${
+                      creating === t.id ? "border-tpl ring-2 ring-tpl/30" : "border-rule hover:border-tpl"
                     }`}
                   >
                     <button
@@ -100,9 +101,9 @@ export function TemplateStartPage() {
                       className="block w-full text-left disabled:cursor-wait"
                       aria-label={`Dupliquer ${t.name}`}
                     >
-                      <div className="flex justify-center border-b border-gray-100 bg-slate-100 px-4 pt-4">
+                      <BlueprintFrame className="flex justify-center px-4 pt-4">
                         {t.preview ? (
-                          <div className="overflow-hidden rounded-t shadow-sm">
+                          <div className="overflow-hidden outline-1 outline-offset-2 outline-dashed outline-white/80">
                             <DocumentThumbnail template={t.preview} width={180} cropHeight={170} />
                           </div>
                         ) : (
@@ -110,7 +111,7 @@ export function TemplateStartPage() {
                             <LayoutTemplate size={28} className="text-gray-200" />
                           </div>
                         )}
-                      </div>
+                      </BlueprintFrame>
                       <div className="p-3">
                         <div className="flex items-center gap-1.5">
                           <h3 className="min-w-0 flex-1 truncate text-xs font-semibold text-gray-900">{t.name}</h3>
@@ -212,6 +213,7 @@ function AtelierTemplatePreview({
       subtitle={template.description ?? undefined}
       template={full ?? null}
       actionLabel="Dupliquer ce template"
+      kind="tpl"
       onAction={onChoose}
       pending={creating}
       onClose={onClose}

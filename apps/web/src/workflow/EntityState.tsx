@@ -14,7 +14,7 @@ export function NotFoundState({ message, backTo, backLabel }: { message: string;
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 bg-gray-50">
       <p className="text-sm text-gray-600">{message}</p>
-      <Link to={backTo} className="text-sm font-medium text-blue-600 hover:underline">
+      <Link to={backTo} className="text-sm font-medium text-ink underline underline-offset-2">
         ← {backLabel}
       </Link>
     </div>

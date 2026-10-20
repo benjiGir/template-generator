@@ -1,3 +1,5 @@
+import type { ObjectKind } from "@/components/ui/ObjectIdentity";
+
 /**
  * Les trois parcours de création, déclarés une fois.
  * WorkflowLayout s'en sert pour le stepper, la navigation et l'action finale.
@@ -10,6 +12,8 @@ export interface WorkflowStepDef {
 
 export interface WorkflowDef {
   space: string;
+  /** Type d'objet produit : sa couleur et sa forme dans l'en-tête, le stepper et l'action finale */
+  kind: ObjectKind;
   listPath: string;
   listLabel: string;
   steps: WorkflowStepDef[];
@@ -17,6 +21,7 @@ export interface WorkflowDef {
 
 export const TEMPLATE_WORKFLOW: WorkflowDef = {
   space:     "Atelier",
+  kind:      "tpl",
   listPath:  "/templates",
   listLabel: "Templates",
   steps: [
@@ -29,6 +34,7 @@ export const TEMPLATE_WORKFLOW: WorkflowDef = {
 
 export const DOCUMENT_WORKFLOW: WorkflowDef = {
   space:     "Studio",
+  kind:      "doc",
   listPath:  "/documents",
   listLabel: "Documents",
   steps: [
@@ -42,6 +48,7 @@ export const DOCUMENT_WORKFLOW: WorkflowDef = {
 /** L'identifiant vaut « new » pour un preset en cours de création */
 export const PRESET_WORKFLOW: WorkflowDef = {
   space:     "Bibliothèque",
+  kind:      "preset",
   listPath:  "/components",
   listLabel: "Presets",
   steps: [

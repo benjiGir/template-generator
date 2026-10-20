@@ -20,13 +20,13 @@ export function PresetPreviewPane({ type, props }: { type: string; props: Record
           id="preview-theme"
           value={theme.name}
           onChange={(e) => setPreviewTheme(e.target.value)}
-          className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-blue-400 focus:outline-none"
+          className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-ink focus:outline-none"
         >
           {BUILTIN_THEMES.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
         </select>
         <span className="ml-auto text-gray-400">Le preset prendra le thème du template où il sera utilisé.</span>
       </div>
-      <div className="flex-1 overflow-y-auto bg-slate-200/70 p-8">
+      <div className="flex-1 overflow-y-auto bg-table p-8">
         <div className="mx-auto max-w-3xl shadow-[0_1px_3px_rgba(15,23,42,0.12),0_8px_24px_rgba(15,23,42,0.08)]">
           <ComponentPreview type={type} props={props} theme={theme} />
         </div>

@@ -56,7 +56,7 @@ export function DocumentExportPage() {
           />
         </aside>
         <div className="min-w-0 flex-1">
-          <PreviewPane template={mergedTemplate} />
+          <PreviewPane template={mergedTemplate} framed />
         </div>
       </div>
       {printNode}

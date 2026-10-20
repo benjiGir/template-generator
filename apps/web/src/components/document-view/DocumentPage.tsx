@@ -33,7 +33,7 @@ export function DocumentPage({ theme, format, children, chromeStyle, onClick }: 
   return (
     <div
       data-doc-page
-      style={{ boxShadow: "0 1px 3px rgba(15,23,42,0.12), 0 8px 24px rgba(15,23,42,0.08)", ...chromeStyle, ...pageStyle(theme, format) }}
+      style={{ boxShadow: "0 0 0 1px rgba(22,22,26,0.10)", ...chromeStyle, ...pageStyle(theme, format) }}
       onClick={onClick}
     >
       {children}

@@ -87,14 +87,14 @@ function ConfirmModal({ options, onClose }: { options: ConfirmOptions; onClose: 
           <button
             ref={cancelRef}
             onClick={() => onClose(false)}
-            className="rounded-md border border-gray-300 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="rounded-md border border-gray-300 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-ink"
           >
             {options.cancelLabel ?? "Annuler"}
           </button>
           <button
             onClick={() => onClose(true)}
             className={`rounded-md px-3.5 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-1 ${
-              danger ? "bg-red-600 hover:bg-red-700 focus:ring-red-500" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+              danger ? "bg-red-600 hover:bg-red-700 focus:ring-red-500" : "bg-ink hover:bg-gray-800 focus:ring-ink"
             }`}
           >
             {options.confirmLabel}

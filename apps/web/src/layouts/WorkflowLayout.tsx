@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Info, X } from "lucide-react";
 import type { WorkflowDef } from "@/workflow/definitions";
 import { useWorkflowSession } from "@/workflow/session";
 import { SaveIndicator } from "@/components/ui/SaveIndicator";
+import { KIND_STYLES, ObjectTag } from "@/components/ui/ObjectIdentity";
 
 export interface StepGuard {
   ok: boolean;
@@ -93,42 +94,33 @@ export function WorkflowLayout({
   const canClick = (index: number) =>
     index >= minIndex && (index < currentIndex || (index === currentIndex + 1 && guard.ok && !onNext));
 
+  const kindStyle = KIND_STYLES[workflow.kind];
+
+  // Étapes numérotées en chasse fixe ; l'étape courante est soulignée dans la couleur de l'objet produit
   const stepper = (
-    <ol className={`flex items-center ${compact ? "gap-1" : "gap-0"}`} aria-label="Étapes">
+    <ol className={`flex items-center ${compact ? "gap-3" : "gap-6"}`} aria-label="Étapes">
       {steps.map((step, index) => {
         const done = index < currentIndex;
         const active = index === currentIndex;
         const clickable = canClick(index) && !pending;
         return (
-          <li key={step.key} className="flex items-center">
+          <li key={step.key}>
             <button
               type="button"
               onClick={() => clickable && goTo(index)}
               disabled={!clickable}
               aria-current={active ? "step" : undefined}
               title={compact && !active ? step.label : undefined}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-2 border-b-[3px] py-1 text-[13px] transition-colors ${
                 active
-                  ? "text-blue-700"
-                  : done
-                  ? clickable ? "text-gray-600 hover:bg-gray-100 hover:text-gray-900" : "text-gray-500"
-                  : clickable ? "text-gray-500 hover:bg-gray-100" : "text-gray-400"
+                  ? `${kindStyle.border} font-semibold text-ink`
+                  : `border-transparent ${done ? "text-gray-700" : "text-gray-500"} ${clickable ? "hover:text-ink hover:underline" : ""}`
               } ${clickable ? "cursor-pointer" : "cursor-default"}`}
             >
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                  active
-                    ? "bg-blue-600 text-white"
-                    : done
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "border border-gray-300 text-gray-400"
-                }`}
-              >
-                {done ? <Check size={11} strokeWidth={3} /> : index + 1}
-              </span>
+              <span className="font-mono text-xs font-medium">{String(index + 1).padStart(2, "0")}</span>
               {(!compact || active) && <span className="whitespace-nowrap">{step.label}</span>}
+              {done && <Check size={12} strokeWidth={3} aria-label="fait" />}
             </button>
-            {index < steps.length - 1 && <span className={`mx-1 h-px ${compact ? "w-3" : "w-6"} ${done ? "bg-emerald-300" : "bg-gray-200"}`} />}
           </li>
         );
       })}
@@ -146,18 +138,19 @@ export function WorkflowLayout({
     <button
       onClick={() => goTo(currentIndex - 1)}
       disabled={pending}
-      className="flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      className="flex min-h-9 items-center gap-1.5 rounded-sm border border-ink bg-transparent px-3 text-sm font-medium text-ink hover:bg-white disabled:opacity-50"
     >
       <ArrowLeft size={14} />
       {previous.label}
     </button>
   );
 
+  // Avancer est à l'encre ; l'action qui termine prend la couleur de l'objet produit
   const primaryButton = isLast && finalAction ? (
     <button
       onClick={() => run(finalAction.onClick)}
       disabled={pending || finalAction.disabled}
-      className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className={`flex min-h-9 items-center gap-1.5 rounded-sm px-4 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 ${kindStyle.bg}`}
     >
       {finalAction.icon ?? <Check size={15} />}
       {finalAction.label}
@@ -167,7 +160,7 @@ export function WorkflowLayout({
       <button
         onClick={handleNext}
         disabled={pending || !guard.ok}
-        className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex min-h-9 items-center gap-1.5 rounded-sm bg-ink px-4 text-sm font-medium text-paper hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {nextLabel === "Suivant" && next ? next.label : nextLabel}
         <ArrowRight size={14} />
@@ -178,27 +171,27 @@ export function WorkflowLayout({
   const quit = (
     <Link
       to={workflow.listPath}
-      className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+      className="flex items-center gap-1 px-1 py-1 font-mono text-xs text-gray-700 hover:text-ink hover:underline"
       title={`Quitter et revenir à la liste — ${workflow.listLabel}`}
     >
-      <X size={14} />
+      <X size={13} />
       Quitter
     </Link>
   );
 
   const heading = (
-    <div className="min-w-0">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{workflow.space}</p>
-      <div className="truncate text-sm font-semibold text-gray-900">{title ?? "Nouveau"}</div>
+    <div className="flex min-w-0 items-center gap-2">
+      <ObjectTag kind={workflow.kind} />
+      <div className="min-w-0 truncate text-sm font-semibold text-ink">{title ?? "Nouveau"}</div>
     </div>
   );
 
   if (compact) {
     return (
       <div className="flex h-full flex-col">
-        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-3">
+        <header className="flex h-12 shrink-0 items-center gap-3 border-b-2 border-ink bg-paper px-3">
           {quit}
-          <div className="w-48 shrink-0">{heading}</div>
+          <div className="w-72 shrink-0">{heading}</div>
           <div className="flex flex-1 justify-center">{stepper}</div>
           <div className="flex items-center gap-2">
             {session?.autosave && <SaveIndicator autosave={session.autosave} />}
@@ -215,9 +208,9 @@ export function WorkflowLayout({
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-gray-200 bg-white px-4">
+      <header className="flex h-14 shrink-0 items-center gap-4 border-b-2 border-ink bg-paper px-4">
         {quit}
-        <div className="w-56 shrink-0">{heading}</div>
+        <div className="w-72 shrink-0">{heading}</div>
         <div className="flex flex-1 justify-center">{stepper}</div>
         <div className="flex w-56 shrink-0 justify-end">
           {session?.autosave && <SaveIndicator autosave={session.autosave} />}
@@ -226,7 +219,7 @@ export function WorkflowLayout({
 
       <div className="flex-1 overflow-hidden">{children}</div>
 
-      <footer className="flex h-14 shrink-0 items-center justify-between gap-4 border-t border-gray-200 bg-white px-6">
+      <footer className="flex h-14 shrink-0 items-center justify-between gap-4 border-t border-ink bg-paper px-6">
         <div>{previousButton}</div>
         <div className="flex items-center gap-3">
           {blockedReason}

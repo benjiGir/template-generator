@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, EyeOff, Lock, SkipForward, X } from "lucide-react";
 import { useDocumentStore } from "@/store/document-store";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
+import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { computeCompletion, fieldKey, isFilled } from "@template-generator/shared/utils/fields";
 import { FormField } from "./FormField";
 import type { EditableField } from "@template-generator/shared/types/template";
@@ -121,10 +122,8 @@ export function InlineFillMode() {
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-5 py-2 text-xs">
         <div className="flex w-56 items-center gap-2">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
-            <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${completion.percent}%` }} />
-          </div>
-          <span className="shrink-0 text-gray-500">{completion.filled}/{completion.total}</span>
+          <div className="flex-1"><SegmentedProgress filled={completion.filled} total={completion.total} /></div>
+          <span className="shrink-0 font-mono text-gray-700">{completion.filled} / {completion.total}</span>
         </div>
         <span className="text-gray-600">
           {remaining === 0 ? "Tout est rempli" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""}`}
@@ -133,7 +132,7 @@ export function InlineFillMode() {
           )}
         </span>
         {remaining > 0 && (
-          <button onClick={goToNextEmpty} className="flex items-center gap-1 rounded px-2 py-1 font-medium text-blue-700 hover:bg-blue-50">
+          <button onClick={goToNextEmpty} className="flex items-center gap-1 rounded px-2 py-1 font-medium text-doc-strong hover:bg-doc-tint">
             <SkipForward size={13} />
             Champ vide suivant
           </button>
@@ -141,7 +140,7 @@ export function InlineFillMode() {
         <button
           onClick={() => setReveal((r) => !r)}
           aria-pressed={reveal}
-          className={`ml-auto flex items-center gap-1.5 rounded px-2 py-1 ${reveal ? "bg-emerald-50 text-emerald-800" : "text-gray-600 hover:bg-gray-100"}`}
+          className={`ml-auto flex items-center gap-1.5 rounded px-2 py-1 ${reveal ? "bg-white text-ink" : "text-gray-600 hover:bg-gray-100"}`}
         >
           {reveal ? <EyeOff size={13} /> : <Eye size={13} />}
           {reveal ? "Masquer les zones modifiables" : "Révéler les zones modifiables"}
@@ -156,7 +155,10 @@ export function InlineFillMode() {
         <PreviewPane
           template={mergedTemplate}
           highlightNodeId={selected ?? hovered}
+          highlightTone="doc"
           outlineNodeIds={reveal ? editableIds : undefined}
+          outlineTone="doc"
+          framed
           onBackgroundClick={handleClick}
           anchoredPanel={panel || undefined}
         />

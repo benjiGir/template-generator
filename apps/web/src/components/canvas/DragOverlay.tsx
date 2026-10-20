@@ -13,12 +13,12 @@ export function DragOverlay({ activeDragData }: Props) {
         <div
           style={{
             backgroundColor: "white",
-            border: "2px solid #2563EB",
+            border: "2px solid #2448C8",
             borderRadius: 6,
             padding: "6px 12px",
             fontSize: 12,
             fontWeight: 600,
-            color: "#1D4ED8",
+            color: "#1D3BA6",
             boxShadow: "0 8px 24px rgba(37,99,235,0.2)",
             fontFamily: "system-ui, sans-serif",
             whiteSpace: "nowrap",

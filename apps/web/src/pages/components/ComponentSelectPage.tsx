@@ -66,7 +66,7 @@ export function ComponentSelectPage() {
               onClick={() => setCategoryFilter(cat)}
               className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
                 categoryFilter === cat
-                  ? "bg-blue-600 text-white"
+                  ? "bg-preset text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
@@ -89,11 +89,11 @@ export function ComponentSelectPage() {
                     onClick={() => choose(def.type)}
                     className={`overflow-hidden rounded-lg border-2 bg-white text-left transition-all ${
                       selected === def.type
-                        ? "border-blue-500 shadow-sm"
-                        : "border-gray-200 hover:border-blue-300 hover:shadow-sm"
+                        ? "border-preset shadow-sm"
+                        : "border-gray-200 hover:border-preset hover:shadow-sm"
                     }`}
                   >
-                    <div className="h-[110px] overflow-hidden border-b border-gray-100 bg-slate-100 p-2">
+                    <div className="h-[110px] overflow-hidden border-b border-gray-100 bg-table p-2">
                       <div className="overflow-hidden rounded-sm bg-white shadow-sm">
                         <ComponentPreview type={def.type} props={def.defaultProps} theme={DEFAULT_THEME} maxHeight={94} compact />
                       </div>

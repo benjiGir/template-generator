@@ -70,7 +70,7 @@ export function DocumentSelectPage() {
               <p className="mt-0.5 text-sm text-gray-500">Le document reprend la mise en page du template ; vous n'aurez qu'à remplir le contenu.</p>
             </div>
             {templates.length > 6 && (
-              <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-blue-400">
+              <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-ink">
                 <Search size={14} className="text-gray-400" />
                 <input
                   value={search}
@@ -90,7 +90,7 @@ export function DocumentSelectPage() {
           {!isLoading && templates.length > 0 && visible.length === 0 && (
             <p className="py-10 text-center text-sm text-gray-500">
               Aucun template ne correspond à « {search} ».{" "}
-              <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">Effacer la recherche</button>
+              <button onClick={() => setSearch("")} className="text-doc-strong hover:underline">Effacer la recherche</button>
             </p>
           )}
 
@@ -102,7 +102,7 @@ export function DocumentSelectPage() {
                 <div
                   key={t.id}
                   className={`group relative overflow-hidden rounded-xl border bg-white transition-all ${
-                    creating ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-blue-400 hover:shadow-md"
+                    creating ? "border-doc ring-2 ring-doc/30" : "border-gray-200 hover:border-doc hover:shadow-md"
                   }`}
                 >
                   <button
@@ -135,14 +135,14 @@ export function DocumentSelectPage() {
 
                   <button
                     onClick={() => setPreviewed(t)}
-                    className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-gray-700 opacity-0 shadow-sm ring-1 ring-gray-200 transition-opacity hover:text-blue-700 focus:opacity-100 group-hover:opacity-100"
+                    className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-gray-700 opacity-0 shadow-sm ring-1 ring-gray-200 transition-opacity hover:text-doc-strong focus:opacity-100 group-hover:opacity-100"
                   >
                     <Eye size={13} />
                     Aperçu
                   </button>
 
                   {creating && (
-                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/70 text-sm font-medium text-blue-700">
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/70 text-sm font-medium text-doc-strong">
                       <Loader2 size={16} className="animate-spin" />
                       Création du document…
                     </div>
@@ -212,7 +212,7 @@ function NoPublishedTemplate({ draftCount }: { draftCount: number }) {
           ? "Un document part toujours d'un template. Le concepteur des templates doit d'abord en créer un dans l'Atelier, puis le publier."
           : `${draftCount} template${draftCount > 1 ? "s sont" : " est"} en préparation dans l'Atelier, mais aucun n'est publié. Le concepteur des templates doit en publier un pour qu'il apparaisse ici.`}
       </p>
-      <button onClick={() => navigate("/templates")} className="mt-3 text-sm text-blue-600 hover:underline">
+      <button onClick={() => navigate("/templates")} className="mt-3 text-sm text-doc-strong hover:underline">
         Ouvrir l'Atelier
       </button>
     </div>

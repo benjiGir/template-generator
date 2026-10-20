@@ -90,7 +90,7 @@ export function ComponentSavePage() {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="Ex: KPI Card Verte"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink"
               />
             </div>
 
@@ -101,7 +101,7 @@ export function ComponentSavePage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Description optionnelle…"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400 resize-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink resize-none"
               />
             </div>
 
@@ -110,7 +110,7 @@ export function ComponentSavePage() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ComponentCategory)}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-white"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink bg-white"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>

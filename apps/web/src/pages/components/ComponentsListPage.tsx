@@ -6,6 +6,7 @@ import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { CreateButton, SpaceHeader } from "@/components/ui/SpaceHeader";
 import { ComponentPreview } from "@/components/document-view/ComponentPreview";
 import { get } from "@template-generator/component-registry/registry";
 import { DEFAULT_THEME } from "@template-generator/shared/types/template";
@@ -73,27 +74,22 @@ export function ComponentsListPage() {
   ) as ComponentCategory[];
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Bibliothèque</h1>
-          <p className="text-xs text-gray-500">Des composants configurés une fois, réutilisables dans tous les templates.</p>
-        </div>
-        <button
-          onClick={handleNew}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
-        >
-          {draftInProgress ? "Reprendre le preset en cours" : "+ Nouveau preset"}
-        </button>
-      </div>
+    <div className="h-full overflow-y-auto bg-paper">
+      <SpaceHeader
+        kind="preset"
+        tag="Presets"
+        title="Bibliothèque"
+        subtitle="Des composants réglés une fois, réutilisables dans tous les templates."
+        action={<CreateButton kind="preset" onClick={handleNew}>{draftInProgress ? "Reprendre le preset en cours" : "Nouveau preset"}</CreateButton>}
+      />
 
-      <div className="bg-white border-b border-gray-100 px-8 py-2 flex items-center gap-4">
+      <div className="flex items-center gap-4 border-b border-rule px-8 py-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-gray-500">Catégorie :</span>
           <button
             onClick={() => setCategoryFilter("all")}
             className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
-              categoryFilter === "all" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              categoryFilter === "all" ? "bg-preset text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             Tous
@@ -103,7 +99,7 @@ export function ComponentsListPage() {
               key={cat}
               onClick={() => setCategoryFilter(cat)}
               className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
-                categoryFilter === cat ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                categoryFilter === cat ? "bg-preset text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {CATEGORY_LABELS[cat] ?? cat}
@@ -116,7 +112,7 @@ export function ComponentsListPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher…"
-            className="px-3 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 w-48"
+            className="px-3 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-ink w-48"
           />
         </div>
       </div>
@@ -133,7 +129,7 @@ export function ComponentsListPage() {
             </p>
             <button
               onClick={handleNew}
-              className="rounded bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded bg-preset px-5 py-2.5 text-sm font-medium text-white transition-colors hover:brightness-95"
             >
               Créer mon premier preset
             </button>
@@ -143,7 +139,7 @@ export function ComponentsListPage() {
         {!isLoading && presets.length > 0 && filtered.length === 0 && (
           <p className="py-16 text-center text-sm text-gray-500">
             Aucun preset ne correspond à ces filtres.{" "}
-            <button onClick={() => { setSearch(""); setCategoryFilter("all"); }} className="text-blue-600 hover:underline">
+            <button onClick={() => { setSearch(""); setCategoryFilter("all"); }} className="text-preset hover:underline">
               Réinitialiser les filtres
             </button>
           </p>
@@ -172,9 +168,9 @@ function PresetCard({
 }) {
   const base = get(preset.baseType);
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-[10px] border border-gray-200 bg-white transition-all hover:border-preset hover:shadow-md">
       <button onClick={() => onEdit(preset)} className="block text-left" aria-label={`Modifier ${preset.label}`}>
-        <div className="h-[130px] overflow-hidden border-b border-gray-100 bg-slate-100 p-3">
+        <div className="h-[130px] overflow-hidden border-b border-gray-100 bg-table p-3">
           <div className="overflow-hidden rounded-sm bg-white shadow-sm">
             <ComponentPreview type={preset.baseType} props={{ ...(base?.defaultProps ?? {}), ...preset.defaultProps }} theme={DEFAULT_THEME} maxHeight={106} compact />
           </div>
@@ -195,7 +191,7 @@ function PresetCard({
       <div className="mt-auto flex items-center justify-end gap-0.5 px-3 pb-2.5 pt-1">
         <button
           onClick={() => onDuplicate(preset.id)}
-          className="rounded px-1.5 py-1 text-xs text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+          className="rounded px-1.5 py-1 text-xs text-gray-500 transition-colors hover:bg-preset-tint hover:text-preset"
         >
           Dupliquer
         </button>

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Loader2, X } from "lucide-react";
 import type { Template } from "@template-generator/shared/types/template";
 import { PreviewPane } from "./PreviewPane";
+import { KIND_STYLES, type ObjectKind } from "@/components/ui/ObjectIdentity";
 
 interface Props {
   title: string;
@@ -12,10 +13,12 @@ interface Props {
   onAction: () => void;
   pending?: boolean;
   onClose: () => void;
+  /** Ce que l'action crée : un document (Studio) ou une copie de template (Atelier) */
+  kind?: ObjectKind;
 }
 
 /** Aperçu en grand d'un template, avant de le choisir comme base */
-export function TemplatePreviewDialog({ title, subtitle, template, actionLabel, onAction, pending = false, onClose }: Props) {
+export function TemplatePreviewDialog({ title, subtitle, template, actionLabel, onAction, pending = false, onClose, kind = "doc" }: Props) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", handler);
@@ -39,7 +42,7 @@ export function TemplatePreviewDialog({ title, subtitle, template, actionLabel, 
           <button
             onClick={onAction}
             disabled={pending}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+            className={`flex items-center gap-1.5 rounded-sm px-4 py-1.5 text-sm font-semibold text-white hover:brightness-95 disabled:opacity-60 ${KIND_STYLES[kind].bg}`}
           >
             {pending && <Loader2 size={14} className="animate-spin" />}
             {actionLabel}
@@ -50,7 +53,7 @@ export function TemplatePreviewDialog({ title, subtitle, template, actionLabel, 
         </div>
         <div className="min-h-0 flex-1">
           {template ? (
-            <PreviewPane template={template} />
+            <PreviewPane template={template} framed />
           ) : (
             <div className="flex h-full items-center justify-center gap-2 text-sm text-gray-400">
               <Loader2 size={16} className="animate-spin" /> Chargement…

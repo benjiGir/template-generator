@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, FileText, LayoutTemplate, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { KIND_STYLES, ObjectMark } from "@/components/ui/ObjectIdentity";
 import { TOUR_ENDINGS, TOUR_PROFILES, TOUR_STEPS, type TourProfile } from "./tourSteps";
 
 const STORAGE_KEY = "docforge-tour";
@@ -182,7 +183,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
             left: rect.left - SPOT_PADDING,
             width: rect.width + SPOT_PADDING * 2,
             height: rect.height + SPOT_PADDING * 2,
-            boxShadow: "0 0 0 9999px rgba(15,23,42,0.55), 0 0 0 2px rgba(96,165,250,0.9)",
+            boxShadow: "0 0 0 9999px rgba(22,22,26,0.55), 0 0 0 2px rgba(247,245,240,0.95)",
           }}
         />
       ) : (
@@ -205,7 +206,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
 
         {!profile ? (
           <>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-600">Première visite</p>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">Première visite</p>
             <h2 id="tour-title" className="mt-1 text-lg font-semibold text-gray-900">Bienvenue dans DocForge</h2>
             <p className="mt-2 text-sm text-gray-600">
               DocForge sépare la forme du fond : un <strong>template</strong> fixe la mise en page une fois pour toutes,
@@ -218,9 +219,9 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
                   key={p.key}
                   ref={i === 0 ? primaryRef : undefined}
                   onClick={() => { setProfile(p.key); setIndex(0); }}
-                  className="flex flex-col items-start gap-1.5 rounded-lg border border-gray-200 p-3 text-left transition-colors hover:border-blue-400 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex flex-col items-start gap-1.5 border border-rule p-3 text-left transition-colors hover:border-ink hover:bg-paper focus:outline-none focus:ring-2 focus:ring-ink"
                 >
-                  {p.key === "contributor" ? <FileText size={18} className="text-blue-600" /> : <LayoutTemplate size={18} className="text-blue-600" />}
+                  <ObjectMark kind={p.key === "contributor" ? "doc" : "tpl"} size={14} />
                   <span className="text-sm font-semibold text-gray-900">{p.title}</span>
                   <span className="text-xs text-gray-500">{p.hint}</span>
                 </button>
@@ -232,7 +233,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
           </>
         ) : step ? (
           <>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-600">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">
               Étape {index + 1} sur {steps.length}
             </p>
             <h2 id="tour-title" className="mt-1 pr-6 text-base font-semibold text-gray-900">{step.title}</h2>
@@ -240,7 +241,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
 
             <div className="mt-4 flex items-center gap-1" aria-hidden>
               {steps.map((_, i) => (
-                <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-blue-600" : "w-1.5 bg-gray-200"}`} />
+                <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-ink" : "w-1.5 bg-rule"}`} />
               ))}
             </div>
 
@@ -250,7 +251,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
                 <button
                   ref={primaryRef}
                   onClick={() => onFinish(TOUR_ENDINGS[profile].to)}
-                  className="w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                  className={`w-full rounded-sm px-3 py-2 text-sm font-semibold text-white hover:brightness-95 ${KIND_STYLES[profile === "contributor" ? "doc" : "tpl"].bg} focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-1`}
                 >
                   {TOUR_ENDINGS[profile].label}
                 </button>
@@ -283,7 +284,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
                   <button
                     ref={primaryRef}
                     onClick={next}
-                    className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                    className="flex items-center gap-1 rounded-sm bg-ink px-3 py-1.5 text-xs font-semibold text-paper hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-1"
                   >
                     Suivant
                     <ArrowRight size={13} />

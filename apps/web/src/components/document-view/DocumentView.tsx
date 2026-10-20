@@ -35,19 +35,48 @@ interface Props {
   renderNodes?: (nodes: ComponentNode[], theme: Theme, page: TemplatePage) => ReactNode;
   /** Réduction pour tenir dans la largeur disponible (1 = taille réelle) */
   zoom?: number;
+  /** Page posée sur la table : traits de coupe et légende de format (écran seulement, jamais imprimé) */
+  framed?: boolean;
 }
 
 /** Affiche toutes les pages d'un template ou d'un document, en lecture seule */
-export function DocumentView({ template, renderNodes, zoom = 1 }: Props) {
+export function DocumentView({ template, renderNodes, zoom = 1, framed = false }: Props) {
+  const count = template.pages.length;
   return (
     <div className="mx-auto flex w-fit flex-col gap-8" style={zoom !== 1 ? { zoom } : undefined}>
-      {template.pages.map((page) => (
-        <DocumentPage key={page.id} theme={template.theme} format={page.format ?? template.pageFormat}>
-          {renderNodes
-            ? renderNodes(page.children, template.theme, page)
-            : page.children.map((node) => <MarkedNode key={node.id} node={node} theme={template.theme} />)}
-        </DocumentPage>
-      ))}
+      {template.pages.map((page, index) => {
+        const format = page.format ?? template.pageFormat;
+        const content = (
+          <DocumentPage key={page.id} theme={template.theme} format={format}>
+            {renderNodes
+              ? renderNodes(page.children, template.theme, page)
+              : page.children.map((node) => <MarkedNode key={node.id} node={node} theme={template.theme} />)}
+          </DocumentPage>
+        );
+        if (!framed) return content;
+        return (
+          <div key={page.id}>
+            <div className="mb-2 flex justify-between px-3 font-mono text-[11px] uppercase tracking-[0.04em] text-gray-700">
+              <span>Page {index + 1}/{count} · {format.width} de large · exportée telle quelle</span>
+            </div>
+            <CropMarks>{content}</CropMarks>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Traits de coupe aux quatre coins, comme sur une épreuve d'imprimerie */
+export function CropMarks({ children }: { children: ReactNode }) {
+  const mark = "pointer-events-none absolute h-2.5 w-2.5 border-gray-700";
+  return (
+    <div className="relative p-3">
+      <span aria-hidden="true" className={`${mark} left-0 top-0 border-l border-t`} />
+      <span aria-hidden="true" className={`${mark} right-0 top-0 border-r border-t`} />
+      <span aria-hidden="true" className={`${mark} bottom-0 left-0 border-b border-l`} />
+      <span aria-hidden="true" className={`${mark} bottom-0 right-0 border-b border-r`} />
+      {children}
     </div>
   );
 }

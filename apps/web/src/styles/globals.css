@@ -1,5 +1,118 @@
 @import "tailwindcss";
 
+/*
+ * Direction visuelle « bureau d'études » : papier, encre, filets plutôt qu'ombres,
+ * et une couleur par type d'objet (document, template, preset).
+ * Les gammes Tailwind sont redéfinies pour que l'interface entière suive ;
+ * les documents eux-mêmes gardent les couleurs de leur template (styles en ligne du registre).
+ */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Neutres chauds : papier → encre */
+  --color-gray-50: #F7F5F0;
+  --color-gray-100: #EFECE5;
+  --color-gray-200: #DDD8CE;
+  --color-gray-300: #C9C3B7;
+  --color-gray-400: #9A958B;
+  --color-gray-500: #6E6A62;
+  --color-gray-600: #57534B;
+  --color-gray-700: #48453F;
+  --color-gray-800: #2E2C28;
+  --color-gray-900: #16161A;
+
+  --color-slate-100: #EFECE5;
+  --color-slate-200: #E2DED5;
+  --color-slate-300: #C9C3B7;
+  --color-slate-400: #9A958B;
+  --color-slate-500: #6E6A62;
+  --color-slate-600: #57534B;
+  --color-slate-700: #48453F;
+  --color-slate-800: #2E2C28;
+  --color-slate-900: #16161A;
+
+  /* Bleu = cobalt, la couleur des templates (Atelier) */
+  --color-blue-50: #EEF1FC;
+  --color-blue-100: #E4EAFB;
+  --color-blue-200: #C9D3F6;
+  --color-blue-300: #A3B4EF;
+  --color-blue-400: #6F89E2;
+  --color-blue-500: #3F5FD6;
+  --color-blue-600: #2448C8;
+  --color-blue-700: #1D3BA6;
+  --color-blue-800: #192F82;
+  --color-blue-900: #142663;
+
+  /* Ambre = ocre, « à compléter » */
+  --color-amber-50: #FBF4E6;
+  --color-amber-100: #F5E6C8;
+  --color-amber-200: #EBD09A;
+  --color-amber-300: #DDB566;
+  --color-amber-400: #C89A3A;
+  --color-amber-500: #A97A16;
+  --color-amber-600: #8A5A00;
+  --color-amber-700: #7A5000;
+  --color-amber-800: #6E4700;
+  --color-amber-900: #553700;
+
+  /* Rouge = cramoisi, réservé au destructif */
+  --color-red-50: #FBEDEF;
+  --color-red-100: #F6D5DA;
+  --color-red-200: #EBAAB4;
+  --color-red-300: #DC7C8B;
+  --color-red-400: #C64B60;
+  --color-red-500: #B12A42;
+  --color-red-600: #9E1B32;
+  --color-red-700: #85162A;
+
+  /* Vert = preset (Bibliothèque) */
+  --color-emerald-50: #EBF7F2;
+  --color-emerald-100: #DDF2EA;
+  --color-emerald-200: #B5E1D0;
+  --color-emerald-300: #7FC8AD;
+  --color-emerald-500: #1E9970;
+  --color-emerald-600: #0F7A57;
+  --color-emerald-700: #0C6648;
+  --color-emerald-800: #0A523A;
+
+  /* Couleurs par type d'objet */
+  --color-paper: #F7F5F0;
+  --color-table: #E2DED5;
+  --color-rule: #DDD8CE;
+  --color-ink: #16161A;
+  --color-doc: #C8441B;
+  --color-doc-strong: #B03B17;
+  --color-doc-tint: #FCE9E0;
+  --color-tpl: #2448C8;
+  --color-tpl-tint: #EEF1FC;
+  --color-tpl-rule: #C9D3F6;
+  --color-preset: #0F7A57;
+  --color-preset-tint: #DDF2EA;
+  --color-warn: #8A5A00;
+
+  /* Angles presque droits, pas d'ombres portées sur les surfaces */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 2px 0 rgba(22, 22, 26, 0.06), 0 8px 24px rgba(22, 22, 26, 0.10);
+  --shadow-xl: 0 2px 0 rgba(22, 22, 26, 0.06), 0 12px 32px rgba(22, 22, 26, 0.14);
+  --shadow-2xl: 0 2px 0 rgba(22, 22, 26, 0.06), 0 18px 48px rgba(22, 22, 26, 0.18);
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+}
+
 /* Aperçu servant à désigner des zones (Atelier, champs remplissables) */
 [data-pickable] [data-node-id] > * {
   cursor: pointer;

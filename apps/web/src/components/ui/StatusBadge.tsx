@@ -2,16 +2,23 @@ import { documentDisplayStatus, templateStatus } from "@template-generator/share
 import type { Template } from "@template-generator/shared/types/template";
 import type { Document } from "@template-generator/shared/types/document";
 
-const STYLES = {
-  gray:  "bg-gray-100 text-gray-600",
-  green: "bg-emerald-100 text-emerald-700",
-  amber: "bg-amber-100 text-amber-800",
-  blue:  "bg-blue-100 text-blue-700",
+/**
+ * Statuts monochromes, distingués par la forme du repère (vide, plein, losange, pointillés) :
+ * la couleur reste réservée aux types d'objets.
+ */
+type Shape = "hollow" | "filled" | "diamond" | "dashed";
+
+const SHAPES: Record<Shape, string> = {
+  hollow: "border-[1.5px] border-ink",
+  filled: "bg-ink",
+  diamond: "bg-ink rotate-45",
+  dashed: "border-[1.5px] border-dashed border-ink",
 };
 
-function Badge({ tone, children, title }: { tone: keyof typeof STYLES; children: string; title?: string }) {
+function Status({ shape, children, title }: { shape: Shape; children: string; title?: string }) {
   return (
-    <span title={title} className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${STYLES[tone]}`}>
+    <span title={title} className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
+      <span aria-hidden="true" className={`box-border inline-block h-2 w-2 ${SHAPES[shape]}`} />
       {children}
     </span>
   );
@@ -20,21 +27,21 @@ function Badge({ tone, children, title }: { tone: keyof typeof STYLES; children:
 export function TemplateStatusBadge({ template }: { template: Pick<Template, "published" | "publishedAt" | "updatedAt"> }) {
   switch (templateStatus(template)) {
     case "draft":
-      return <Badge tone="gray" title="Pas encore disponible dans le Studio">Brouillon</Badge>;
+      return <Status shape="dashed" title="Pas encore disponible dans le Studio">Brouillon</Status>;
     case "published":
-      return <Badge tone="green" title="Disponible dans le Studio">Publié</Badge>;
+      return <Status shape="filled" title="Disponible dans le Studio">Publié</Status>;
     case "published-with-changes":
-      return <Badge tone="amber" title="Le Studio utilise encore la version publiée précédente">Modifications non publiées</Badge>;
+      return <Status shape="diamond" title="Le Studio utilise encore la version publiée précédente">Modifs non publiées</Status>;
   }
 }
 
 export function DocumentStatusBadge({ document }: { document: Pick<Document, "status" | "exportedAt" | "updatedAt"> }) {
   switch (documentDisplayStatus(document)) {
     case "draft":
-      return <Badge tone="blue">Brouillon</Badge>;
+      return <Status shape="hollow">Brouillon</Status>;
     case "finalized":
-      return <Badge tone="green" title="Exporté en PDF">Finalisé</Badge>;
+      return <Status shape="filled" title="Exporté en PDF">Finalisé</Status>;
     case "modified-after-export":
-      return <Badge tone="amber" title="Modifié depuis le dernier export PDF">Modifié depuis l'export</Badge>;
+      return <Status shape="diamond" title="Modifié depuis le dernier export PDF">Modifié depuis l'export</Status>;
   }
 }

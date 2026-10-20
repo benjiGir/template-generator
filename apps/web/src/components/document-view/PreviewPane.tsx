@@ -17,9 +17,13 @@ interface Props {
   template: Pick<Template, "theme" | "pageFormat" | "pages">;
   /** Composant à mettre en évidence (et à amener à l'écran quand il change) */
   highlightNodeId?: string | null;
-  highlightTone?: "focus" | "warning";
+  /** focus = cobalt (Atelier), doc = orange (Studio), warning = ocre (à compléter) */
+  highlightTone?: "focus" | "doc" | "warning";
   /** Zones repérées en permanence, discrètement (ex. : contenus retenus comme champs) */
   outlineNodeIds?: string[];
+  outlineTone?: "tpl" | "doc";
+  /** Page posée sur la table, avec traits de coupe */
+  framed?: boolean;
   /** Curseur « main » sur les composants : l'aperçu sert à désigner des zones */
   pickable?: boolean;
   renderNodes?: (nodes: ComponentNode[], theme: Theme, page: TemplatePage) => ReactNode;
@@ -47,7 +51,7 @@ function measureNode(el: HTMLElement, nodeId: string): Rect | null {
   return { top: top - container.top + el.scrollTop, left: left - container.left + el.scrollLeft, width: right - left, height: bottom - top };
 }
 
-export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, pickable = false, renderNodes, onBackgroundClick, header, anchoredPanel }: Props) {
+export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, outlineTone = "tpl", framed = false, pickable = false, renderNodes, onBackgroundClick, header, anchoredPanel }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -62,7 +66,8 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
   }, []);
 
   const pageWidthPx = dimToPx(template.pageFormat.width);
-  const zoom = width > 0 ? Math.min(1, (width - PADDING) / pageWidthPx) : 1;
+  // Les traits de coupe ajoutent 12 px de chaque côté de la page
+  const zoom = width > 0 ? Math.min(1, (width - PADDING - (framed ? 24 : 0)) / pageWidthPx) : 1;
 
   const [outlines, setOutlines] = useState<Rect[]>([]);
   const outlineKey = outlineNodeIds?.join("|") ?? "";
@@ -112,18 +117,20 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
     <div
       ref={scrollRef}
       data-pickable={pickable || undefined}
-      className="relative h-full overflow-auto bg-slate-200/70 p-8"
+      className="relative h-full overflow-auto bg-table p-8"
       onClick={onBackgroundClick}
     >
       <div>
         {header}
-        <DocumentView template={template} renderNodes={renderNodes} zoom={zoom} />
+        <DocumentView template={template} renderNodes={renderNodes} zoom={zoom} framed={framed} />
       </div>
       {outlines.map((r, i) => (
         <div
           key={i}
           aria-hidden
-          className="pointer-events-none absolute rounded-sm bg-emerald-400/5 outline-1 outline-offset-1 outline-emerald-500/70 outline-dashed"
+          className={`pointer-events-none absolute outline-1 outline-offset-1 outline-dashed ${
+            outlineTone === "doc" ? "bg-doc/5 outline-doc/80" : "bg-tpl/5 outline-tpl/80"
+          }`}
           style={{ top: r.top, left: r.left, width: r.width, height: r.height }}
         />
       ))}
@@ -145,8 +152,10 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
           aria-hidden
           className={`pointer-events-none absolute rounded-sm transition-all duration-150 ${
             highlightTone === "warning"
-              ? "bg-amber-400/10 ring-2 ring-amber-500 ring-offset-2"
-              : "bg-blue-500/5 ring-2 ring-blue-500 ring-offset-2"
+              ? "bg-amber-400/10 ring-2 ring-amber-600 ring-offset-2"
+              : highlightTone === "doc"
+              ? "bg-doc/5 ring-2 ring-doc ring-offset-2"
+              : "bg-tpl/5 ring-2 ring-tpl ring-offset-2"
           }`}
           style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
         />

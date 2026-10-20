@@ -16,17 +16,17 @@ export function ExportPanel({ filename, onFilenameChange, format, onFormatChange
   return (
     <div className="h-full space-y-6 overflow-y-auto p-6">
       {exportedAt && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-          <p className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
+        <div className="rounded-lg border border-ink bg-white p-4">
+          <p className="flex items-center gap-2 text-sm font-semibold text-ink">
             <CheckCircle2 size={16} />
             Document finalisé
           </p>
-          <p className="mt-1 text-xs text-emerald-800/80">
+          <p className="mt-1 text-xs text-ink/80">
             Si le PDF n'a pas été enregistré, relancez simplement l'export. Vous pouvez toujours modifier le document.
           </p>
           <div className="mt-3 flex gap-3 text-xs font-medium">
-            <Link to={editPath} className="text-emerald-800 underline hover:no-underline">Revenir à l'édition</Link>
-            <Link to="/documents" className="text-emerald-800 underline hover:no-underline">Retour aux documents</Link>
+            <Link to={editPath} className="text-ink underline hover:no-underline">Revenir à l'édition</Link>
+            <Link to="/documents" className="text-ink underline hover:no-underline">Retour aux documents</Link>
           </div>
         </div>
       )}
@@ -36,7 +36,7 @@ export function ExportPanel({ filename, onFilenameChange, format, onFormatChange
 
         <div className="space-y-1.5">
           <label htmlFor="export-filename" className="text-xs font-medium text-gray-700">Nom du fichier</label>
-          <div className="flex items-center rounded-md border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+          <div className="flex items-center rounded-md border border-gray-300 focus-within:ring-2 focus-within:ring-ink">
             <input
               id="export-filename"
               type="text"
@@ -59,10 +59,10 @@ export function ExportPanel({ filename, onFilenameChange, format, onFormatChange
                 key={value}
                 onClick={() => onFormatChange(value)}
                 className={`rounded-md border px-3 py-2 text-left transition-colors ${
-                  format === value ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
+                  format === value ? "border-doc bg-doc-tint" : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <span className={`block text-xs font-medium ${format === value ? "text-blue-700" : "text-gray-700"}`}>{label}</span>
+                <span className={`block text-xs font-medium ${format === value ? "text-doc-strong" : "text-gray-700"}`}>{label}</span>
                 <span className="block text-[11px] text-gray-500">{hint}</span>
               </button>
             ))}
@@ -90,12 +90,12 @@ function PrintDialogIllustration() {
   const row = (label: string, value: string, highlight: boolean, step?: number) => (
     <div className="flex items-center justify-between gap-3 py-1.5">
       <span className="flex items-center gap-1.5 text-[11px] text-gray-500">
-        {step && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white">{step}</span>}
+        {step && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-doc text-[9px] font-bold text-white">{step}</span>}
         {label}
       </span>
       <span
         className={`min-w-[150px] rounded border px-2 py-0.5 text-[11px] ${
-          highlight ? "border-blue-500 bg-blue-50 font-semibold text-blue-800 ring-2 ring-blue-200" : "border-gray-200 bg-white text-gray-400"
+          highlight ? "border-doc bg-doc-tint font-semibold text-doc-strong ring-2 ring-doc/30" : "border-gray-200 bg-white text-gray-400"
         }`}
       >
         {value}

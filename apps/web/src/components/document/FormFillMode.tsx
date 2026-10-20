@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDocumentStore } from "@/store/document-store";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
+import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { FormFieldGroup } from "./FormFieldGroup";
 import { computeCompletion, fieldKey } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
@@ -70,11 +71,9 @@ export function FormFillMode() {
             <span className="font-medium text-gray-700">
               {remaining === 0 ? "Tous les champs sont remplis" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""} à remplir`}
             </span>
-            <span className="text-gray-400">{completion.filled}/{completion.total}</span>
+            <span className="font-mono text-xs text-gray-700">{completion.filled} / {completion.total}</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
-            <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${completion.percent}%` }} />
-          </div>
+          <SegmentedProgress filled={completion.filled} total={completion.total} />
           {completion.missingRequired.length > 0 && (
             <button
               type="button"
@@ -90,7 +89,7 @@ export function FormFillMode() {
           {editableFields.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-400">Ce template n'a aucun champ à remplir.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-6">
               {Array.from(groups.entries()).map(([group, fields]) => (
                 <FormFieldGroup
                   key={group ?? "__"}
@@ -109,7 +108,7 @@ export function FormFillMode() {
 
       <div className="min-w-0 flex-1">
         {mergedTemplate && (
-          <PreviewPane template={mergedTemplate} highlightNodeId={active?.nodeId ?? null} onBackgroundClick={handlePreviewClick} />
+          <PreviewPane template={mergedTemplate} highlightNodeId={active?.nodeId ?? null} highlightTone="doc" framed onBackgroundClick={handlePreviewClick} />
         )}
       </div>
     </div>

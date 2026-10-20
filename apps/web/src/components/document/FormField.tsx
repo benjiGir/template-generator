@@ -49,7 +49,7 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
 
   const requiredBadge = field.required ? (
     filled ? (
-      <span className="text-[10px] font-medium text-emerald-600">✓ obligatoire</span>
+      <span className="text-[10px] font-medium text-ink">✓ obligatoire</span>
     ) : (
       <span className="text-[10px] font-medium text-amber-700">obligatoire</span>
     )
@@ -65,7 +65,7 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
       id={`field-${field.nodeId}.${field.propKey}`}
       onFocusCapture={onFocus}
       onMouseDown={onFocus}
-      className={`relative -mx-2 rounded-md px-2 py-1.5 transition-colors ${active ? "bg-blue-50/70 ring-1 ring-blue-200" : ""}`}
+      className={`relative -mx-2 rounded-md px-2 py-1.5 transition-colors ${active ? "bg-doc-tint/70 ring-1 ring-doc/30" : ""}`}
     >
       {/* Les listes ont leur propre action en haut à droite : le statut passe sous le champ */}
       {field.type !== "list" && <div className="absolute right-2 top-1.5">{requiredBadge}</div>}
@@ -75,7 +75,7 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
         <p className="mt-1 text-[11px] text-gray-400">
           Vide : le document garde le contenu du template.{" "}
           {(field.type === "textarea" || field.type === "richtext" || field.type === "list") && (
-            <button type="button" onClick={startFromDefault} className="text-blue-600 hover:underline">
+            <button type="button" onClick={startFromDefault} className="text-doc-strong hover:underline">
               Partir de ce contenu
             </button>
           )}

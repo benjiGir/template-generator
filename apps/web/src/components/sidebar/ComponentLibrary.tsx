@@ -6,6 +6,7 @@ import { api } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { ComponentCard } from "./ComponentCard";
 import { PresetCard } from "./PresetCard";
+import { ObjectMark } from "@/components/ui/ObjectIdentity";
 
 const CATEGORY_ORDER: ComponentCategory[] = ["layout", "content", "data", "decoration"];
 
@@ -58,7 +59,8 @@ export function ComponentLibrary() {
       <div className="flex-1 overflow-y-auto">
         {filteredPresets.length > 0 && (
           <div className="border-b border-gray-100 pb-1">
-            <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-blue-500">
+            <p className="flex items-center gap-1.5 px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-preset">
+              <ObjectMark kind="preset" size={8} />
               Mes presets
             </p>
             {filteredPresets.map((preset) => (

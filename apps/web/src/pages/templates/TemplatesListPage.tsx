@@ -5,6 +5,8 @@ import { api, type TemplateSummary } from "@/api/client";
 import { queryKeys } from "@/api/queryKeys";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
+import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
+import { CreateButton, SpaceHeader } from "@/components/ui/SpaceHeader";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 
 export function TemplatesListPage() {
@@ -52,19 +54,14 @@ export function TemplatesListPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50">
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-8 py-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Atelier</h1>
-          <p className="text-xs text-gray-500">Concevez les templates que le Studio utilisera pour produire les documents.</p>
-        </div>
-        <button
-          onClick={() => navigate("/templates/new")}
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          + Nouveau template
-        </button>
-      </div>
+    <div className="h-full overflow-y-auto bg-paper">
+      <SpaceHeader
+        kind="tpl"
+        tag="Templates"
+        title="Atelier"
+        subtitle="Dessinez les templates que le Studio utilisera pour produire les documents."
+        action={<CreateButton kind="tpl" onClick={() => navigate("/templates/new")}>Nouveau template</CreateButton>}
+      />
 
       <div className="px-8 py-8">
         {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
@@ -90,24 +87,22 @@ export function TemplatesListPage() {
             <div
               key={t.id}
               onClick={() => navigate(`/templates/${t.id}/build`)}
-              className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-sm"
+              className="group cursor-pointer overflow-hidden border border-rule bg-white transition-colors hover:border-tpl"
             >
-              <div className="flex h-[200px] w-full justify-center overflow-hidden border-b border-gray-100 bg-slate-100 px-5 pt-4">
+              <BlueprintFrame className="flex h-[200px] w-full justify-center overflow-hidden px-5 pt-4">
                 {t.preview ? (
-                  <div className="overflow-hidden rounded-t shadow-sm">
+                  <div className="overflow-hidden outline-1 outline-offset-2 outline-dashed outline-white/80">
                     <DocumentThumbnail template={t.preview} width={240} cropHeight={184} />
                   </div>
                 ) : (
-                  <LayoutTemplate size={32} className="mt-16 text-gray-200" />
+                  <LayoutTemplate size={32} className="mt-16 text-white/60" />
                 )}
-              </div>
+              </BlueprintFrame>
               <div className="p-3">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="truncate text-sm font-semibold text-gray-900">{t.name}</h3>
-                      <TemplateStatusBadge template={t} />
-                    </div>
+                    <h3 className="truncate text-sm font-semibold text-ink">{t.name}</h3>
+                    <div className="mt-0.5"><TemplateStatusBadge template={t} /></div>
                     {t.description && <p className="mt-1 line-clamp-1 text-xs text-gray-500">{t.description}</p>}
                   </div>
                   <div className="ml-2 flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">

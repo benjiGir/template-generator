@@ -50,9 +50,9 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
   });
 
   const outline = isDropTarget
-    ? `2px dashed ${check.ok ? "#2563EB" : "#DC2626"}`
+    ? `2px dashed ${check.ok ? "#2448C8" : "#9E1B32"}`
     : isSelected
-    ? "2px solid #2563EB"
+    ? "2px solid #2448C8"
     : "2px solid transparent";
 
   return (
@@ -102,13 +102,13 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
       )}
 
       {isDropTarget && (
-        <div style={chipStyle(check.ok ? "#2563EB" : "#DC2626")}>{check.ok ? `Déposer dans « ${label} »` : check.reason}</div>
+        <div style={chipStyle(check.ok ? "#2448C8" : "#9E1B32")}>{check.ok ? `Déposer dans « ${label} »` : check.reason}</div>
       )}
 
       {/* Sélection : nom du composant et actions rapides (hors document, jamais imprimées) */}
       {isSelected && !isDropTarget && (
         <div
-          style={{ ...chipStyle("#2563EB"), pointerEvents: "auto", display: "flex", alignItems: "center", gap: 2, padding: "0 2px 0 0" }}
+          style={{ ...chipStyle("#2448C8"), pointerEvents: "auto", display: "flex", alignItems: "center", gap: 2, padding: "0 2px 0 0" }}
           onClick={(e) => e.stopPropagation()}
         >
           <span {...listeners} {...attributes} title="Déplacer" style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 6px", cursor: "grab", touchAction: "none" }}>

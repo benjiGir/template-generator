@@ -1,28 +1,41 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { Home, LayoutTemplate, Puzzle, FileText, CircleHelp, type LucideIcon } from "lucide-react";
+import { CircleHelp, Home } from "lucide-react";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { OnboardingProvider, useOnboarding } from "@/components/onboarding/Onboarding";
+import { ObjectMark, type ObjectKind } from "@/components/ui/ObjectIdentity";
 
 interface NavItem {
-  icon: LucideIcon;
   to: string;
   label: string;
   /** Ce qu'on vient faire dans l'espace */
   intent: string;
+  /** Type d'objet de l'espace : sa couleur et sa forme ; aucun pour l'accueil */
+  kind?: ObjectKind;
   /** Repère pour la visite guidée */
   tour: string;
 }
 
+const HOME: NavItem = { to: "/", label: "Accueil", intent: "Reprendre mon travail", tour: "nav-home" };
+
 /** Le Studio d'abord : c'est l'espace des contributeurs, les deux autres servent à préparer les templates */
-const PRIMARY: NavItem = { icon: FileText, to: "/documents", label: "Studio", intent: "Produire un document", tour: "nav-studio" };
+const PRIMARY: NavItem = { to: "/documents", label: "Studio", intent: "Remplir des documents", kind: "doc", tour: "nav-studio" };
 
 const DESIGN: NavItem[] = [
-  { icon: LayoutTemplate, to: "/templates",  label: "Atelier",      intent: "Concevoir les templates", tour: "nav-templates" },
-  { icon: Puzzle,         to: "/components", label: "Bibliothèque", intent: "Préparer des composants", tour: "nav-components" },
+  { to: "/templates",  label: "Atelier",      intent: "Dessiner les templates", kind: "tpl",    tour: "nav-templates" },
+  { to: "/components", label: "Bibliothèque", intent: "Régler les presets",     kind: "preset", tour: "nav-components" },
 ];
 
+/** Filet gauche de l'entrée active, dans la couleur de l'espace */
+const ACTIVE_BAR: Record<ObjectKind | "home", string> = {
+  home: "border-ink",
+  doc: "border-doc",
+  tpl: "border-tpl",
+  preset: "border-preset",
+};
+
 function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boolean; collapsed: boolean }) {
-  const Icon = item.icon;
+  const mark = item.kind ? <ObjectMark kind={item.kind} size={collapsed ? 14 : 10} /> : <Home size={collapsed ? 17 : 13} className="shrink-0" aria-hidden />;
+
   if (collapsed) {
     return (
       <NavLink
@@ -32,12 +45,12 @@ function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boole
         title={`${item.label} — ${item.intent}`}
         aria-label={item.label}
         className={({ isActive }) =>
-          `flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
-            isActive ? "bg-white/10 text-blue-400" : "text-slate-400 hover:bg-white/5 hover:text-white"
+          `flex h-10 w-10 items-center justify-center border-l-[3px] transition-colors ${
+            isActive ? `bg-white ${ACTIVE_BAR[item.kind ?? "home"]}` : "border-transparent hover:bg-white/60"
           }`
         }
       >
-        <Icon size={18} />
+        {mark}
       </NavLink>
     );
   }
@@ -47,19 +60,17 @@ function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boole
       end={end}
       data-tour={item.tour}
       className={({ isActive }) =>
-        `group flex items-start gap-3 rounded-lg px-3 py-2 transition-colors ${
-          isActive ? "bg-white/10 text-white" : "text-slate-400 hover:bg-white/5 hover:text-white"
+        `flex items-start gap-2.5 border-l-[3px] px-2.5 py-2 transition-colors ${
+          isActive ? `bg-white ${ACTIVE_BAR[item.kind ?? "home"]}` : "border-transparent hover:bg-white/60"
         }`
       }
     >
       {({ isActive }) => (
         <>
-          <Icon size={18} className={`mt-0.5 shrink-0 ${isActive ? "text-blue-400" : ""}`} />
+          <span className="mt-[5px] flex w-3.5 justify-center">{mark}</span>
           <span className="min-w-0">
-            <span className="block text-sm font-medium leading-5">{item.label}</span>
-            <span className={`block text-[11px] leading-4 ${isActive ? "text-slate-300" : "text-slate-500 group-hover:text-slate-400"}`}>
-              {item.intent}
-            </span>
+            <span className={`block text-sm leading-5 ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+            {item.kind && <span className="block text-xs leading-4 text-gray-500">{item.intent}</span>}
           </span>
         </>
       )}
@@ -76,11 +87,11 @@ function ReplayTourButton({ collapsed }: { collapsed: boolean }) {
       data-tour="tour-replay"
       title="Revoir le tutoriel"
       aria-label="Revoir le tutoriel"
-      className={`mt-auto flex items-center gap-2 rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white ${
-        collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 text-xs"
+      className={`mt-auto flex items-center gap-2 text-gray-600 transition-colors hover:text-ink ${
+        collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 font-mono text-xs"
       }`}
     >
-      <CircleHelp size={collapsed ? 18 : 15} />
+      <CircleHelp size={collapsed ? 18 : 14} />
       {!collapsed && "Revoir le tutoriel"}
     </button>
   );
@@ -95,22 +106,23 @@ export function RootLayout() {
   return (
     <ConfirmProvider>
       <OnboardingProvider>
-        <div className="flex h-screen">
+        <div className="flex h-screen bg-paper text-ink">
           <nav
-            className={`flex shrink-0 flex-col gap-1 bg-[#0F172A] py-4 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
+            className={`flex shrink-0 flex-col gap-0.5 border-r border-rule bg-gray-100 py-6 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
             aria-label="Navigation principale"
           >
-            <div className={`mb-4 text-sm font-bold tracking-tight text-white ${collapsed ? "" : "px-3"}`}>
-              {collapsed ? "DF" : "DocForge"}
+            <div className={`mb-6 ${collapsed ? "text-center" : "px-3"}`}>
+              <div className="text-[17px] font-bold tracking-tight">{collapsed ? "DF" : "DocForge"}</div>
+              {!collapsed && <div className="font-mono text-[11px] text-gray-500">Documents techniques</div>}
             </div>
 
-            <NavEntry item={{ icon: Home, to: "/", label: "Accueil", intent: "Reprendre mon travail", tour: "nav-home" }} end collapsed={collapsed} />
+            <NavEntry item={HOME} end collapsed={collapsed} />
             <NavEntry item={PRIMARY} collapsed={collapsed} />
 
             {collapsed ? (
-              <div className="my-3 h-px w-8 bg-slate-700" />
+              <div className="my-3 h-px w-8 bg-rule" />
             ) : (
-              <div className="mt-6 px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Conception</div>
+              <div className="mt-5 px-3 pb-1 font-mono text-[11px] tracking-[0.06em] text-gray-500">CONCEPTION</div>
             )}
             {DESIGN.map((item) => (
               <NavEntry key={item.to} item={item} collapsed={collapsed} />

@@ -24,7 +24,7 @@ export function PresetCard({ preset }: Props) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="flex items-start gap-2 rounded border border-transparent px-3 py-2.5 transition-all hover:border-blue-200 hover:bg-blue-50 cursor-grab active:cursor-grabbing"
+      className="flex items-start gap-2 rounded-[10px] border border-transparent px-3 py-2.5 transition-all hover:border-preset/40 hover:bg-preset-tint cursor-grab active:cursor-grabbing"
       style={{ opacity: isDragging ? 0.4 : 1, touchAction: "none" }}
     >
       <div className="min-w-0 flex-1">

@@ -26,7 +26,7 @@ export function DocumentPreviewPage() {
       <div className="flex h-full flex-col overflow-hidden">
         <div
           className={`flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b px-5 py-2 text-xs ${
-            missingRequired.length > 0 ? "border-amber-200 bg-amber-50" : "border-emerald-100 bg-emerald-50"
+            missingRequired.length > 0 ? "border-amber-200 bg-amber-50" : "border-rule bg-white"
           }`}
         >
           {missingRequired.length > 0 ? (
@@ -51,14 +51,14 @@ export function DocumentPreviewPage() {
               <span className="text-amber-700/80">Vous pouvez tout de même exporter.</span>
             </>
           ) : (
-            <span className="flex items-center gap-1.5 font-medium text-emerald-800">
+            <span className="flex items-center gap-1.5 font-medium text-ink">
               <CheckCircle2 size={13} />
               Tout est rempli. Voici exactement le document qui sera exporté.
             </span>
           )}
         </div>
         <div className="min-h-0 flex-1">
-          {mergedTemplate && <PreviewPane template={mergedTemplate} highlightNodeId={hovered} highlightTone="warning" />}
+          {mergedTemplate && <PreviewPane template={mergedTemplate} highlightNodeId={hovered} highlightTone="warning" framed />}
         </div>
       </div>
     </WorkflowLayout>

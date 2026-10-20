@@ -34,8 +34,8 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
           padding: "3px 10px",
           fontSize: 11,
           fontWeight: 600,
-          backgroundColor: isActivePage ? "#2563EB" : "#E5E7EB",
-          color: isActivePage ? "#fff" : "#6B7280",
+          backgroundColor: isActivePage ? "#2448C8" : "#DDD8CE",
+          color: isActivePage ? "#fff" : "#6E6A62",
           border: "none",
           borderRadius: "4px 4px 0 0",
           cursor: "pointer",
@@ -49,7 +49,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       <DocumentPage
         theme={theme}
         format={pageFormat}
-        chromeStyle={{ outline: isDropTarget ? "2px dashed #2563EB" : isActivePage ? "2px solid #BFDBFE" : "none", outlineOffset: 2 }}
+        chromeStyle={{ outline: isDropTarget ? "2px dashed #2448C8" : isActivePage ? "2px solid #C9D3F6" : "none", outlineOffset: 2 }}
         onClick={() => { selectPage(pageIndex); selectNode(null); }}
       >
         {/* DropZones entre chaque composant racine */}
@@ -69,7 +69,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#D1D5DB",
+              color: "#C9C3B7",
               fontSize: 13,
               fontFamily: "system-ui, sans-serif",
               pointerEvents: "none",

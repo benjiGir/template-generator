@@ -8,8 +8,8 @@ interface Props {
   direction?: "vertical" | "horizontal";
 }
 
-const BLUE = "#2563EB";
-const RED = "#DC2626";
+const BLUE = "#2448C8";
+const RED = "#9E1B32";
 
 /** Point d'insertion entre deux composants ; visible seulement pendant un glisser-déposer */
 export function DropZone({ pageIndex, parentId, index, direction = "vertical" }: Props) {
@@ -38,7 +38,7 @@ export function DropZone({ pageIndex, parentId, index, direction = "vertical" }:
         }}
       >
         {isDragging && (
-          <div style={{ width: isOver ? 4 : 2, borderRadius: 2, backgroundColor: isOver ? color : "#BFDBFE" }} />
+          <div style={{ width: isOver ? 4 : 2, borderRadius: 2, backgroundColor: isOver ? color : "#C9D3F6" }} />
         )}
       </div>
     );
@@ -64,7 +64,7 @@ export function DropZone({ pageIndex, parentId, index, direction = "vertical" }:
             left: 0,
             right: 0,
             height: isOver ? 3 : 1,
-            backgroundColor: isOver ? color : "#BFDBFE",
+            backgroundColor: isOver ? color : "#C9D3F6",
             borderRadius: 2,
           }}
         />

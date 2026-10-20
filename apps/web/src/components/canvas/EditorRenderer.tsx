@@ -34,17 +34,17 @@ function GridDropZone({ pageIndex, parentId, index, isEmpty }: GridDropZoneProps
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: isOver ? "2px solid #2563EB" : (isEmpty || isDragging) ? "1.5px dashed #CBD5E1" : "none",
+        border: isOver ? "2px solid #2448C8" : (isEmpty || isDragging) ? "1.5px dashed #C9C3B7" : "none",
         borderRadius: 4,
-        backgroundColor: isOver ? "#EFF6FF" : "transparent",
+        backgroundColor: isOver ? "#EEF1FC" : "transparent",
         transition: "all 0.15s ease",
         fontSize: 11,
-        color: "#94A3B8",
+        color: "#6E6A62",
       }}
     >
       {isEmpty && !isDragging && "Glissez des composants ici"}
       {isOver && (
-        <div style={{ width: "100%", height: 2, backgroundColor: "#2563EB", borderRadius: 1, position: "absolute" }} />
+        <div style={{ width: "100%", height: 2, backgroundColor: "#2448C8", borderRadius: 1, position: "absolute" }} />
       )}
     </div>
   );
@@ -71,7 +71,7 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
             border: "1px solid #FCA5A5",
             borderRadius: 4,
             fontSize: 12,
-            color: "#DC2626",
+            color: "#9E1B32",
             fontFamily: "monospace",
           }}
         >
