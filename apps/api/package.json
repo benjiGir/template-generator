@@ -15,8 +15,8 @@
     "db:seed:themes": "tsx src/seed/seed-themes.ts"
   },
   "dependencies": {
-    "@template-generator/shared": "workspace:*",
     "@hono/node-server": "^1.13.0",
+    "@template-generator/shared": "workspace:*",
     "drizzle-orm": "^0.38.0",
     "hono": "^4.6.0",
     "pg": "^8.13.0"
@@ -25,6 +25,6 @@
     "@types/pg": "^8.11.0",
     "drizzle-kit": "^0.30.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^7.0.2"
   }
 }
