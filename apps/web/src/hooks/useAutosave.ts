@@ -59,6 +59,9 @@ export function useAutosave<T, R>({
       try {
         const result = await doSave(snapshot);
         latest.current.onSaved(rev, result);
+        // Sans attendre que le parent soit rendu de nouveau avec la révision confirmée : un envoi
+        // en attente ne renverra pas ce qui vient d'être enregistré. Le prochain rendu remplace cette valeur.
+        latest.current.savedRevision = Math.max(latest.current.savedRevision, rev);
         setStatus("idle");
         return true;
       } catch (e) {

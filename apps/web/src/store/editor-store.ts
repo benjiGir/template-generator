@@ -75,13 +75,22 @@ function cloneTemplate(t: Template): Template {
   return structuredClone(isDraft(t) ? current(t) : t);
 }
 
-function pushHistory(state: EditorState, template: Template): void {
-  const snap = cloneTemplate(template);
-  const newHistory = state.history.slice(0, state.historyIndex + 1);
-  newHistory.push(snap);
-  if (newHistory.length > 50) newHistory.splice(0, newHistory.length - 50);
-  state.history = newHistory;
-  state.historyIndex = newHistory.length - 1;
+/** Étapes que l'on peut annuler */
+const HISTORY_STEPS = 50;
+
+/**
+ * Enregistre une modification qui vient d'être appliquée : l'historique garde l'état obtenu
+ * (après l'état chargé, une entrée par étape), et la révision avance pour la sauvegarde automatique.
+ * Ce qui pouvait être rétabli est abandonné.
+ */
+function commit(state: EditorState): void {
+  if (!state.template) return;
+  const history = state.history.slice(0, state.historyIndex + 1);
+  history.push(cloneTemplate(state.template));
+  if (history.length > HISTORY_STEPS + 1) history.splice(0, history.length - (HISTORY_STEPS + 1));
+  state.history = history;
+  state.historyIndex = history.length - 1;
+  state.revision++;
 }
 
 export const useEditorStore = create<EditorState>()(
@@ -134,16 +143,14 @@ export const useEditorStore = create<EditorState>()(
     updateTemplateMeta: (name, description) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.name = name;
         if (description !== undefined) s.template.description = description;
-        s.revision++;
+        commit(s);
       }),
 
     updateTheme: (theme) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.theme = {
           ...s.template.theme,
           ...theme,
@@ -152,21 +159,19 @@ export const useEditorStore = create<EditorState>()(
           spacing: { ...s.template.theme.spacing, ...theme.spacing },
           borders: { ...s.template.theme.borders, ...theme.borders },
         };
-        s.revision++;
+        commit(s);
       }),
 
     updatePageFormat: (format) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.pageFormat = { ...s.template.pageFormat, ...format };
-        s.revision++;
+        commit(s);
       }),
 
     addPage: () =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         const newPage: TemplatePage = {
           id: generateNodeId(),
           label: `Page ${s.template.pages.length + 1}`,
@@ -174,25 +179,23 @@ export const useEditorStore = create<EditorState>()(
         };
         s.template.pages.push(newPage);
         s.selectedPageIndex = s.template.pages.length - 1;
-        s.revision++;
+        commit(s);
       }),
 
     removePage: (pageIndex) =>
       set((s) => {
         if (!s.template || s.template.pages.length <= 1) return;
-        pushHistory(s, s.template);
         s.template.pages.splice(pageIndex, 1);
         s.selectedPageIndex = Math.min(s.selectedPageIndex, s.template.pages.length - 1);
-        s.revision++;
+        commit(s);
       }),
 
     renamePage: (pageIndex, label) =>
       set((s) => {
         const page = s.template?.pages[pageIndex];
         if (!s.template || !page || page.label === label) return;
-        pushHistory(s, s.template);
         page.label = label;
-        s.revision++;
+        commit(s);
       }),
 
     setEditableFields: (fields) =>
@@ -204,39 +207,33 @@ export const useEditorStore = create<EditorState>()(
 
     reorderPages: (fromIndex, toIndex) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const [page] = s.template.pages.splice(fromIndex, 1);
-        if (page) s.template.pages.splice(toIndex, 0, page);
-        s.revision++;
+        const [page] = s.template?.pages.splice(fromIndex, 1) ?? [];
+        if (!s.template || !page) return;
+        s.template.pages.splice(toIndex, 0, page);
+        commit(s);
       }),
 
     addNode: (pageIndex, parentId, index, node) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
         page.children = insertNode(page.children, parentId, index, node);
         s.selectedNodeId = node.id;
-        s.revision++;
+        commit(s);
       }),
 
     removeNode: (pageIndex, nodeId) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
         page.children = treeRemoveNode(page.children, nodeId);
         if (s.selectedNodeId === nodeId) s.selectedNodeId = null;
-        s.revision++;
+        commit(s);
       }),
 
     moveNode: (fromPageIndex, toPageIndex, nodeId, newParentId, newIndex) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         const fromPage = s.template.pages[fromPageIndex];
         if (!fromPage) return;
         const node = findNode(fromPage.children, nodeId);
@@ -244,31 +241,27 @@ export const useEditorStore = create<EditorState>()(
         fromPage.children = treeRemoveNode(fromPage.children, nodeId);
         const toPage = s.template.pages[toPageIndex] ?? fromPage;
         toPage.children = insertNode(toPage.children, newParentId, newIndex, node);
-        s.revision++;
+        commit(s);
       }),
 
     updateNodeProps: (nodeId, props) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        for (const page of s.template.pages) {
+        for (const page of s.template?.pages ?? []) {
           const node = findNode(page.children, nodeId);
           if (node) {
             node.props = { ...node.props, ...props };
-            break;
+            commit(s);
+            return;
           }
         }
-        s.revision++;
       }),
 
     duplicateNode: (pageIndex, nodeId) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
         page.children = treeDuplicateNode(page.children, nodeId);
-        s.revision++;
+        commit(s);
       }),
 
     selectNode: (nodeId) =>

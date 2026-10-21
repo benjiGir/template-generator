@@ -23,9 +23,10 @@ Outil privé de création de documents techniques (présentations, rapports, rev
 ├── packages/
 │   ├── shared/               # Types TypeScript partagés + utilitaires
 │   └── component-registry/   # 16 composants rendables (styles inline)
-└── apps/
-    ├── web/                  # Frontend React (Vite)
-    └── api/                  # API REST (Hono)
+├── apps/
+│   ├── web/                  # Frontend React (Vite)
+│   └── api/                  # API REST (Hono)
+└── e2e/                      # Tests de bout en bout (Playwright)
 ```
 
 ## Développement local
@@ -165,7 +166,8 @@ GET    /api/health                    Health check
   ressource absente répond 404, une erreur inattendue 500 (journalisée côté serveur).
 - **Client typé** : le front appelle l'API avec `hc<AppType>` (`apps/web/src/api/client.ts`) ; paramètres, corps et
   réponses sont inférés depuis les routes. Changer une route casse la compilation du front là où elle est utilisée.
-- **Tests** : `apps/api/src/app.test.ts` couvre la validation et les erreurs sans base de données.
+- **Tests** : `apps/api/src/app.test.ts` couvre la validation et les erreurs sans base de données ; les tests des
+  routes (`routes/*.test.ts`) tournent sur une base de test (voir « Tests »).
 - **Côté front** : les écrans passent par les hooks de `apps/web/src/api/hooks` (une règle oxlint interdit `useQuery` et
   `useMutation` ailleurs). Les invalidations du cache sont écrites une fois dans `apps/web/src/api/cache.ts`, et toute
   mutation qui échoue affiche un message (texte dans `meta.errorMessage` du hook).
@@ -261,13 +263,41 @@ pnpm check                  # Lint, format, types et tests : ce que vérifie la 
 pnpm lint                   # oxlint (pnpm lint:fix corrige ce qui peut l'être)
 pnpm format                 # oxfmt : formate tout le dépôt (pnpm format:check pour vérifier)
 pnpm typecheck              # Vérification TypeScript sur tout le monorepo
-pnpm test                   # Tests unitaires
+pnpm test                   # Tests unitaires et d'API (voir « Tests »)
+pnpm test:e2e               # Tests de bout en bout (Playwright)
 pnpm build                  # Build de production
 
 pnpm --filter @template-generator/api run db:migrate   # Appliquer les migrations
 pnpm --filter @template-generator/api run db:generate  # Générer une migration
 pnpm --filter @template-generator/api run db:seed      # Seeder le template KOMITY
 ```
+
+## Tests
+
+| Où                | Quoi                                                                      | Outil                    |
+| ----------------- | ------------------------------------------------------------------------- | ------------------------ |
+| `packages/shared` | Champs, détection des champs, arbre de composants                         | Vitest                   |
+| `apps/api`        | Validation et erreurs ; publication, version figée, documents             | Vitest + base PostgreSQL |
+| `apps/web`        | Stores (annuler / rétablir, déplacements, saisie), sauvegarde automatique | Vitest (+ jsdom)         |
+| `e2e`             | Les trois parcours : Atelier, Studio, Bibliothèque                        | Playwright               |
+
+**Base de test.** Les tests d'API sur base et les tests de bout en bout utilisent `TEST_DATABASE_URL`, jamais
+`DATABASE_URL`. Le nom de la base doit finir par `_test` : elle est créée et migrée automatiquement, puis vidée par les
+tests. Sans cette variable, `pnpm test` ignore les tests sur base (la CI, elle, les exige).
+
+```bash
+export TEST_DATABASE_URL=postgres://docforge:password@localhost:5432/docforge_test
+pnpm test
+```
+
+**Bout en bout.** `pnpm test:e2e` démarre sa propre API (port 3101) et son propre front (port 5183) sur la base de test :
+les serveurs de développement peuvent rester ouverts. La première fois, installer le navigateur :
+
+```bash
+pnpm --filter @template-generator/e2e exec playwright install chromium
+```
+
+`pnpm --filter @template-generator/e2e run e2e:ui` ouvre l'interface de Playwright pour suivre ou rejouer un test.
 
 ## Qualité du code
 
@@ -277,5 +307,6 @@ pnpm --filter @template-generator/api run db:seed      # Seeder le template KOMI
 - **Format** : [oxfmt](https://oxc.rs/docs/guide/usage/formatter), configuré dans `.oxfmtrc.json` (lignes de 120 caractères,
   guillemets doubles). Avec VS Code, l'extension Oxc formate à l'enregistrement.
 - **CI** : `.github/workflows/ci.yml` et `.gitlab-ci.yml` lancent les mêmes étapes à chaque push (installation figée, lint,
-  format, types, tests, build). Les deux fichiers sont à garder alignés.
+  format, types, tests avec une base PostgreSQL, build), puis les tests de bout en bout dans un job séparé. Les deux
+  fichiers sont à garder alignés.
 - **Versions** : Node dans `.nvmrc`, pnpm dans `packageManager` ; les Dockerfiles et le devcontainer suivent les mêmes.
