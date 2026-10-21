@@ -11,7 +11,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
 import { FORMAT_TEXT_COMMAND } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
-import { EDITOR_NODES, MARKDOWN_TRANSFORMERS } from "./lexical-config";
+import { EDITOR_NODES, MARKDOWN_TRANSFORMERS, PassthroughErrorBoundary } from "./lexical-config";
 import { useEditorStore } from "@/store/editor-store";
 
 const inlineEditorTheme = {
@@ -156,7 +156,7 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
             />
           }
           placeholder={null}
-          ErrorBoundary={({ children }) => <>{children}</>}
+          ErrorBoundary={PassthroughErrorBoundary}
         />
         <InitPlugin value={value} />
         <HistoryPlugin />

@@ -15,8 +15,8 @@ export function ThemeSpacingEditor() {
   return (
     <div className="px-4 space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Unité de base (px)</label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Unité de base (px)</span>
           <input
             type="number"
             min={1}
@@ -25,9 +25,9 @@ export function ThemeSpacingEditor() {
             onChange={(e) => update("unit", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Écart sections</label>
+        </label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Écart sections</span>
           <input
             type="number"
             min={0}
@@ -36,12 +36,12 @@ export function ThemeSpacingEditor() {
             onChange={(e) => update("sectionGap", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </label>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Écart composants</label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Écart composants</span>
           <input
             type="number"
             min={0}
@@ -50,11 +50,11 @@ export function ThemeSpacingEditor() {
             onChange={(e) => update("componentGap", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </label>
       </div>
 
-      <div>
-        <label className="text-xs text-gray-500 block mb-1">Padding de page</label>
+      <label className="block">
+        <span className="text-xs text-gray-500 block mb-1">Padding de page</span>
         <input
           type="text"
           value={sp.pagePadding}
@@ -62,7 +62,7 @@ export function ThemeSpacingEditor() {
           placeholder="28px 36px 32px"
           className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 font-mono"
         />
-      </div>
+      </label>
 
       {/* Preview schéma */}
       <div className="flex items-center justify-center mt-1">

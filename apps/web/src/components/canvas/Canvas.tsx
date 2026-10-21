@@ -32,7 +32,7 @@ export function Canvas() {
   const fit = width > 0 ? Math.min(1, (width - PADDING) / pageWidth) : 1;
   const zoom = mode === "fit" ? fit : mode;
   const stepFrom = (dir: 1 | -1) => {
-    const next = dir > 0 ? STEPS.find((s) => s > zoom + 0.001) : [...STEPS].reverse().find((s) => s < zoom - 0.001);
+    const next = dir > 0 ? STEPS.find((s) => s > zoom + 0.001) : STEPS.toReversed().find((s) => s < zoom - 0.001);
     if (next) setMode(next);
   };
 

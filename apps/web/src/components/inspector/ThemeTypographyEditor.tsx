@@ -33,8 +33,8 @@ export function ThemeTypographyEditor() {
   return (
     <div className="px-4 space-y-3">
       {/* Fontes */}
-      <div>
-        <label className="text-xs text-gray-500 block mb-1">Fonte principale</label>
+      <label className="block">
+        <span className="text-xs text-gray-500 block mb-1">Fonte principale</span>
         <input
           list="font-suggestions"
           type="text"
@@ -44,13 +44,15 @@ export function ThemeTypographyEditor() {
         />
         <datalist id="font-suggestions">
           {FONT_SUGGESTIONS.map((f) => (
-            <option key={f} value={f} />
+            <option key={f} value={f}>
+              {f}
+            </option>
           ))}
         </datalist>
-      </div>
+      </label>
 
-      <div>
-        <label className="text-xs text-gray-500 block mb-1">Fonte titres</label>
+      <label className="block">
+        <span className="text-xs text-gray-500 block mb-1">Fonte titres</span>
         <input
           list="font-suggestions"
           type="text"
@@ -58,12 +60,12 @@ export function ThemeTypographyEditor() {
           onChange={(e) => update("headingFontFamily", e.target.value)}
           className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
         />
-      </div>
+      </label>
 
       {/* Taille de base + interlignage */}
       <div className="grid grid-cols-2 gap-2">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Taille base (px)</label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Taille base (px)</span>
           <input
             type="number"
             min={10}
@@ -72,9 +74,9 @@ export function ThemeTypographyEditor() {
             onChange={(e) => update("baseFontSize", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Interlignage</label>
+        </label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Interlignage</span>
           <input
             type="number"
             min={1}
@@ -84,7 +86,7 @@ export function ThemeTypographyEditor() {
             onChange={(e) => update("lineHeight", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </label>
       </div>
 
       {/* Tailles de titres */}

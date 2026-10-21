@@ -19,7 +19,7 @@ export interface DetectedField extends EditableField {
 }
 
 /** Contenus possibles ; les nombres du registre sont des réglages de mise en page (espacement, opacité…) */
-const EDITABLE_TYPES: PropType[] = ["text", "textarea", "richtext", "list", "image"];
+const EDITABLE_TYPES = new Set<PropType>(["text", "textarea", "richtext", "list", "image"]);
 
 /** Composants dont le texte sert de titre de section : ils structurent le formulaire */
 const SECTION_TITLES: Record<string, string> = {
@@ -95,7 +95,7 @@ export function detectFields(template: Pick<Template, "pages">, resolve: Resolve
       }
       if (node.type === "page-footer") section = "Pied de page";
 
-      const editable = info.schema.filter((s) => EDITABLE_TYPES.includes(s.type));
+      const editable = info.schema.filter((s) => EDITABLE_TYPES.has(s.type));
       const name = contextName(node, info);
       const index = (counters.get(node.type) ?? 0) + 1;
       if (editable.length > 0) counters.set(node.type, index);
@@ -171,8 +171,8 @@ export interface ReconciledFields {
  */
 export function reconcileFields(stored: EditableField[], detected: DetectedField[]): ReconciledFields {
   const byKey = new Map(detected.map((f) => [fieldKey(f), f]));
-  const retained = [...stored]
-    .sort((a, b) => a.order - b.order)
+  const retained = stored
+    .toSorted((a, b) => a.order - b.order)
     .filter((f) => byKey.has(fieldKey(f)))
     .map((f, i) => {
       const d = byKey.get(fieldKey(f))!;
@@ -185,7 +185,7 @@ export function reconcileFields(stored: EditableField[], detected: DetectedField
 /** Groupes dans l'ordre du formulaire, par première apparition (null = champs sans groupe) */
 export function groupOrder(fields: EditableField[]): (string | null)[] {
   const groups: (string | null)[] = [];
-  for (const f of [...fields].sort((a, b) => a.order - b.order)) {
+  for (const f of fields.toSorted((a, b) => a.order - b.order)) {
     const g = f.group ?? null;
     if (!groups.includes(g)) groups.push(g);
   }
@@ -197,7 +197,7 @@ export function groupOrder(fields: EditableField[]): (string | null)[] {
  * c'est l'ordre dans lequel le Studio affiche le formulaire.
  */
 export function normalizeFieldOrder(fields: EditableField[]): EditableField[] {
-  const sorted = [...fields].sort((a, b) => a.order - b.order);
+  const sorted = fields.toSorted((a, b) => a.order - b.order);
   return groupOrder(sorted)
     .flatMap((g) => sorted.filter((f) => (f.group ?? null) === g))
     .map((f, i) => ({ ...f, order: i }));

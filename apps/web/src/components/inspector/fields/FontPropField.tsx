@@ -17,7 +17,7 @@ const GOOGLE_FONTS = [
   "Source Code Pro",
 ];
 
-const ALL_FONTS = [...SYSTEM_FONTS, ...GOOGLE_FONTS].sort((a, b) => a.localeCompare(b));
+const ALL_FONTS = [...SYSTEM_FONTS, ...GOOGLE_FONTS].toSorted((a, b) => a.localeCompare(b));
 const GOOGLE_FONT_SET = new Set(GOOGLE_FONTS);
 const injected = new Set<string>();
 

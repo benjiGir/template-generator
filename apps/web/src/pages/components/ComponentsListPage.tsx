@@ -188,7 +188,7 @@ function PresetCard({
           <div className="overflow-hidden rounded-sm bg-white shadow-sm">
             <ComponentPreview
               type={preset.baseType}
-              props={{ ...(base?.defaultProps ?? {}), ...preset.defaultProps }}
+              props={{ ...base?.defaultProps, ...preset.defaultProps }}
               theme={DEFAULT_THEME}
               maxHeight={106}
               compact

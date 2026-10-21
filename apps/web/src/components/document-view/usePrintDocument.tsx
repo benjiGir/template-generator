@@ -62,7 +62,8 @@ export function usePrintDocument(): {
           .map(
             (img) =>
               new Promise((r) => {
-                img.onload = img.onerror = r;
+                img.addEventListener("load", r, { once: true });
+                img.addEventListener("error", r, { once: true });
               }),
           ),
       );

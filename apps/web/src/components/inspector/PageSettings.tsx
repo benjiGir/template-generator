@@ -28,8 +28,8 @@ export function PageSettings() {
           Page {selectedPageIndex + 1}
         </h3>
         <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Nom</label>
+          <label className="block">
+            <span className="block text-xs font-medium text-gray-600 mb-1">Nom</span>
             <input
               type="text"
               value={label}
@@ -37,7 +37,7 @@ export function PageSettings() {
               onBlur={handleLabelBlur}
               className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
             />
-          </div>
+          </label>
         </div>
       </section>
 

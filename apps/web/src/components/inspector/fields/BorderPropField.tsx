@@ -17,7 +17,7 @@ const BORDER_STYLES: { label: string; value: BorderValue["style"] }[] = [
 ];
 
 export function BorderPropField({ label, value, onChange }: Props) {
-  const val: BorderValue = { ...EMPTY, ...((value as BorderValue | undefined) ?? {}) };
+  const val: BorderValue = { ...EMPTY, ...(value as BorderValue | undefined) };
 
   const update = <K extends keyof BorderValue>(key: K, v: BorderValue[K]) => {
     onChange({ ...val, [key]: v });
@@ -57,8 +57,8 @@ export function BorderPropField({ label, value, onChange }: Props) {
           <>
             {/* Width + Color */}
             <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-[10px] text-gray-400 block mb-0.5">Épaisseur (px)</label>
+              <label className="block flex-1">
+                <span className="text-[10px] text-gray-400 block mb-0.5">Épaisseur (px)</span>
                 <input
                   type="number"
                   min={1}
@@ -67,18 +67,20 @@ export function BorderPropField({ label, value, onChange }: Props) {
                   onChange={(e) => update("width", Number(e.target.value))}
                   className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
                 />
-              </div>
+              </label>
               <div>
-                <label className="text-[10px] text-gray-400 block mb-0.5">Couleur</label>
+                <span className="text-[10px] text-gray-400 block mb-0.5">Couleur</span>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="color"
+                    aria-label="Couleur de la bordure"
                     value={val.color}
                     onChange={(e) => update("color", e.target.value)}
                     className="w-8 h-7 cursor-pointer rounded border border-gray-200 p-0.5"
                   />
                   <input
                     type="text"
+                    aria-label="Code hexadécimal de la couleur"
                     value={val.color}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -93,8 +95,8 @@ export function BorderPropField({ label, value, onChange }: Props) {
         )}
 
         {/* Radius */}
-        <div>
-          <label className="text-[10px] text-gray-400 block mb-0.5">Rayon (px)</label>
+        <label className="block">
+          <span className="text-[10px] text-gray-400 block mb-0.5">Rayon (px)</span>
           <input
             type="number"
             min={0}
@@ -102,7 +104,7 @@ export function BorderPropField({ label, value, onChange }: Props) {
             onChange={(e) => update("radius", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </label>
 
         {/* Preview */}
         <div style={previewStyle} />

@@ -2,6 +2,8 @@ import type { Theme } from "@template-generator/shared/types/template";
 import { register } from "../../registry";
 import type { RegisteredComponent } from "../../registry";
 
+const NONE: string[] = [];
+
 interface Props {
   theme: Theme;
   title?: string;
@@ -10,7 +12,7 @@ interface Props {
   summary?: string;
 }
 
-function NextSection({ theme, title = "Et pour la suite ?", intro = "", items = [], summary }: Props) {
+function NextSection({ theme, title = "Et pour la suite ?", intro = "", items = NONE, summary }: Props) {
   return (
     <div
       style={{

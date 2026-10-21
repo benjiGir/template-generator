@@ -126,6 +126,7 @@ export function ColorPropField({ label, value, onChange }: Props) {
                       setOpen(false);
                     }}
                     title={l}
+                    aria-label={l}
                     style={{
                       backgroundColor: hex,
                       border: value === ref ? "2px solid #2563EB" : "1px solid rgba(0,0,0,0.15)",
@@ -150,6 +151,7 @@ export function ColorPropField({ label, value, onChange }: Props) {
                     setOpen(false);
                   }}
                   title={color}
+                  aria-label={color}
                   style={{
                     backgroundColor: color,
                     border: displayColor === color && !isThemeRef ? "2px solid #2563EB" : "1px solid rgba(0,0,0,0.1)",

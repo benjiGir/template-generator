@@ -12,7 +12,7 @@ function ghost(type: string, index: number): ComponentNode {
   return {
     id: `${GHOST}${type}-${index}`,
     type,
-    props: { ...(def?.defaultProps ?? {}) },
+    props: { ...def?.defaultProps },
     children: def?.acceptsChildren ? [] : undefined,
   };
 }

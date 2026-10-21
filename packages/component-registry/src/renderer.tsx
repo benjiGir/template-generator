@@ -4,7 +4,6 @@ import type { ComponentNode, Theme } from "@template-generator/shared/types/temp
 interface Props {
   node: ComponentNode;
   theme: Theme;
-  isEditor?: boolean;
 }
 
 /** Remplace les références `theme.<couleur>` des props par la valeur du thème */
@@ -19,7 +18,7 @@ export function resolveThemeVars(props: Record<string, unknown>, theme: Theme): 
   return resolved;
 }
 
-export function ComponentRenderer({ node, theme, isEditor }: Props) {
+export function ComponentRenderer({ node, theme }: Props) {
   const definition = get(node.type);
 
   if (!definition) {
@@ -33,7 +32,7 @@ export function ComponentRenderer({ node, theme, isEditor }: Props) {
     return (
       <Component {...mergedProps}>
         {node.children.map((child) => (
-          <ComponentRenderer key={child.id} node={child} theme={theme} isEditor={isEditor} />
+          <ComponentRenderer key={child.id} node={child} theme={theme} />
         ))}
       </Component>
     );

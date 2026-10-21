@@ -53,7 +53,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       document: doc,
       templateSnapshot: snapshot,
       // Documents antérieurs : la valeur par défaut est relue dans le snapshot
-      editableFields: withNodeDefaults(snapshot?.editableFields ?? [], snapshot?.pages ?? []).sort(
+      editableFields: withNodeDefaults(snapshot?.editableFields ?? [], snapshot?.pages ?? []).toSorted(
         (a, b) => a.order - b.order,
       ),
       data: doc.data ?? {},

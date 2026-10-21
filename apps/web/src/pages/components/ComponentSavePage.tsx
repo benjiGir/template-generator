@@ -86,10 +86,10 @@ export function ComponentSavePage() {
           </h2>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+            <label className="block">
+              <span className="block text-xs font-medium text-gray-600 mb-1">
                 Nom du preset <span className="text-red-400">*</span>
-              </label>
+              </span>
               <input
                 autoFocus
                 type="text"
@@ -98,10 +98,10 @@ export function ComponentSavePage() {
                 placeholder="Ex: KPI Card Verte"
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink"
               />
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <label className="block">
+              <span className="block text-xs font-medium text-gray-600 mb-1">Description</span>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -109,10 +109,10 @@ export function ComponentSavePage() {
                 placeholder="Description optionnelle…"
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink resize-none"
               />
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Catégorie</label>
+            <label className="block">
+              <span className="block text-xs font-medium text-gray-600 mb-1">Catégorie</span>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ComponentCategory)}
@@ -124,7 +124,7 @@ export function ComponentSavePage() {
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
             <div className="pt-2 border-t border-gray-100">
               <p className="text-xs text-gray-400">

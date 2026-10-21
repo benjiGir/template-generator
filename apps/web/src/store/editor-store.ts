@@ -13,7 +13,6 @@ import {
   findNode,
   insertNode,
   removeNode as treeRemoveNode,
-  moveNode as treeMoveNode,
   duplicateNode as treeDuplicateNode,
   generateNodeId,
 } from "@template-generator/shared/utils/tree";
@@ -145,10 +144,10 @@ export const useEditorStore = create<EditorState>()(
         s.template.theme = {
           ...s.template.theme,
           ...theme,
-          colors: { ...s.template.theme.colors, ...(theme.colors ?? {}) },
-          typography: { ...s.template.theme.typography, ...(theme.typography ?? {}) },
-          spacing: { ...s.template.theme.spacing, ...(theme.spacing ?? {}) },
-          borders: { ...s.template.theme.borders, ...(theme.borders ?? {}) },
+          colors: { ...s.template.theme.colors, ...theme.colors },
+          typography: { ...s.template.theme.typography, ...theme.typography },
+          spacing: { ...s.template.theme.spacing, ...theme.spacing },
+          borders: { ...s.template.theme.borders, ...theme.borders },
         };
         s.revision++;
       }),

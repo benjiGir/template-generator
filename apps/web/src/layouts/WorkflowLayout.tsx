@@ -21,6 +21,8 @@ export interface FinalAction {
   disabled?: boolean;
 }
 
+const ALWAYS_OK: StepGuard = { ok: true };
+
 interface Props {
   workflow: WorkflowDef;
   /** Clé de l'étape courante */
@@ -50,7 +52,7 @@ export function WorkflowLayout({
   entityId,
   title,
   firstNavigableStep,
-  guard = { ok: true },
+  guard = ALWAYS_OK,
   onNext,
   nextLabel = "Suivant",
   finalAction,

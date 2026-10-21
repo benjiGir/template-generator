@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ExternalLink, X } from "lucide-react";
 import { ObjectTag } from "@/components/ui/ObjectIdentity";
 import { findArticle } from "./articles";
@@ -13,9 +13,10 @@ interface Target {
 export function HelpProvider({ children }: { children: ReactNode }) {
   const [target, setTarget] = useState<Target | null>(null);
   const open = useCallback((slug: string, sectionId?: string) => setTarget({ slug, sectionId }), []);
+  const value = useMemo(() => ({ open }), [open]);
 
   return (
-    <HelpContext.Provider value={{ open }}>
+    <HelpContext.Provider value={value}>
       {children}
       {target && <HelpPanel target={target} onNavigate={setTarget} onClose={() => setTarget(null)} />}
     </HelpContext.Provider>

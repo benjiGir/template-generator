@@ -86,6 +86,7 @@ export function ComponentSelectPage() {
                   <button
                     key={def.type}
                     onClick={() => choose(def.type)}
+                    aria-label={def.label}
                     className={`overflow-hidden rounded-lg border-2 bg-white text-left transition-all ${
                       selected === def.type
                         ? "border-preset shadow-sm"

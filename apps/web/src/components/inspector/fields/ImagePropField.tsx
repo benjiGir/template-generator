@@ -10,16 +10,16 @@ interface Props {
 const EMPTY: ImageValue = { type: "url", value: "" };
 
 export function ImagePropField({ label, value, onChange }: Props) {
-  const val: ImageValue = { ...EMPTY, ...((value as ImageValue | undefined) ?? {}) };
+  const val: ImageValue = { ...EMPTY, ...(value as ImageValue | undefined) };
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.addEventListener("load", () => {
       onChange({ type: "base64", value: String(reader.result) });
-    };
+    });
     reader.readAsDataURL(file);
     e.target.value = "";
   };

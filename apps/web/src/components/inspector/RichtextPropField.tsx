@@ -12,7 +12,7 @@ import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/m
 import { FORMAT_TEXT_COMMAND, $getSelection, $isRangeSelection } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
 import { TOGGLE_LINK_COMMAND } from "@lexical/link";
-import { MARKDOWN_TRANSFORMERS, EDITOR_NODES, editorTheme } from "./lexical-config";
+import { MARKDOWN_TRANSFORMERS, EDITOR_NODES, PassthroughErrorBoundary, editorTheme } from "./lexical-config";
 
 /* ── Init plugin : charge le markdown initial ── */
 function InitPlugin({ value }: { value: string }) {
@@ -177,7 +177,7 @@ export function RichtextPropField({ label, value, onChange, placeholder }: Props
                     {placeholder ?? "Contenu…"}
                   </div>
                 }
-                ErrorBoundary={({ children }) => <>{children}</>}
+                ErrorBoundary={PassthroughErrorBoundary}
               />
             </div>
           </div>

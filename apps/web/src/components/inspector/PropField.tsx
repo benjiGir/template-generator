@@ -56,7 +56,7 @@ function PropInput({ schema, value, onChange }: Props) {
       return <NumberPropField value={num} onChange={onChange} />;
 
     case "boolean":
-      return <BooleanPropField value={bool} onChange={onChange} />;
+      return <BooleanPropField label={schema.label} value={bool} onChange={onChange} />;
 
     case "select":
       return <SelectPropField value={str} options={schema.options ?? []} onChange={onChange} />;

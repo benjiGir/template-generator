@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -67,13 +68,15 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     setActive(true);
   }, [location.pathname, navigate]);
 
+  const value = useMemo(() => ({ start }), [start]);
+
   const close = (outcome: "done" | "skipped") => {
     markTourSeen(outcome);
     setActive(false);
   };
 
   return (
-    <Context.Provider value={{ start }}>
+    <Context.Provider value={value}>
       {children}
       {active && location.pathname === "/" && (
         <Tour
@@ -135,9 +138,10 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
     };
   }, [step]);
 
+  // Hauteur de la bulle, pour la placer : son contenu change avec le profil et l'étape
   useLayoutEffect(() => {
     setCardHeight(cardRef.current?.offsetHeight ?? 0);
-  });
+  }, [profile, index]);
 
   const next = () => {
     if (!profile) return;

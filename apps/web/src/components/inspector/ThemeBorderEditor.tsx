@@ -15,8 +15,8 @@ export function ThemeBorderEditor() {
   return (
     <div className="px-4 space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Rayon (px)</label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Rayon (px)</span>
           <input
             type="number"
             min={0}
@@ -25,9 +25,9 @@ export function ThemeBorderEditor() {
             onChange={(e) => update("radius", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Rayon large</label>
+        </label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Rayon large</span>
           <input
             type="number"
             min={0}
@@ -36,9 +36,9 @@ export function ThemeBorderEditor() {
             onChange={(e) => update("radiusLg", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Épaisseur</label>
+        </label>
+        <label className="block">
+          <span className="text-xs text-gray-500 block mb-1">Épaisseur</span>
           <input
             type="number"
             min={0}
@@ -47,7 +47,7 @@ export function ThemeBorderEditor() {
             onChange={(e) => update("width", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </label>
       </div>
 
       {/* Preview */}

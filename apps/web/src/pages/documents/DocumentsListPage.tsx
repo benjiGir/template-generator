@@ -61,7 +61,7 @@ export function DocumentsListPage() {
 
   const templateNames = Array.from(
     new Set(documents.map((d) => d.templateName).filter((n): n is string => !!n)),
-  ).sort();
+  ).toSorted();
   const counts = new Map<StatusFilter, number>([["all", documents.length]]);
   for (const d of documents) {
     const s = documentDisplayStatus(d);

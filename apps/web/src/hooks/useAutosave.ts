@@ -46,6 +46,7 @@ export function useAutosave<T>({
 
   const run = useCallback(async (): Promise<boolean> => {
     // Une requête à la fois : on attend la précédente puis on renvoie si l'état a encore changé
+    // oxlint-disable-next-line no-await-in-loop
     while (inFlight.current) await inFlight.current;
 
     const { revision: rev, savedRevision: saved, getSnapshot: snap, save: doSave } = latest.current;

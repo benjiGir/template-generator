@@ -10,7 +10,7 @@ interface Props {
 const EMPTY: SpacingValue = { top: 0, right: 0, bottom: 0, left: 0 };
 
 export function SpacingPropField({ label, value, onChange }: Props) {
-  const val: SpacingValue = { ...EMPTY, ...((value as SpacingValue | undefined) ?? {}) };
+  const val: SpacingValue = { ...EMPTY, ...(value as SpacingValue | undefined) };
   const [linked, setLinked] = useState(false);
 
   const update = (side: keyof SpacingValue, n: number) => {

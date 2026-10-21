@@ -3,6 +3,8 @@ import { register } from "../../registry";
 import type { RegisteredComponent } from "../../registry";
 import { resolveColor, resolveLightBg } from "../../color-map";
 
+const NONE: string[] = [];
+
 interface Props {
   theme: Theme;
   title?: string;
@@ -18,9 +20,9 @@ function DetailBlock({
   theme,
   title = "Titre",
   color = "blue",
-  paragraphs = [],
+  paragraphs = NONE,
   benefitsLabel = "Bénéfices",
-  benefits = [],
+  benefits = NONE,
   result,
   suite,
 }: Props) {

@@ -189,8 +189,10 @@ const ZONE_STYLES: Record<ZoneLook, string> = {
   warn: "outline outline-2 outline-amber-500 outline-offset-1 bg-amber-50",
 };
 
+const NO_ZONES = {};
+
 export function MiniPage({
-  zones = {},
+  zones = NO_ZONES,
   dense = false,
   className = "",
   style,
