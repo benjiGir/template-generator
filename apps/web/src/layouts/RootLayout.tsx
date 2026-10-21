@@ -1,8 +1,9 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { CircleHelp, Home } from "lucide-react";
+import { BookOpen, CircleHelp, Home } from "lucide-react";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { OnboardingProvider, useOnboarding } from "@/components/onboarding/Onboarding";
 import { ObjectMark, type ObjectKind } from "@/components/ui/ObjectIdentity";
+import { HelpProvider } from "@/help/HelpProvider";
 
 interface NavItem {
   to: string;
@@ -78,6 +79,25 @@ function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boole
   );
 }
 
+/** Documentation : chaque étape expliquée avec des extraits d'écrans */
+function HelpNavLink({ collapsed }: { collapsed: boolean }) {
+  return (
+    <NavLink
+      to="/aide"
+      title="Aide — chaque étape expliquée"
+      aria-label={collapsed ? "Aide" : undefined}
+      className={({ isActive }) =>
+        `mt-auto flex items-center gap-2 transition-colors hover:text-ink ${isActive ? "font-semibold text-ink" : "text-gray-600"} ${
+          collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 font-mono text-xs"
+        }`
+      }
+    >
+      <BookOpen size={collapsed ? 18 : 14} />
+      {!collapsed && "Aide"}
+    </NavLink>
+  );
+}
+
 /** Relance la visite guidée ; repère de la dernière étape de la visite */
 function ReplayTourButton({ collapsed }: { collapsed: boolean }) {
   const { start } = useOnboarding();
@@ -87,7 +107,7 @@ function ReplayTourButton({ collapsed }: { collapsed: boolean }) {
       data-tour="tour-replay"
       title="Revoir le tutoriel"
       aria-label="Revoir le tutoriel"
-      className={`mt-auto flex items-center gap-2 text-gray-600 transition-colors hover:text-ink ${
+      className={`flex items-center gap-2 text-gray-600 transition-colors hover:text-ink ${
         collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 font-mono text-xs"
       }`}
     >
@@ -106,35 +126,38 @@ export function RootLayout() {
   return (
     <ConfirmProvider>
       <OnboardingProvider>
-        <div className="flex h-screen bg-paper text-ink">
-          <nav
-            className={`flex shrink-0 flex-col gap-0.5 border-r border-rule bg-gray-100 py-6 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
-            aria-label="Navigation principale"
-          >
-            <div className={`mb-6 ${collapsed ? "text-center" : "px-3"}`}>
-              <div className="text-[17px] font-bold tracking-tight">{collapsed ? "DF" : "DocForge"}</div>
-              {!collapsed && <div className="font-mono text-[11px] text-gray-500">Documents techniques</div>}
-            </div>
+        <HelpProvider>
+          <div className="flex h-screen bg-paper text-ink">
+            <nav
+              className={`flex shrink-0 flex-col gap-0.5 border-r border-rule bg-gray-100 py-6 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
+              aria-label="Navigation principale"
+            >
+              <div className={`mb-6 ${collapsed ? "text-center" : "px-3"}`}>
+                <div className="text-[17px] font-bold tracking-tight">{collapsed ? "DF" : "DocForge"}</div>
+                {!collapsed && <div className="font-mono text-[11px] text-gray-500">Documents techniques</div>}
+              </div>
 
-            <NavEntry item={HOME} end collapsed={collapsed} />
-            <NavEntry item={PRIMARY} collapsed={collapsed} />
+              <NavEntry item={HOME} end collapsed={collapsed} />
+              <NavEntry item={PRIMARY} collapsed={collapsed} />
 
-            {collapsed ? (
-              <div className="my-3 h-px w-8 bg-rule" />
-            ) : (
-              <div className="mt-5 px-3 pb-1 font-mono text-[11px] tracking-[0.06em] text-gray-500">CONCEPTION</div>
-            )}
-            {DESIGN.map((item) => (
-              <NavEntry key={item.to} item={item} collapsed={collapsed} />
-            ))}
+              {collapsed ? (
+                <div className="my-3 h-px w-8 bg-rule" />
+              ) : (
+                <div className="mt-5 px-3 pb-1 font-mono text-[11px] tracking-[0.06em] text-gray-500">CONCEPTION</div>
+              )}
+              {DESIGN.map((item) => (
+                <NavEntry key={item.to} item={item} collapsed={collapsed} />
+              ))}
 
-            <ReplayTourButton collapsed={collapsed} />
-          </nav>
+              <HelpNavLink collapsed={collapsed} />
+              <ReplayTourButton collapsed={collapsed} />
+            </nav>
 
-          <main className="flex-1 overflow-hidden">
-            <Outlet />
-          </main>
-        </div>
+            <main className="flex-1 overflow-hidden">
+              <Outlet />
+            </main>
+          </div>
+        </HelpProvider>
       </OnboardingProvider>
     </ConfirmProvider>
   );

@@ -1,10 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, Info, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CircleHelp, Info, X } from "lucide-react";
 import type { WorkflowDef } from "@/workflow/definitions";
 import { useWorkflowSession } from "@/workflow/session";
 import { SaveIndicator } from "@/components/ui/SaveIndicator";
 import { KIND_STYLES, ObjectTag } from "@/components/ui/ObjectIdentity";
+import { useHelp } from "@/help/context";
+import { stepHelp } from "@/help/stepHelp";
 
 export interface StepGuard {
   ok: boolean;
@@ -58,6 +60,7 @@ export function WorkflowLayout({
 }: Props) {
   const navigate = useNavigate();
   const session = useWorkflowSession();
+  const help = useHelp();
   const [pending, setPending] = useState(false);
 
   const steps = workflow.steps;
@@ -179,6 +182,19 @@ export function WorkflowLayout({
     </Link>
   );
 
+  // Aide de l'étape en cours, dans un panneau : le travail reste à l'écran
+  const helpTarget = stepHelp(workflow.kind, current);
+  const helpButton = helpTarget && (
+    <button
+      onClick={() => help.open(helpTarget.slug, helpTarget.sectionId)}
+      className="flex items-center gap-1 px-1 py-1 font-mono text-xs text-gray-700 hover:text-ink hover:underline"
+      title="Aide sur cette étape"
+    >
+      <CircleHelp size={13} />
+      Aide
+    </button>
+  );
+
   const heading = (
     <div className="flex min-w-0 items-center gap-2">
       <ObjectTag kind={workflow.kind} />
@@ -194,6 +210,7 @@ export function WorkflowLayout({
           <div className="w-72 shrink-0">{heading}</div>
           <div className="flex flex-1 justify-center">{stepper}</div>
           <div className="flex items-center gap-2">
+            {helpButton}
             {session?.autosave && <SaveIndicator autosave={session.autosave} />}
             {blockedReason}
             {secondaryActions}
@@ -212,8 +229,9 @@ export function WorkflowLayout({
         {quit}
         <div className="w-72 shrink-0">{heading}</div>
         <div className="flex flex-1 justify-center">{stepper}</div>
-        <div className="flex w-56 shrink-0 justify-end">
+        <div className="flex w-56 shrink-0 items-center justify-end gap-3">
           {session?.autosave && <SaveIndicator autosave={session.autosave} />}
+          {helpButton}
         </div>
       </header>
 

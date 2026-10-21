@@ -17,6 +17,7 @@ import { DocumentWorkflowRoute, DocumentEntryRedirect } from "@/pages/documents/
 import { DocumentFillPage } from "@/pages/documents/DocumentFillPage";
 import { DocumentPreviewPage } from "@/pages/documents/DocumentPreviewPage";
 import { DocumentExportPage } from "@/pages/documents/DocumentExportPage";
+import { HelpPage } from "@/pages/HelpPage";
 
 /** Anciennes URL de l'éditeur (/templates/:id/edit) */
 function LegacyTemplateEdit() {
@@ -70,6 +71,9 @@ const router = createBrowserRouter([
           { path: "save",      element: <ComponentSavePage /> },
         ],
       },
+
+      { path: "/aide",       element: <HelpPage /> },
+      { path: "/aide/:slug", element: <HelpPage /> },
 
       { path: "*", element: <Navigate to="/" replace /> },
     ],

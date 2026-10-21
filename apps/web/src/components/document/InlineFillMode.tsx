@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, EyeOff, Lock, SkipForward, X } from "lucide-react";
+import { useHelp } from "@/help/context";
 import { useDocumentStore } from "@/store/document-store";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
@@ -32,6 +33,7 @@ export function InlineFillMode() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [reveal, setReveal] = useState(false);
   const [lockedNotice, setLockedNotice] = useState(false);
+  const help = useHelp();
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const mergedTemplate = getMergedTemplate();
@@ -69,7 +71,7 @@ export function InlineFillMode() {
     if (nodeIdFrom(e.target)) {
       setLockedNotice(true);
       clearTimeout(noticeTimer.current);
-      noticeTimer.current = setTimeout(() => setLockedNotice(false), 2500);
+      noticeTimer.current = setTimeout(() => setLockedNotice(false), 4000);
     }
   };
 
@@ -163,9 +165,21 @@ export function InlineFillMode() {
           anchoredPanel={panel || undefined}
         />
         {lockedNotice && (
-          <div role="status" className="pointer-events-none absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-xs text-white shadow-lg">
+          <div
+            role="status"
+            className="absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-xs text-white shadow-lg"
+            // Le message reste tant qu'on le survole, le temps de cliquer sur « Pourquoi ? »
+            onMouseEnter={() => clearTimeout(noticeTimer.current)}
+            onMouseLeave={() => { noticeTimer.current = setTimeout(() => setLockedNotice(false), 1500); }}
+          >
             <Lock size={12} />
             Cette partie fait partie du template : elle ne se modifie pas ici.
+            <button
+              onClick={() => { setLockedNotice(false); help.open("bases", "zones-verrouillees"); }}
+              className="font-semibold underline underline-offset-2 hover:no-underline"
+            >
+              Pourquoi ?
+            </button>
           </div>
         )}
         {!selected && !reveal && hovered === null && (
