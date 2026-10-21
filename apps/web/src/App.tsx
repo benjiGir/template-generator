@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { RootLayout } from "@/layouts/RootLayout";
 import { RouteError } from "@/components/ui/RouteError";
 import { AppLoading } from "@/components/ui/AppLoading";
@@ -10,12 +10,6 @@ import { AppLoading } from "@/components/ui/AppLoading";
  */
 function screen<M>(load: () => Promise<M>, pick: (module: M) => ComponentType) {
   return async () => ({ Component: pick(await load()) });
-}
-
-/** Anciennes URL de l'éditeur (/templates/:id/edit) */
-function LegacyTemplateEdit() {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/templates/${id}/build`} replace />;
 }
 
 const router = createBrowserRouter([
@@ -105,7 +99,6 @@ const router = createBrowserRouter([
               (m) => m.TemplateStartPage,
             ),
           },
-          { path: "/templates/:id/edit", element: <LegacyTemplateEdit /> },
           {
             path: "/templates/:id",
             lazy: screen(

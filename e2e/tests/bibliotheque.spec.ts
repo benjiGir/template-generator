@@ -19,3 +19,27 @@ test("la Bibliothèque règle un composant et le range comme preset", async ({ p
   await expect(page).toHaveURL(/\/components$/);
   await expect(page.getByText(name)).toBeVisible();
 });
+
+test("l'éditeur de texte enrichi charge le contenu et applique le markdown", async ({ page }) => {
+  await page.goto("/components/new");
+  await page.getByRole("button", { name: "Encadré d'appel", exact: true }).click();
+  await expect(page).toHaveURL(/\/configure$/);
+
+  // Le contenu par défaut est chargé dans l'éditeur (Lexical)
+  const editor = page.locator('[contenteditable="true"]').first();
+  await expect(editor).toContainText("Votre message ici");
+
+  // Annuler juste après l'ouverture garde le contenu chargé
+  await editor.click();
+  await page.keyboard.press("ControlOrMeta+z");
+  await expect(editor).toContainText("Votre message ici");
+
+  await page.keyboard.press("ControlOrMeta+a");
+  await page.keyboard.type("Message **important** ");
+
+  // Le raccourci markdown met en gras, et l'aperçu suit la saisie
+  await expect(editor.locator("strong, .font-bold").getByText("important")).toBeVisible();
+  const preview = page.locator("[data-component-preview]");
+  await expect(preview).toContainText("Message important");
+  await expect(preview.locator("strong").getByText("important")).toBeVisible();
+});

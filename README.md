@@ -63,7 +63,9 @@ Appliquer les migrations :
 pnpm --filter @template-generator/api run db:migrate
 ```
 
-Seeder le template KOMITY de démonstration (optionnel) :
+Charger les données de démonstration (optionnel) : thèmes intégrés, 5 templates, 8 presets et 10 documents.
+Elles sont décrites en JSON dans `apps/api/src/seed/data` (un fichier par template), vérifiées à la lecture avec les
+schémas de l'API, et n'insèrent que ce qui manque :
 
 ```bash
 pnpm --filter @template-generator/api run db:seed
@@ -269,7 +271,7 @@ pnpm build                  # Build de production
 
 pnpm --filter @template-generator/api run db:migrate   # Appliquer les migrations
 pnpm --filter @template-generator/api run db:generate  # Générer une migration
-pnpm --filter @template-generator/api run db:seed      # Seeder le template KOMITY
+pnpm --filter @template-generator/api run db:seed      # Données de démonstration (apps/api/src/seed/data)
 ```
 
 ## Tests

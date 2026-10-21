@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@template-generator/shared": "workspace:*",
-    "lucide-react": "^0.469.0"
+    "lucide-react": "^1.60.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

@@ -1,0 +1,136 @@
+[
+  {
+    "template": "KOMITY — Chantiers Techniques",
+    "name": "Chantiers Techniques — Janvier 2025",
+    "status": "finalized",
+    "data": {
+      "tb-1.subtitle": "Bilan mensuel — Janvier 2025",
+      "ib-1.content": "Ce document présente l'avancement des **chantiers techniques** de janvier 2025. Toutes les livraisons planifiées ont été réalisées.",
+      "kc-1.description": "12/12 tâches livrées dans les délais.",
+      "kc-2.description": "+18% vs décembre 2024.",
+      "kc-3.description": "12 bugs critiques corrigés en production.",
+      "kc-4.description": "4 déploiements réussis sans rollback.",
+      "db-1.result": "Livré en production le 15 janvier. Aucun incident signalé.",
+      "pf-1.text": "KOMITY — Document confidentiel — Janvier 2025"
+    }
+  },
+  {
+    "template": "KOMITY — Chantiers Techniques",
+    "name": "Chantiers Techniques — Février 2025",
+    "status": "finalized",
+    "data": {
+      "tb-1.subtitle": "Bilan mensuel — Février 2025",
+      "ib-1.content": "Bilan de février 2025 : mois dense marqué par la finalisation de l'optimisation API et le démarrage de la migration K8s.",
+      "kc-1.description": "9/10 tâches livrées — 1 reportée.",
+      "kc-2.description": "+7% vs janvier 2025.",
+      "kc-3.description": "8 bugs corrigés, 2 en cours d'investigation.",
+      "kc-4.description": "3 déploiements — 1 rollback partiel.",
+      "db-1.result": "Optimisation API finalisée. P99 < 180ms.",
+      "pf-1.text": "KOMITY — Document confidentiel — Février 2025"
+    }
+  },
+  {
+    "template": "KOMITY — Chantiers Techniques",
+    "name": "Chantiers Techniques — Mars 2025",
+    "status": "draft",
+    "data": {
+      "tb-1.subtitle": "Bilan mensuel — Mars 2025",
+      "kc-1.description": "En cours de saisie..."
+    }
+  },
+  {
+    "template": "RH — Bilan Mensuel",
+    "name": "Bilan RH — Janvier 2025",
+    "status": "finalized",
+    "data": {
+      "rh-tb-1.subtitle": "Janvier 2025",
+      "rh-kc-1.description": "142 collaborateurs actifs.",
+      "rh-kc-2.description": "3 postes pourvus ce mois.",
+      "rh-kc-3.description": "3,2% — en baisse vs décembre.",
+      "rh-kc-4.description": "eNPS : +42 (enquête jan.)",
+      "rh-ns-1.items": [
+        "Finaliser le recrutement Backend ouvert",
+        "Lancer les entretiens annuels",
+        "Déployer le module de formation"
+      ]
+    }
+  },
+  {
+    "template": "RH — Bilan Mensuel",
+    "name": "Bilan RH — Février 2025",
+    "status": "finalized",
+    "data": {
+      "rh-tb-1.subtitle": "Février 2025",
+      "rh-kc-1.description": "145 collaborateurs actifs (+3).",
+      "rh-kc-2.description": "2 postes pourvus, 1 en cours.",
+      "rh-kc-3.description": "2,8% — objectif 3% atteint.",
+      "rh-kc-4.description": "eNPS : +47 (post-onboarding).",
+      "rh-ns-1.items": [
+        "Finaliser l'onboarding des 2 nouvelles recrues",
+        "Lancer la campagne de formation Q2",
+        "Préparer le bilan social"
+      ]
+    }
+  },
+  {
+    "template": "RH — Bilan Mensuel",
+    "name": "Bilan RH — Mars 2025",
+    "status": "draft",
+    "data": {
+      "rh-tb-1.subtitle": "Mars 2025"
+    }
+  },
+  {
+    "template": "Finance — Rapport Trimestriel",
+    "name": "Rapport Financier — Q1 2025",
+    "status": "finalized",
+    "data": {
+      "fi-tb-1.subtitle": "Q1 2025 — Janvier · Février · Mars",
+      "fi-kc-1.description": "€ 1,24M — +12% vs Q1 2024.",
+      "fi-kc-2.description": "67% — stable vs objectif.",
+      "fi-kc-3.description": "14 comptes signés ce trimestre.",
+      "fi-kc-4.description": "€ 98K — objectif Q2 : € 115K.",
+      "fi-db-1.result": "Objectif CA Q1 atteint à 103%.",
+      "fi-db-2.result": "Ratio dépenses/CA : 61% (vs 63% Q1 2024)."
+    }
+  },
+  {
+    "template": "Finance — Rapport Trimestriel",
+    "name": "Rapport Financier — Q2 2025",
+    "status": "draft",
+    "data": {
+      "fi-tb-1.subtitle": "Q2 2025 — Avril · Mai · Juin"
+    }
+  },
+  {
+    "template": "Incident — Rapport Post-Mortem",
+    "name": "Post-Mortem — INC-2025-0042",
+    "status": "finalized",
+    "data": {
+      "pm-tb-1.subtitle": "INC-2025-0042 — 8 février 2025",
+      "pm-kc-1.description": "2h14 d'interruption partielle.",
+      "pm-kc-2.description": "API Gateway + Auth Service.",
+      "pm-kc-3.description": "~340 comptes Enterprise.",
+      "pm-kc-4.description": "SEV-2 (dégradation partielle).",
+      "pm-db-1.result": "Certificat TLS interne expiré — alerte désactivée lors migration nov. 2024.",
+      "pm-ns-1.items": [
+        "Automatiser renouvellement (cert-manager)",
+        "Alerte J-30 et J-7 sur tous les certs",
+        "Mettre à jour le runbook Auth",
+        "Check validité cert en CI"
+      ]
+    }
+  },
+  {
+    "template": "Incident — Rapport Post-Mortem",
+    "name": "Post-Mortem — INC-2025-0067",
+    "status": "draft",
+    "data": {
+      "pm-tb-1.subtitle": "INC-2025-0067 — 2 mars 2025",
+      "pm-kc-1.description": "45 min de latence dégradée.",
+      "pm-kc-2.description": "Service de notifications.",
+      "pm-kc-3.description": "~80 comptes affectés.",
+      "pm-kc-4.description": "SEV-3 (impact limité)."
+    }
+  }
+]

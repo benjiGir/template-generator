@@ -1,0 +1,100 @@
+[
+  {
+    "baseType": "kpi-card",
+    "label": "KPI Succès vert",
+    "description": "Carte KPI avec couleur verte pour indiquer un résultat positif.",
+    "category": "data",
+    "defaultProps": {
+      "emoji": "✅",
+      "title": "Indicateur",
+      "description": "Résultat positif atteint.",
+      "color": "green"
+    }
+  },
+  {
+    "baseType": "kpi-card",
+    "label": "KPI Alerte orange",
+    "description": "Carte KPI avec couleur orange pour signaler un point d'attention.",
+    "category": "data",
+    "defaultProps": {
+      "emoji": "⚠️",
+      "title": "Point d'attention",
+      "description": "À surveiller ce mois.",
+      "color": "amber"
+    }
+  },
+  {
+    "baseType": "kpi-card",
+    "label": "KPI Neutre bleu",
+    "description": "Carte KPI bleue pour les informations neutres ou de contexte.",
+    "category": "data",
+    "defaultProps": {
+      "emoji": "📊",
+      "title": "Chiffre clé",
+      "description": "Donnée de contexte.",
+      "color": "blue"
+    }
+  },
+  {
+    "baseType": "intro-box",
+    "label": "Intro standard bleue",
+    "description": "Bloc d'introduction avec accent bleu primaire.",
+    "category": "content",
+    "defaultProps": {
+      "content": "Saisissez ici l'introduction de votre document.",
+      "accentColor": "#2563EB"
+    }
+  },
+  {
+    "baseType": "intro-box",
+    "label": "Intro alerte rouge",
+    "description": "Bloc d'introduction avec accent rouge pour les documents d'incident.",
+    "category": "content",
+    "defaultProps": {
+      "content": "⚠️ Ce document traite d'un incident ou d'une situation critique.",
+      "accentColor": "#DC2626"
+    }
+  },
+  {
+    "baseType": "detail-block",
+    "label": "Bloc résultat positif",
+    "description": "Bloc de détail vert — résultat atteint.",
+    "category": "content",
+    "defaultProps": {
+      "title": "Titre du chantier",
+      "color": "green",
+      "paragraphs": ["Description de l'action menée."],
+      "benefitsLabel": "Bénéfices",
+      "benefits": ["Bénéfice 1", "Bénéfice 2"],
+      "result": "Résultat : objectif atteint.",
+      "suite": "Prochaine étape à définir."
+    }
+  },
+  {
+    "baseType": "detail-block",
+    "label": "Bloc en cours orange",
+    "description": "Bloc de détail orange — action en cours ou à risque.",
+    "category": "content",
+    "defaultProps": {
+      "title": "Titre du chantier",
+      "color": "amber",
+      "paragraphs": ["Description de l'action en cours."],
+      "benefitsLabel": "Avancement",
+      "benefits": ["Étape 1 : terminée", "Étape 2 : en cours"],
+      "result": "En cours — X% réalisé.",
+      "suite": "Livraison prévue semaine X."
+    }
+  },
+  {
+    "baseType": "next-section",
+    "label": "Suite — 4 actions",
+    "description": "Bloc 'Et pour la suite ?' pré-rempli avec 4 actions à personnaliser.",
+    "category": "content",
+    "defaultProps": {
+      "title": "Et pour la suite ?",
+      "intro": "Les priorités pour le prochain mois :",
+      "items": ["Action prioritaire 1", "Action prioritaire 2", "Action prioritaire 3", "Action prioritaire 4"],
+      "summary": "X actions planifiées pour le prochain mois."
+    }
+  }
+]

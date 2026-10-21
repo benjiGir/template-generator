@@ -1,0 +1,124 @@
+{
+  "name": "Produit — Release Notes",
+  "description": "Notes de version produit : nouvelles fonctionnalités, améliorations et corrections.",
+  "theme": "Vibrant",
+  "published": false,
+  "tags": ["produit", "release", "changelog"],
+  "editableFields": [],
+  "pages": [
+    {
+      "id": "rn-page-1",
+      "label": "Release Notes",
+      "children": [
+        {
+          "id": "rn-ph-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "KOMITY",
+            "brandSub": "Product Updates",
+            "showChevron": true
+          }
+        },
+        {
+          "id": "rn-tb-1",
+          "type": "title-block",
+          "props": {
+            "title": "Release Notes",
+            "subtitle": "Version 3.4 — Mars 2025"
+          }
+        },
+        {
+          "id": "rn-ib-1",
+          "type": "intro-box",
+          "props": {
+            "content": "La version **3.4** apporte de nouvelles fonctionnalités majeures, des améliorations de performance et des corrections importantes.",
+            "accentColor": "#7C3AED"
+          }
+        },
+        {
+          "id": "rn-kr-1",
+          "type": "kpi-row",
+          "props": {
+            "sectionTitle": "Cette version en chiffres"
+          },
+          "children": [
+            {
+              "id": "rn-kc-1",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "✨",
+                "title": "Nouvelles features",
+                "description": "8 fonctionnalités majeures ajoutées.",
+                "color": "blue"
+              }
+            },
+            {
+              "id": "rn-kc-2",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "⚡",
+                "title": "Perf.",
+                "description": "Temps de chargement réduit de 35%.",
+                "color": "green"
+              }
+            },
+            {
+              "id": "rn-kc-3",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🐛",
+                "title": "Corrections",
+                "description": "23 bugs corrigés.",
+                "color": "amber"
+              }
+            },
+            {
+              "id": "rn-kc-4",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🔒",
+                "title": "Sécurité",
+                "description": "2 CVE patchés.",
+                "color": "green"
+              }
+            }
+          ]
+        },
+        {
+          "id": "rn-sh-1",
+          "type": "section-header",
+          "props": {
+            "text": "Fonctionnalités majeures"
+          }
+        },
+        {
+          "id": "rn-db-1",
+          "type": "detail-block",
+          "props": {
+            "title": "Éditeur de templates v2",
+            "color": "blue",
+            "paragraphs": [
+              "Refonte complète de l'éditeur avec glisser-déposer, prévisualisation en temps réel et gestion multi-pages."
+            ],
+            "benefitsLabel": "Nouveautés",
+            "benefits": [
+              "Drag & drop entre pages",
+              "Prévisualisation instantanée",
+              "Export PDF amélioré",
+              "Thèmes personnalisables"
+            ],
+            "result": "Disponible pour tous les plans dès la mise à jour.",
+            "suite": "Tutoriels vidéo publiés dans le centre d'aide."
+          }
+        },
+        {
+          "id": "rn-pf-1",
+          "type": "page-footer",
+          "props": {
+            "text": "KOMITY — Release Notes v3.4 — Mars 2025"
+          }
+        }
+      ]
+    }
+  ]
+}

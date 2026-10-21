@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import type { EditorState } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -8,27 +9,16 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
 import { FORMAT_TEXT_COMMAND, $getSelection, $isRangeSelection } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
 import { TOGGLE_LINK_COMMAND } from "@lexical/link";
-import { MARKDOWN_TRANSFORMERS, EDITOR_NODES, PassthroughErrorBoundary, editorTheme } from "./lexical-config";
-
-/* ── Init plugin : charge le markdown initial ── */
-function InitPlugin({ value }: { value: string }) {
-  const [editor] = useLexicalComposerContext();
-  const initialized = useRef(false);
-
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    editor.update(() => {
-      $convertFromMarkdownString(value, MARKDOWN_TRANSFORMERS);
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return null;
-}
+import {
+  MARKDOWN_TRANSFORMERS,
+  PassthroughErrorBoundary,
+  editorTheme,
+  markdownEditorConfig,
+  readMarkdown,
+} from "./lexical-config";
 
 /* ── Toolbar ── */
 function ToolbarPlugin() {
@@ -143,24 +133,14 @@ export function RichtextPropField({ label, value, onChange, placeholder }: Props
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleChange = useCallback(
-    (editorState: import("lexical").EditorState) => {
+    (editorState: EditorState) => {
       clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        editorState.read(() => {
-          const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-          onChange(md);
-        });
-      }, 300);
+      timerRef.current = setTimeout(() => onChange(readMarkdown(editorState)), 300);
     },
     [onChange],
   );
 
-  const initialConfig = {
-    namespace: "richtext-inspector",
-    theme: editorTheme,
-    nodes: EDITOR_NODES,
-    onError: (err: Error) => console.error(err),
-  };
+  const initialConfig = markdownEditorConfig("richtext-inspector", editorTheme, value);
 
   return (
     <div>
@@ -181,7 +161,6 @@ export function RichtextPropField({ label, value, onChange, placeholder }: Props
               />
             </div>
           </div>
-          <InitPlugin value={value} />
           <HistoryPlugin />
           <ListPlugin />
           <LinkPlugin />

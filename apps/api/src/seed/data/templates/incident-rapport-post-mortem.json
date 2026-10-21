@@ -1,0 +1,235 @@
+{
+  "name": "Incident — Rapport Post-Mortem",
+  "description": "Rapport post-mortem d'incident : chronologie, analyse des causes et plan d'action.",
+  "theme": "Minimal Dark",
+  "published": true,
+  "tags": ["incident", "post-mortem", "ops"],
+  "editableFields": [
+    {
+      "nodeId": "pm-tb-1",
+      "propKey": "subtitle",
+      "label": "Identifiant et date de l'incident",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 0
+    },
+    {
+      "nodeId": "pm-kc-1",
+      "propKey": "description",
+      "label": "KPI — Durée de l'incident",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Impact",
+      "order": 1
+    },
+    {
+      "nodeId": "pm-kc-2",
+      "propKey": "description",
+      "label": "KPI — Services impactés",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Impact",
+      "order": 2
+    },
+    {
+      "nodeId": "pm-kc-3",
+      "propKey": "description",
+      "label": "KPI — Utilisateurs affectés",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Impact",
+      "order": 3
+    },
+    {
+      "nodeId": "pm-kc-4",
+      "propKey": "description",
+      "label": "KPI — Sévérité",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Impact",
+      "order": 4
+    },
+    {
+      "nodeId": "pm-db-1",
+      "propKey": "result",
+      "label": "Cause racine",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": true,
+      "group": "Analyse",
+      "order": 5
+    },
+    {
+      "nodeId": "pm-ns-1",
+      "propKey": "items",
+      "label": "Actions correctives",
+      "type": "list",
+      "defaultValue": [],
+      "required": true,
+      "group": "Plan d'action",
+      "order": 6
+    }
+  ],
+  "pages": [
+    {
+      "id": "pm-page-1",
+      "label": "Analyse & Plan d'action",
+      "children": [
+        {
+          "id": "pm-ph-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "KOMITY",
+            "brandSub": "SRE / Ops",
+            "showChevron": false
+          }
+        },
+        {
+          "id": "pm-tb-1",
+          "type": "title-block",
+          "props": {
+            "title": "Rapport Post-Mortem",
+            "subtitle": "INC-2025-0042 — 8 février 2025"
+          }
+        },
+        {
+          "id": "pm-ib-1",
+          "type": "intro-box",
+          "props": {
+            "content": "Ce document analyse l'incident **INC-2025-0042** survenu le 8 février 2025. Il présente la chronologie, les causes racines identifiées et le plan d'action correctif.",
+            "accentColor": "#818CF8"
+          }
+        },
+        {
+          "id": "pm-kr-1",
+          "type": "kpi-row",
+          "props": {
+            "sectionTitle": "Impact de l'incident"
+          },
+          "children": [
+            {
+              "id": "pm-kc-1",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "⏱️",
+                "title": "Durée",
+                "description": "2h14 d'interruption partielle.",
+                "color": "amber"
+              }
+            },
+            {
+              "id": "pm-kc-2",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🔧",
+                "title": "Services impactés",
+                "description": "API Gateway + Auth Service.",
+                "color": "amber"
+              }
+            },
+            {
+              "id": "pm-kc-3",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "👤",
+                "title": "Utilisateurs affectés",
+                "description": "~340 comptes Enterprise.",
+                "color": "amber"
+              }
+            },
+            {
+              "id": "pm-kc-4",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🚨",
+                "title": "Sévérité",
+                "description": "SEV-2 (dégradation partielle).",
+                "color": "amber"
+              }
+            }
+          ]
+        },
+        {
+          "id": "pm-sh-1",
+          "type": "section-header",
+          "props": {
+            "text": "Analyse des causes"
+          }
+        },
+        {
+          "id": "pm-tg-1",
+          "type": "two-column-grid",
+          "props": {
+            "gap": 16
+          },
+          "children": [
+            {
+              "id": "pm-db-1",
+              "type": "detail-block",
+              "props": {
+                "title": "Cause racine",
+                "color": "amber",
+                "paragraphs": [
+                  "Expiration non anticipée d'un certificat TLS interne utilisé par le service d'authentification.",
+                  "L'alerte de renouvellement automatique avait été désactivée lors d'une migration en novembre 2024."
+                ],
+                "benefitsLabel": "Facteurs contributifs",
+                "benefits": ["Absence d'alerte J-30", "Pas de test de validité en CI", "Runbook non à jour"],
+                "result": "Certificat renouvelé manuellement à 14h32. Service rétabli à 14h47.",
+                "suite": "Automatisation du renouvellement à déployer."
+              }
+            },
+            {
+              "id": "pm-db-2",
+              "type": "detail-block",
+              "props": {
+                "title": "Chronologie",
+                "color": "blue",
+                "paragraphs": [
+                  "12:18 — Premières erreurs 401 détectées.",
+                  "12:33 — Alerte PagerDuty déclenchée.",
+                  "13:05 — Cause identifiée par l'équipe SRE.",
+                  "14:32 — Certificat renouvelé.",
+                  "14:47 — Monitoring nominal."
+                ],
+                "benefitsLabel": "Temps clés",
+                "benefits": ["MTTD : 15 min", "MTTI : 32 min", "MTTR : 2h14"],
+                "result": "RCA complète validée le 10 février.",
+                "suite": "Revue post-incident planifiée."
+              }
+            }
+          ]
+        },
+        {
+          "id": "pm-ns-1",
+          "type": "next-section",
+          "props": {
+            "title": "Plan d'action",
+            "intro": "Les mesures correctives à mettre en œuvre :",
+            "items": [
+              "Automatiser le renouvellement des certificats (cert-manager)",
+              "Ajouter une alerte J-30 et J-7 sur tous les certificats",
+              "Mettre à jour le runbook d'incident Auth",
+              "Ajouter un check de validité certificat dans la CI",
+              "Réviser la checklist de migration des services"
+            ],
+            "summary": "5 actions — deadline : 28 février 2025."
+          }
+        },
+        {
+          "id": "pm-pf-1",
+          "type": "page-footer",
+          "props": {
+            "text": "KOMITY — SRE — Post-Mortem INC-2025-0042 — Confidentiel"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
+import type { EditorState } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -8,10 +9,9 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
 import { FORMAT_TEXT_COMMAND } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
-import { EDITOR_NODES, MARKDOWN_TRANSFORMERS, PassthroughErrorBoundary } from "./lexical-config";
+import { MARKDOWN_TRANSFORMERS, PassthroughErrorBoundary, markdownEditorConfig, readMarkdown } from "./lexical-config";
 import { useEditorStore } from "@/store/editor-store";
 
 const inlineEditorTheme = {
@@ -20,17 +20,6 @@ const inlineEditorTheme = {
   list: { ul: "list-disc ml-4", ol: "list-decimal ml-4", listitem: "ml-2" },
   paragraph: "mb-1",
 };
-
-function InitPlugin({ value }: { value: string }) {
-  const [editor] = useLexicalComposerContext();
-  const initialized = useRef(false);
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    editor.update(() => $convertFromMarkdownString(value, MARKDOWN_TRANSFORMERS));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  return null;
-}
 
 function MiniToolbar() {
   const [editor] = useLexicalComposerContext();
@@ -119,24 +108,14 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
   }, [stopInlineEdit]);
 
   const handleChange = useCallback(
-    (editorState: import("lexical").EditorState) => {
+    (editorState: EditorState) => {
       clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        editorState.read(() => {
-          const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-          updateNodeProps(nodeId, { [propKey]: md });
-        });
-      }, 200);
+      timerRef.current = setTimeout(() => updateNodeProps(nodeId, { [propKey]: readMarkdown(editorState) }), 200);
     },
     [nodeId, propKey, updateNodeProps],
   );
 
-  const initialConfig = {
-    namespace: "inline-editor",
-    theme: inlineEditorTheme,
-    nodes: EDITOR_NODES,
-    onError: (err: Error) => console.error(err),
-  };
+  const initialConfig = markdownEditorConfig("inline-editor", inlineEditorTheme, value);
 
   return (
     <div
@@ -158,7 +137,6 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
           placeholder={null}
           ErrorBoundary={PassthroughErrorBoundary}
         />
-        <InitPlugin value={value} />
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
