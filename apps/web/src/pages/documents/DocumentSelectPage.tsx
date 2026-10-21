@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { Eye, LayoutTemplate, Loader2, Search } from "lucide-react";
-import { api, type TemplateSummary } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { type TemplateSummary } from "@/api/client";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 import { TemplatePreviewDialog } from "@/components/document-view/TemplatePreviewDialog";
-import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
+import { DOCUMENT_WORKFLOW, DOCUMENT_PATHS } from "@/workflow/definitions";
+import { useCreateDocument } from "@/api/hooks/documents";
+import { useTemplate, useTemplates } from "@/api/hooks/templates";
 
 /** L'effort se lit en taille de formulaire plutôt qu'en nombre brut */
 function effortOf(t: TemplateSummary) {
@@ -22,30 +22,20 @@ export function DocumentSelectPage() {
   const [creatingId, setCreatingId] = useState<string | null>(null);
   const [previewed, setPreviewed] = useState<TemplateSummary | null>(null);
   const [search, setSearch] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const { data: templates = [], isLoading } = useQuery({
-    queryKey: queryKeys.templates.list({ published: true }),
-    queryFn: () => api.templates.list({ published: true }),
-  });
+  const { data: templates = [], isLoading } = useTemplates({ published: true });
   // Pour distinguer « aucun template » de « aucun template publié »
-  const { data: allTemplates = [] } = useQuery({
-    queryKey: queryKeys.templates.list(),
-    queryFn: () => api.templates.list(),
-    enabled: !isLoading && templates.length === 0,
-  });
+  const { data: allTemplates = [] } = useTemplates(undefined, { enabled: !isLoading && templates.length === 0 });
+  const createDocument = useCreateDocument();
 
   // Choisir un template crée le document ; on remplace l'URL pour ne pas recréer au retour
   const choose = async (template: TemplateSummary) => {
     if (creatingId) return;
     setCreatingId(template.id);
-    setError(null);
     try {
-      const doc = await api.documents.create({ templateId: template.id });
-      navigate(DOCUMENT_WORKFLOW.steps[1]!.path(doc.id), { replace: true });
-    } catch (e) {
-      console.error("Erreur création document:", e);
-      setError("La création du document a échoué. Réessayez.");
+      const doc = await createDocument.mutateAsync(template.id);
+      navigate(DOCUMENT_PATHS.fill(doc.id), { replace: true });
+    } catch {
+      // Échec signalé par le message d'erreur global ; on peut choisir de nouveau
       setCreatingId(null);
     }
   };
@@ -84,7 +74,6 @@ export function DocumentSelectPage() {
             )}
           </div>
 
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
 
           {!isLoading && templates.length === 0 && <NoPublishedTemplate draftCount={allTemplates.length} />}
@@ -185,10 +174,7 @@ function StudioTemplatePreview({
   creating: boolean;
 }) {
   // La liste ne contient que la première page : on charge la version publiée complète
-  const { data: full } = useQuery({
-    queryKey: queryKeys.templates.detail(template.id),
-    queryFn: () => api.templates.get(template.id),
-  });
+  const { data: full } = useTemplate(template.id);
   const effort = effortOf(template);
 
   return (

@@ -2,16 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SaveStatus = "idle" | "saving" | "error";
 
-interface Options<T> {
+interface Options<T, R> {
   /** Révision courante de l'état édité */
   revision: number;
   /** Dernière révision confirmée par le serveur */
   savedRevision: number;
   /** État à envoyer ; null tant que rien n'est chargé */
   getSnapshot: () => T | null;
-  save: (snapshot: T) => Promise<unknown>;
-  /** Appelé après succès avec la révision envoyée */
-  onSaved: (revision: number, result: unknown) => void;
+  save: (snapshot: T) => Promise<R>;
+  /** Appelé après succès avec la révision envoyée et la réponse du serveur */
+  onSaved: (revision: number, result: R) => void;
   delay?: number;
 }
 
@@ -27,14 +27,14 @@ export interface Autosave {
  * attend une pause de saisie, n'envoie qu'une requête à la fois,
  * sauvegarde ce qui reste au démontage et prévient avant de fermer l'onglet.
  */
-export function useAutosave<T>({
+export function useAutosave<T, R>({
   revision,
   savedRevision,
   getSnapshot,
   save,
   onSaved,
   delay = 1200,
-}: Options<T>): Autosave {
+}: Options<T, R>): Autosave {
   const [status, setStatus] = useState<SaveStatus>("idle");
   const dirty = revision !== savedRevision;
 

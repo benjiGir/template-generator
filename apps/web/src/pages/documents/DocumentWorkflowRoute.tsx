@@ -1,14 +1,15 @@
 import { useEffect, useRef } from "react";
-import { Navigate, Outlet, useParams } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Navigate, Outlet } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
-import { useDocumentStore } from "@/store/document-store";
+import { cache } from "@/api/cache";
+import { useDocumentForEditing } from "@/api/hooks/documents";
+import { useDocumentStore, useLoadedDocument } from "@/store/document-store";
 import { useAutosave } from "@/hooks/useAutosave";
 import { WorkflowSessionProvider, useAutosaveExitGuard } from "@/workflow/session";
 import { LoadingState, NotFoundState } from "@/workflow/EntityState";
-import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
-import type { Document } from "@template-generator/shared/types/document";
+import { useRouteParam } from "@/workflow/params";
+import { DOCUMENT_PATHS } from "@/workflow/definitions";
 
 /**
  * Route parente des étapes 2 à 4 du Studio.
@@ -16,7 +17,7 @@ import type { Document } from "@template-generator/shared/types/document";
  * les étapes lisent le store, donc la relecture voit toujours la dernière saisie.
  */
 export function DocumentWorkflowRoute() {
-  const { id } = useParams<{ id: string }>();
+  const id = useRouteParam("id");
   const queryClient = useQueryClient();
   const loadDocument = useDocumentStore((s) => s.loadDocument);
   const markSaved = useDocumentStore((s) => s.markSaved);
@@ -25,17 +26,11 @@ export function DocumentWorkflowRoute() {
   const loadedId = useDocumentStore((s) => s.document?.id);
   const loadedForMount = useRef<string | null>(null);
 
-  const query = useQuery({
-    queryKey: queryKeys.documents.detail(id!),
-    queryFn: () => api.documents.get(id!),
-    enabled: !!id,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: false,
-  });
+  const query = useDocumentForEditing(id);
 
   useEffect(() => {
     if (query.data && query.isFetchedAfterMount && loadedForMount.current !== id) {
-      loadedForMount.current = id!;
+      loadedForMount.current = id;
       loadDocument(query.data);
     }
   }, [query.data, query.isFetchedAfterMount, id, loadDocument]);
@@ -48,12 +43,10 @@ export function DocumentWorkflowRoute() {
       return document && document.id === id ? { id: document.id, data } : null;
     },
     save: ({ id: documentId, data }) => api.documents.updateData(documentId, data),
-    onSaved: (rev, result) => {
+    onSaved: (rev, saved) => {
       markSaved(rev);
-      const saved = result as Document;
       useDocumentStore.getState().applyServerState(saved);
-      queryClient.setQueryData(queryKeys.documents.detail(saved.id), saved);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() });
+      cache.documentChanged(queryClient, saved);
     },
   });
 
@@ -79,8 +72,7 @@ export function DocumentWorkflowRoute() {
 
 /** Ouvrir un document : un brouillon reprend au remplissage, un document finalisé à la relecture */
 export function DocumentEntryRedirect() {
-  const document = useDocumentStore((s) => s.document)!;
+  const document = useLoadedDocument();
   const step = document.status === "finalized" ? "preview" : "fill";
-  const target = DOCUMENT_WORKFLOW.steps.find((s) => s.key === step)!;
-  return <Navigate to={target.path(document.id)} replace />;
+  return <Navigate to={DOCUMENT_PATHS[step](document.id)} replace />;
 }

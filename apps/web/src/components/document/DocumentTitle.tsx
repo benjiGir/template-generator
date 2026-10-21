@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
-import { useDocumentStore } from "@/store/document-store";
+import { useRenameDocument } from "@/api/hooks/documents";
+import { useDocumentStore, useLoadedDocument } from "@/store/document-store";
 
 /** Nom du document dans l'en-tête du workflow, modifiable sur place */
 export function DocumentTitle() {
-  const queryClient = useQueryClient();
-  const document = useDocumentStore((s) => s.document)!;
+  const rename = useRenameDocument();
+  const document = useLoadedDocument();
   const applyServerState = useDocumentStore((s) => s.applyServerState);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(document.name);
@@ -20,14 +18,11 @@ export function DocumentTitle() {
       setDraft(document.name);
       return;
     }
-    try {
-      const updated = await api.documents.rename(document.id, name);
-      applyServerState(updated);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() });
-    } catch (e) {
-      console.error("Renommage impossible :", e);
-      setDraft(document.name);
-    }
+    rename.mutate(
+      { id: document.id, name },
+      // En cas d'échec (signalé par un message), le titre reprend le nom enregistré
+      { onSuccess: applyServerState, onError: () => setDraft(document.name) },
+    );
   };
 
   if (editing) {

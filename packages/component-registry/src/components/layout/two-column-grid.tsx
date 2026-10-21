@@ -1,13 +1,13 @@
+import type { Theme } from "@template-generator/shared/types/template";
 import type { ReactNode } from "react";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  gap?: number;
-  children?: ReactNode;
-}
+const schema = defineSchema([{ key: "gap", label: "Espacement (px)", type: "number", defaultValue: 16 }]);
 
-function TwoColumnGrid({ gap = 16, children }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme; children?: ReactNode };
+
+function TwoColumnGrid({ gap, children }: Props) {
   return (
     <div
       style={{
@@ -22,14 +22,13 @@ function TwoColumnGrid({ gap = 16, children }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "two-column-grid",
   label: "Grille 2 colonnes",
   icon: "Columns2",
   category: "layout",
   description: "Disposition en 2 colonnes égales",
-  schema: [{ key: "gap", label: "Espacement (px)", type: "number", defaultValue: 16 }],
+  schema,
   acceptsChildren: true,
-  defaultProps: { gap: 16 },
-  render: TwoColumnGrid as RegisteredComponent["render"],
+  render: TwoColumnGrid,
 });

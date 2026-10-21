@@ -66,7 +66,8 @@ const router = new Hono()
       .insert(templates)
       .values({ ...c.req.valid("json"), published: false })
       .returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   .post("/:id/duplicate", validate("param", idParam), async (c) => {
@@ -86,7 +87,8 @@ const router = new Hono()
         published: false,
       })
       .returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   .put("/:id", validate("param", idParam), validate("json", templateUpdate), async (c) => {
@@ -119,7 +121,9 @@ const router = new Hono()
       })
       .where(eq(templates.id, id))
       .returning();
-    return c.json(result!, 200);
+    // Supprimé entre-temps par une autre requête
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
   })
 
   /** Les documents gardent leur snapshot : ils sont détachés, pas supprimés */

@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { ComponentCategory } from "@template-generator/shared/types/component";
+import type { ComponentCategory, PropValue, PropValues } from "@template-generator/shared/types/component";
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
 interface ComponentDraftState {
   baseType: string | null;
-  props: Record<string, unknown>;
+  props: PropValues;
   /** Preset modifié, ou null pour une création */
   editingId: string | null;
   label: string;
@@ -16,26 +16,24 @@ interface ComponentDraftState {
   /** Thème utilisé pour l'aperçu (un preset n'a pas de thème propre) */
   previewTheme: string;
   setPreviewTheme: (name: string) => void;
-  setBaseType: (
-    type: string,
-    defaultProps: Record<string, unknown>,
-    category: ComponentCategory,
-    label: string,
-  ) => void;
-  updateProp: (key: string, value: unknown) => void;
-  resetProps: (defaultProps: Record<string, unknown>) => void;
+  setBaseType: (type: string, defaultProps: PropValues, category: ComponentCategory, label: string) => void;
+  updateProp: (key: string, value: PropValue) => void;
+  resetProps: (defaultProps: PropValues) => void;
   setMeta: (meta: Partial<Pick<ComponentDraftState, "label" | "description" | "category">>) => void;
   loadPreset: (preset: ComponentPreset) => void;
   reset: () => void;
 }
 
-const EMPTY = {
+const EMPTY: Pick<
+  ComponentDraftState,
+  "baseType" | "props" | "editingId" | "label" | "description" | "category" | "dirty"
+> = {
   baseType: null,
   props: {},
   editingId: null,
   label: "",
   description: "",
-  category: "content" as ComponentCategory,
+  category: "content",
   dirty: false,
 };
 

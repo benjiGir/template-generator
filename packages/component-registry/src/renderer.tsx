@@ -1,4 +1,5 @@
 import { get } from "./registry";
+import type { PropValues } from "@template-generator/shared/types/component";
 import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
 
 interface Props {
@@ -6,14 +7,17 @@ interface Props {
   theme: Theme;
 }
 
+/** Couleur du thème désignée par une référence `theme.<couleur>`, sinon undefined */
+export function themeColor(theme: Theme, reference: string): string | undefined {
+  if (!reference.startsWith("theme.")) return undefined;
+  return new Map(Object.entries(theme.colors)).get(reference.slice("theme.".length));
+}
+
 /** Remplace les références `theme.<couleur>` des props par la valeur du thème */
-export function resolveThemeVars(props: Record<string, unknown>, theme: Theme): Record<string, unknown> {
+export function resolveThemeVars(props: PropValues, theme: Theme): PropValues {
   const resolved = { ...props };
   for (const [key, value] of Object.entries(resolved)) {
-    if (typeof value === "string" && value.startsWith("theme.")) {
-      const path = value.slice(6) as keyof typeof theme.colors;
-      resolved[key] = theme.colors[path] ?? value;
-    }
+    if (typeof value === "string") resolved[key] = themeColor(theme, value) ?? value;
   }
   return resolved;
 }
@@ -26,11 +30,11 @@ export function ComponentRenderer({ node, theme }: Props) {
   }
 
   const Component = definition.render;
-  const mergedProps = { ...definition.defaultProps, ...resolveThemeVars(node.props, theme), theme };
+  const values = resolveThemeVars(node.props, theme);
 
   if (definition.acceptsChildren && node.children) {
     return (
-      <Component {...mergedProps}>
+      <Component values={values} theme={theme}>
         {node.children.map((child) => (
           <ComponentRenderer key={child.id} node={child} theme={theme} />
         ))}
@@ -38,5 +42,5 @@ export function ComponentRenderer({ node, theme }: Props) {
     );
   }
 
-  return <Component {...mergedProps} />;
+  return <Component values={values} theme={theme} />;
 }

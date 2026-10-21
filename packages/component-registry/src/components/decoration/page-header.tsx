@@ -1,15 +1,16 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  brandName?: string;
-  brandSub?: string;
-  showChevron?: boolean;
-}
+const schema = defineSchema([
+  { key: "brandName", label: "Nom de marque", type: "text", defaultValue: "Marque" },
+  { key: "brandSub", label: "Sous-titre", type: "text", defaultValue: "" },
+  { key: "showChevron", label: "Afficher chevrons", type: "boolean", defaultValue: true },
+]);
 
-function PageHeader({ theme, brandName = "Marque", brandSub = "", showChevron = true }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function PageHeader({ theme, brandName, brandSub, showChevron }: Props) {
   return (
     <div
       style={{
@@ -89,18 +90,13 @@ function PageHeader({ theme, brandName = "Marque", brandSub = "", showChevron = 
   );
 }
 
-register({
+defineComponent({
   type: "page-header",
   label: "En-tête de page",
   icon: "PanelTop",
   category: "decoration",
   description: "En-tête avec nom de marque et décoration",
-  schema: [
-    { key: "brandName", label: "Nom de marque", type: "text", defaultValue: "Marque" },
-    { key: "brandSub", label: "Sous-titre", type: "text", defaultValue: "" },
-    { key: "showChevron", label: "Afficher chevrons", type: "boolean", defaultValue: true },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { brandName: "Marque", brandSub: "", showChevron: true },
-  render: PageHeader as RegisteredComponent["render"],
+  render: PageHeader,
 });

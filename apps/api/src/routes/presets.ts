@@ -22,7 +22,8 @@ const router = new Hono()
 
   .post("/", validate("json", presetCreate), async (c) => {
     const [result] = await db.insert(componentPresets).values(c.req.valid("json")).returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   .post("/:id/duplicate", validate("param", idParam), async (c) => {
@@ -34,7 +35,8 @@ const router = new Hono()
       .insert(componentPresets)
       .values({ ...rest, label: `${source.label} (copie)` })
       .returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   .put("/:id", validate("param", idParam), validate("json", presetUpdate), async (c) => {

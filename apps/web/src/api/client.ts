@@ -1,8 +1,9 @@
 import { hc, parseResponse, type InferRequestType } from "hono/client";
 import type { AppType } from "@template-generator/api";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 // Vide par défaut : URLs relatives, relayées vers l'API par Vite (dev) ou nginx (Docker)
-const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) || window.location.origin;
+const BASE_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 /**
  * Client typé depuis les routes de l'API : paramètres, corps et réponses suivent le code du serveur,
@@ -44,7 +45,7 @@ export const api = {
     duplicate: (id: string) => parseResponse(client.documents[":id"].duplicate.$post({ param: { id } })),
     rename: (id: string, name: string) =>
       parseResponse(client.documents[":id"].$put({ param: { id }, json: { name } })),
-    updateData: (id: string, data: Record<string, unknown>) =>
+    updateData: (id: string, data: PropValues) =>
       parseResponse(client.documents[":id"].data.$put({ param: { id }, json: { data } })),
     markExported: (id: string) => parseResponse(client.documents[":id"].export.$put({ param: { id } })),
     delete: (id: string) => parseResponse(client.documents[":id"].$delete({ param: { id } })),

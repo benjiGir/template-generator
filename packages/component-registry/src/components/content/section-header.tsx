@@ -1,13 +1,12 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  text?: string;
-}
+const schema = defineSchema([{ key: "text", label: "Texte", type: "text", defaultValue: "Section" }]);
 
-function SectionHeader({ theme, text = "Section" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function SectionHeader({ theme, text }: Props) {
   return (
     <div
       style={{
@@ -32,14 +31,13 @@ function SectionHeader({ theme, text = "Section" }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "section-header",
   label: "En-tête de section",
   icon: "Heading2",
   category: "content",
   description: "Titre de section avec ligne de séparation",
-  schema: [{ key: "text", label: "Texte", type: "text", defaultValue: "Section" }],
+  schema,
   acceptsChildren: false,
-  defaultProps: { text: "Section" },
-  render: SectionHeader as RegisteredComponent["render"],
+  render: SectionHeader,
 });

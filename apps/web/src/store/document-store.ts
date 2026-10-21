@@ -2,12 +2,13 @@ import { create } from "zustand";
 import { isFilled, mergeDocumentData, withNodeDefaults } from "@template-generator/shared/utils/fields";
 import type { Document, DocumentSnapshot } from "@template-generator/shared/types/document";
 import type { EditableField } from "@template-generator/shared/types/template";
+import type { PropValue, PropValues } from "@template-generator/shared/types/component";
 
 interface DocumentState {
   document: Document | null;
   templateSnapshot: DocumentSnapshot | null;
   editableFields: EditableField[];
-  data: Record<string, unknown>;
+  data: PropValues;
   fillMode: "form" | "inline";
   /** Incrémenté à chaque saisie ; comparé à savedRevision pour savoir s'il reste à sauvegarder */
   revision: number;
@@ -16,7 +17,7 @@ interface DocumentState {
   loadDocument: (doc: Document) => void;
   /** Met à jour les métadonnées venues du serveur (statut, progression) sans toucher à la saisie */
   applyServerState: (doc: Document) => void;
-  updateField: (fieldKey: string, value: unknown) => void;
+  updateField: (fieldKey: string, value: PropValue) => void;
   setFillMode: (mode: "form" | "inline") => void;
   markSaved: (revision: number) => void;
   /** Snapshot avec les données saisies : ce que montrent l'aperçu et l'export */
@@ -93,3 +94,13 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
 
   reset: () => set(EMPTY),
 }));
+
+/**
+ * Document en cours, pour les étapes du Studio : leur route parente ne les affiche qu'une fois
+ * le document chargé. Hors de ce parcours, l'erreur est explicite plutôt qu'un document vide.
+ */
+export function useLoadedDocument(): Document {
+  const document = useDocumentStore((s) => s.document);
+  if (!document) throw new Error("Document non chargé : cet écran s'affiche dans le parcours du Studio");
+  return document;
+}

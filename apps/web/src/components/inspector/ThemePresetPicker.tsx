@@ -1,33 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Theme } from "@template-generator/shared/types/template";
-import { BUILTIN_THEMES } from "@template-generator/shared/themes/presets";
-import { api, type ThemeRecord } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { type ThemeRecord } from "@/api/client";
 import { useEditorStore } from "@/store/editor-store";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { useDeleteTheme, useThemes } from "@/api/hooks/themes";
 
 export function ThemePresetPicker() {
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
   const currentThemeName = useEditorStore((s) => s.template?.theme.name);
   const updateTheme = useEditorStore((s) => s.updateTheme);
 
-  const { data: records = [] } = useQuery({
-    queryKey: queryKeys.themes.list(),
-    queryFn: () => api.themes.list(),
-    placeholderData: BUILTIN_THEMES.map((theme, i) => ({
-      id: String(i),
-      name: theme.name,
-      theme,
-      isBuiltin: true,
-      createdAt: "",
-    })),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.themes.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.themes.list() }),
-  });
+  const { data: records = [] } = useThemes();
+  const deleteMutation = useDeleteTheme();
 
   const applyTheme = (theme: Theme) => updateTheme(theme);
 

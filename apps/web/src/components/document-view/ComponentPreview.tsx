@@ -4,6 +4,7 @@ import { DEFAULT_PAGE_FORMAT, type ComponentNode, type Theme } from "@template-g
 import { DocumentPage } from "./DocumentPage";
 import { MarkedNode } from "./DocumentView";
 import { dimToPx } from "./units";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 const GHOST = "ghost-";
 
@@ -44,7 +45,7 @@ function inContext(node: ComponentNode): ComponentNode {
 
 interface Props {
   type: string;
-  props: Record<string, unknown>;
+  props: PropValues;
   theme: Theme;
   /** Hauteur affichée maximale (vignettes) ; sans valeur, l'aperçu est complet */
   maxHeight?: number;

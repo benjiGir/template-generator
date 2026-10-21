@@ -47,9 +47,8 @@ const EXTENDED_PALETTE = [
 ];
 
 function resolveDisplayColor(value: string, colors: ThemeColors | undefined): string {
-  if (value.startsWith("theme.") && colors) {
-    const k = value.slice(6) as keyof ThemeColors;
-    return colors[k] ?? "#000000";
+  if (value.startsWith("theme.")) {
+    return (colors && new Map(Object.entries(colors)).get(value.slice("theme.".length))) || "#000000";
   }
   return value || "#000000";
 }
@@ -76,7 +75,7 @@ export function ColorPropField({ label, value, onChange }: Props) {
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (containerRef.current && !(e.target instanceof Node && containerRef.current.contains(e.target))) {
         setOpen(false);
       }
     };

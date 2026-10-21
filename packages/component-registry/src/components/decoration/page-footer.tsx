@@ -1,13 +1,12 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  text?: string;
-}
+const schema = defineSchema([{ key: "text", label: "Texte", type: "textarea", defaultValue: "Pied de page" }]);
 
-function PageFooter({ theme, text = "" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function PageFooter({ theme, text }: Props) {
   return (
     <div
       style={{
@@ -31,14 +30,13 @@ function PageFooter({ theme, text = "" }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "page-footer",
   label: "Pied de page",
   icon: "PanelBottom",
   category: "decoration",
   description: "Pied de page avec texte centré",
-  schema: [{ key: "text", label: "Texte", type: "textarea", defaultValue: "Pied de page" }],
+  schema,
   acceptsChildren: false,
-  defaultProps: { text: "Pied de page" },
-  render: PageFooter as RegisteredComponent["render"],
+  render: PageFooter,
 });

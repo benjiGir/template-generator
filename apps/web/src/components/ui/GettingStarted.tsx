@@ -17,27 +17,33 @@ export function GettingStarted({ templates, documentCount }: Props) {
   const hasTemplate = templates.length > 0;
   const hasPublished = templates.some((t) => t.published);
 
-  const steps = [
+  const steps: {
+    done: boolean;
+    title: string;
+    text: string;
+    action: { to: string; label: string };
+    kind: ObjectKind;
+  }[] = [
     {
       done: hasTemplate,
       title: "Concevoir un template",
       text: "Dans l'Atelier, assemblez la mise en page d'un type de document (rapport, revue…).",
       action: { to: "/templates/new", label: "Créer un template" },
-      kind: "tpl" as ObjectKind,
+      kind: "tpl",
     },
     {
       done: hasPublished,
       title: "Le publier",
       text: "Choisissez les champs à remplir, puis publiez : le template devient disponible dans le Studio.",
       action: { to: "/templates", label: "Ouvrir l'Atelier" },
-      kind: "tpl" as ObjectKind,
+      kind: "tpl",
     },
     {
       done: false,
       title: "Produire un document",
       text: "Dans le Studio, remplissez le template et exportez le PDF. À refaire à chaque édition.",
       action: { to: "/documents/new", label: "Créer un document" },
-      kind: "doc" as ObjectKind,
+      kind: "doc",
     },
   ];
   const current = steps.findIndex((s) => !s.done);

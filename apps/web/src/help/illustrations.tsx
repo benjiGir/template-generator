@@ -579,21 +579,25 @@ export function ThemeFigure() {
             <MonoLabel>Thèmes prédéfinis</MonoLabel>
             <div className="mt-1.5 grid grid-cols-2 gap-1.5">
               {[
-                ["KOMITY Blue", ["bg-blue-700", "bg-blue-400", "bg-emerald-500", "bg-amber-400"], false],
-                ["Minimal Light", ["bg-ink", "bg-gray-400", "bg-blue-500", "bg-gray-200"], true],
-                ["Minimal Dark", ["bg-slate-900", "bg-slate-600", "bg-blue-400", "bg-slate-300"], false],
-                ["Corporate Gray", ["bg-gray-700", "bg-blue-600", "bg-gray-400", "bg-gray-200"], false],
-              ].map(([name, colors, active]) => (
+                { name: "KOMITY Blue", colors: ["bg-blue-700", "bg-blue-400", "bg-emerald-500", "bg-amber-400"] },
+                {
+                  name: "Minimal Light",
+                  colors: ["bg-ink", "bg-gray-400", "bg-blue-500", "bg-gray-200"],
+                  active: true,
+                },
+                { name: "Minimal Dark", colors: ["bg-slate-900", "bg-slate-600", "bg-blue-400", "bg-slate-300"] },
+                { name: "Corporate Gray", colors: ["bg-gray-700", "bg-blue-600", "bg-gray-400", "bg-gray-200"] },
+              ].map(({ name, colors, active }) => (
                 <span
-                  key={name as string}
+                  key={name}
                   className={`space-y-1 border p-1.5 ${active ? "border-ink bg-paper" : "border-gray-200"}`}
                 >
                   <span className="flex gap-0.5">
-                    {(colors as string[]).map((c) => (
+                    {colors.map((c) => (
                       <span key={c} className={`h-2.5 w-2.5 ${c}`} />
                     ))}
                   </span>
-                  <Label className={active ? "font-semibold" : ""}>{name as string}</Label>
+                  <Label className={active ? "font-semibold" : ""}>{name}</Label>
                 </span>
               ))}
             </div>

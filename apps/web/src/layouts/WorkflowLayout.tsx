@@ -77,6 +77,10 @@ export function WorkflowLayout({
     setPending(true);
     try {
       await action();
+    } catch (error) {
+      // Déjà signalé à l'utilisateur (message d'erreur global ou indicateur de sauvegarde) :
+      // on reste sur l'étape, prêt à réessayer
+      console.error(error);
     } finally {
       setPending(false);
     }

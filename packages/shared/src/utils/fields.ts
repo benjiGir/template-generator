@@ -1,5 +1,6 @@
 import type { EditableField, PublishedVersion, Template, TemplateStatus } from "../types/template";
 import type { Document, DocumentDisplayStatus, DocumentSnapshot } from "../types/document";
+import type { PropValue, PropValues } from "../types/component";
 import { findNode } from "./tree";
 
 /** Clé d'un champ dans `Document.data` */
@@ -8,8 +9,8 @@ export function fieldKey(field: Pick<EditableField, "nodeId" | "propKey">): stri
 }
 
 /** Une valeur est considérée remplie si elle n'est ni vide ni une liste vide */
-export function isFilled(value: unknown): boolean {
-  if (value === undefined || value === null) return false;
+export function isFilled(value: PropValue | undefined): boolean {
+  if (value === undefined) return false;
   if (typeof value === "string") return value.trim() !== "";
   if (Array.isArray(value)) return value.length > 0;
   return true;
@@ -22,7 +23,7 @@ export interface Completion {
   missingRequired: EditableField[];
 }
 
-export function computeCompletion(fields: EditableField[], data: Record<string, unknown>): Completion {
+export function computeCompletion(fields: EditableField[], data: PropValues): Completion {
   const total = fields.length;
   const filled = fields.filter((f) => isFilled(data[fieldKey(f)])).length;
   const missingRequired = fields.filter((f) => f.required && !isFilled(data[fieldKey(f)]));
@@ -37,16 +38,16 @@ export function computeCompletion(fields: EditableField[], data: Record<string, 
 /** Applique les données saisies sur une copie du snapshot du template (ou de son aperçu) */
 export function mergeDocumentData<T extends Pick<DocumentSnapshot, "pages" | "editableFields">>(
   snapshot: T,
-  data: Record<string, unknown>,
+  data: PropValues,
 ): T {
   const merged = structuredClone(snapshot);
   for (const field of merged.editableFields ?? []) {
-    const key = fieldKey(field);
-    if (!(key in data)) continue;
+    const value = data[fieldKey(field)];
+    if (value === undefined) continue;
     for (const page of merged.pages) {
       const node = findNode(page.children, field.nodeId);
       if (node) {
-        node.props[field.propKey] = data[key];
+        node.props[field.propKey] = value;
         break;
       }
     }
@@ -62,7 +63,9 @@ export function withNodeDefaults(fields: EditableField[], pages: Template["pages
   return fields.map((field) => {
     for (const page of pages) {
       const node = findNode(page.children, field.nodeId);
-      if (node) return field.propKey in node.props ? { ...field, defaultValue: node.props[field.propKey] } : field;
+      const current = node?.props[field.propKey];
+      if (current !== undefined) return { ...field, defaultValue: current };
+      if (node) return field;
     }
     return field;
   });

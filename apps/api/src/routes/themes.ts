@@ -19,7 +19,8 @@ const router = new Hono()
       .insert(themes)
       .values({ ...c.req.valid("json"), isBuiltin: false })
       .returning();
-    return c.json(created!, 201);
+    if (!created) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(created, 201);
   })
 
   .put("/:id", validate("param", idParam), validate("json", themeUpdate), async (c) => {

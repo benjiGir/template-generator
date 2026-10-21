@@ -102,6 +102,7 @@ export const COLOR_GROUPS: { title: string; hint?: string; tokens: ColorToken[] 
 ];
 
 export function ColorTokenRow({ token }: { token: ColorToken }) {
+  const { light } = token;
   const colors = useEditorStore((s) => s.template?.theme.colors);
   const updateTheme = useEditorStore((s) => s.updateTheme);
   if (!colors) return null;
@@ -127,10 +128,10 @@ export function ColorTokenRow({ token }: { token: ColorToken }) {
           aria-label={`${token.label} (code couleur)`}
           className="min-w-0 flex-1 rounded border border-gray-200 px-1.5 py-0.5 font-mono text-xs focus:border-blue-400 focus:outline-none"
         />
-        {token.light && (
+        {light && (
           <button
             type="button"
-            onClick={() => set({ [token.light!]: lighten(value) })}
+            onClick={() => set({ [light]: lighten(value) })}
             title="Recalculer la variante claire à partir de cette couleur"
             className="shrink-0 rounded px-1 text-[10px] text-gray-400 hover:bg-blue-50 hover:text-blue-600"
           >

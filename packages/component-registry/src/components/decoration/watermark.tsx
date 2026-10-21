@@ -1,13 +1,12 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  opacity?: number;
-}
+const schema = defineSchema([{ key: "opacity", label: "Opacité", type: "number", defaultValue: 0.08 }]);
 
-function Watermark({ theme, opacity = 0.08 }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function Watermark({ theme, opacity }: Props) {
   return (
     <div
       style={{
@@ -38,14 +37,13 @@ function Watermark({ theme, opacity = 0.08 }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "watermark",
   label: "Filigrane",
   icon: "Stamp",
   category: "decoration",
   description: "Filigrane CONFIDENTIEL en arrière-plan",
-  schema: [{ key: "opacity", label: "Opacité", type: "number", defaultValue: 0.08 }],
+  schema,
   acceptsChildren: false,
-  defaultProps: { opacity: 0.08 },
-  render: Watermark as RegisteredComponent["render"],
+  render: Watermark,
 });

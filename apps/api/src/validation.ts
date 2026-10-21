@@ -1,13 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
 import type { ValidationTargets } from "hono";
-import type { z } from "zod";
+import { z } from "zod";
 
-/** Corps des réponses d'erreur de l'API */
-export interface ApiErrorBody {
-  error: string;
-  /** Champs en cause, pour une requête invalide */
-  issues?: { path: string; message: string }[];
-}
+/** Corps des réponses d'erreur de l'API ; `issues` détaille les champs en cause d'une requête invalide */
+export const apiErrorBody = z.object({
+  error: z.string(),
+  issues: z.array(z.object({ path: z.string(), message: z.string() })).optional(),
+});
+export type ApiErrorBody = z.infer<typeof apiErrorBody>;
 
 /**
  * Valide une partie de la requête (corps JSON, paramètres d'URL, query) avec un schéma zod.

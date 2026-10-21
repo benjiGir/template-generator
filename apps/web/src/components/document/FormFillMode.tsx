@@ -48,9 +48,9 @@ export function FormFillMode() {
 
   // Clic dans l'aperçu : on remonte au composant cliqué et on ouvre son premier champ
   const handlePreviewClick = (e: React.MouseEvent) => {
-    let el = e.target as HTMLElement | null;
+    let el = e.target instanceof Element ? e.target : null;
     while (el) {
-      const nodeId = el.dataset?.["nodeId"];
+      const nodeId = el.getAttribute("data-node-id");
       if (nodeId) {
         const field = editableFields.find((f) => f.nodeId === nodeId);
         if (field) return focusField(field);
@@ -63,8 +63,9 @@ export function FormFillMode() {
   const groups = new Map<string | null, EditableField[]>();
   for (const field of editableFields) {
     const g = field.group ?? null;
-    if (!groups.has(g)) groups.set(g, []);
-    groups.get(g)!.push(field);
+    const group = groups.get(g);
+    if (group) group.push(field);
+    else groups.set(g, [field]);
   }
   const ungroupedOnly = groups.size === 1 && groups.has(null);
   const remaining = completion.total - completion.filled;
@@ -87,7 +88,10 @@ export function FormFillMode() {
           {completion.missingRequired.length > 0 && (
             <button
               type="button"
-              onClick={() => focusField(completion.missingRequired[0]!)}
+              onClick={() => {
+                const firstMissing = completion.missingRequired[0];
+                if (firstMissing) focusField(firstMissing);
+              }}
               className="mt-2 text-xs text-amber-700 hover:underline"
             >
               {completion.missingRequired.length} champ{completion.missingRequired.length > 1 ? "s" : ""} obligatoire

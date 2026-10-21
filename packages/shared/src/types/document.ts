@@ -1,5 +1,5 @@
 import type { PublishedVersion } from "./template";
-import type { ComponentCategory } from "./component";
+import type { ComponentCategory, PropValues } from "./component";
 
 /** Ce qu'un document garde de son template : la version publiée qui l'a créé */
 export type DocumentSnapshot = PublishedVersion;
@@ -10,7 +10,7 @@ export interface ComponentPreset {
   baseType: string;
   label: string;
   description: string | null;
-  defaultProps: Record<string, unknown>;
+  defaultProps: PropValues;
   category: ComponentCategory | null;
   createdAt: string;
 }
@@ -21,7 +21,8 @@ export interface Document {
   /** null si le template a été supprimé depuis : le document garde son snapshot */
   templateId: string | null;
   name: string;
-  data: Record<string, unknown>;
+  /** Valeurs saisies, par clé « nœud.prop » */
+  data: PropValues;
   templateSnapshot: DocumentSnapshot;
   status: "draft" | "finalized";
   completionPercent: number;

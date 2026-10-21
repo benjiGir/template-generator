@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { useDeletePreset, useDuplicatePreset, usePresets } from "@/api/hooks/presets";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { PRESET_PATHS } from "@/workflow/definitions";
 import { CreateButton, SpaceHeader } from "@/components/ui/SpaceHeader";
 import { ComponentPreview } from "@/components/document-view/ComponentPreview";
 import { get } from "@template-generator/component-registry/registry";
@@ -22,32 +20,20 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function ComponentsListPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
   const draftInProgress = useComponentDraftStore((s) => s.baseType !== null && s.editingId === null);
 
   const [categoryFilter, setCategoryFilter] = useState<ComponentCategory | "all">("all");
   const [search, setSearch] = useState("");
 
-  const { data: presets = [], isLoading } = useQuery({
-    queryKey: queryKeys.presets.list(),
-    queryFn: () => api.presets.list(),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.presets.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
-  });
-
-  const duplicateMutation = useMutation({
-    mutationFn: (id: string) => api.presets.duplicate(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
-  });
+  const { data: presets = [], isLoading } = usePresets();
+  const deleteMutation = useDeletePreset();
+  const duplicateMutation = useDuplicatePreset();
 
   // Un brouillon de création interrompu est repris là où il en était
-  const handleNew = () => navigate(PRESET_WORKFLOW.steps[draftInProgress ? 1 : 0]!.path("new"));
+  const handleNew = () => navigate(draftInProgress ? PRESET_PATHS.configure("new") : PRESET_PATHS.select());
 
-  const handleEdit = (preset: ComponentPreset) => navigate(PRESET_WORKFLOW.steps[1]!.path(preset.id));
+  const handleEdit = (preset: ComponentPreset) => navigate(PRESET_PATHS.configure(preset.id));
 
   const handleDelete = async (e: React.MouseEvent, preset: ComponentPreset) => {
     e.stopPropagation();
@@ -69,7 +55,7 @@ export function ComponentsListPage() {
     return true;
   });
 
-  const categories = Array.from(new Set(presets.map((p) => p.category).filter(Boolean))) as ComponentCategory[];
+  const categories = Array.from(new Set(presets.flatMap((p) => (p.category ? [p.category] : []))));
 
   return (
     <div className="h-full overflow-y-auto bg-paper">

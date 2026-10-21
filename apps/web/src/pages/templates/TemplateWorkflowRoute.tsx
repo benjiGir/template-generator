@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
-import { Outlet, useParams } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Outlet } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { cache } from "@/api/cache";
+import { useTemplateForEditing } from "@/api/hooks/templates";
 import { useEditorStore } from "@/store/editor-store";
 import { useAutosave } from "@/hooks/useAutosave";
 import { WorkflowSessionProvider, useAutosaveExitGuard } from "@/workflow/session";
 import { LoadingState, NotFoundState } from "@/workflow/EntityState";
-import type { Template } from "@template-generator/shared/types/template";
+import { useRouteParam } from "@/workflow/params";
 
 /**
  * Route parente des étapes 2 à 4 de l'Atelier.
@@ -15,7 +16,7 @@ import type { Template } from "@template-generator/shared/types/template";
  * les étapes lisent le store, jamais le cache, donc elles voient toujours le même état.
  */
 export function TemplateWorkflowRoute() {
-  const { id } = useParams<{ id: string }>();
+  const id = useRouteParam("id");
   const queryClient = useQueryClient();
   const loadTemplate = useEditorStore((s) => s.loadTemplate);
   const markSaved = useEditorStore((s) => s.markSaved);
@@ -24,18 +25,12 @@ export function TemplateWorkflowRoute() {
   const loadedId = useEditorStore((s) => s.template?.id);
   const loadedForMount = useRef<string | null>(null);
 
-  const query = useQuery({
-    queryKey: queryKeys.templates.detail(id!),
-    queryFn: () => api.templates.get(id!),
-    enabled: !!id,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: false,
-  });
+  const query = useTemplateForEditing(id);
 
   // On charge la version serveur fraîche une seule fois par visite du workflow
   useEffect(() => {
     if (query.data && query.isFetchedAfterMount && loadedForMount.current !== id) {
-      loadedForMount.current = id!;
+      loadedForMount.current = id;
       loadTemplate(query.data);
     }
   }, [query.data, query.isFetchedAfterMount, id, loadTemplate]);
@@ -57,12 +52,10 @@ export function TemplateWorkflowRoute() {
       };
     },
     save: ({ id: templateId, ...body }) => api.templates.update(templateId, body),
-    onSaved: (rev, result) => {
+    onSaved: (rev, saved) => {
       markSaved(rev);
-      const saved = result as Template;
       useEditorStore.getState().applyServerState(saved);
-      queryClient.setQueryData(queryKeys.templates.detail(saved.id), saved);
-      void queryClient.invalidateQueries({ queryKey: ["templates", "list"] });
+      cache.templateChanged(queryClient, saved);
     },
   });
 

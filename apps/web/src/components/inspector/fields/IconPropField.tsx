@@ -1,5 +1,6 @@
-import { useState, type ElementType } from "react";
-import * as LucideIcons from "lucide-react";
+import { useState } from "react";
+import { HelpCircle } from "lucide-react";
+import { ICONS, IconByName } from "@template-generator/component-registry/icons";
 
 // Curated list of common icons
 const ICON_NAMES = [
@@ -88,17 +89,15 @@ const ICON_NAMES = [
 interface Props {
   label: string;
   value: string;
-  onChange: (v: unknown) => void;
+  onChange: (v: string) => void;
 }
 
 export function IconPropField({ label, value, onChange }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const current = (value as string | undefined) ?? "";
+  const current = value;
 
   const filtered = query ? ICON_NAMES.filter((n) => n.toLowerCase().includes(query.toLowerCase())) : ICON_NAMES;
-
-  const CurrentIcon = current ? (LucideIcons as unknown as Record<string, ElementType>)[current] : null;
 
   return (
     <div>
@@ -109,9 +108,9 @@ export function IconPropField({ label, value, onChange }: Props) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs border border-gray-200 rounded hover:border-gray-300 bg-white"
       >
-        {CurrentIcon ? (
+        {ICONS.has(current) ? (
           <>
-            <CurrentIcon size={14} className="text-gray-600 shrink-0" />
+            <IconByName name={current} fallback={HelpCircle} size={14} className="text-gray-600 shrink-0" />
             <span className="text-gray-900">{current}</span>
           </>
         ) : (
@@ -135,8 +134,7 @@ export function IconPropField({ label, value, onChange }: Props) {
           <div className="overflow-y-auto max-h-52 p-1.5">
             <div className="grid grid-cols-6 gap-1">
               {filtered.map((name) => {
-                const Icon = (LucideIcons as unknown as Record<string, ElementType>)[name];
-                if (!Icon) return null;
+                if (!ICONS.has(name)) return null;
                 return (
                   <button
                     key={name}
@@ -151,7 +149,7 @@ export function IconPropField({ label, value, onChange }: Props) {
                       name === current ? "bg-blue-50 text-blue-700" : "hover:bg-gray-100 text-gray-600"
                     }`}
                   >
-                    <Icon size={14} />
+                    <IconByName name={name} fallback={HelpCircle} size={14} />
                     <span className="truncate w-full text-center leading-none">{name}</span>
                   </button>
                 );

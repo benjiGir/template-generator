@@ -1,21 +1,19 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { FileDown } from "lucide-react";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
-import { useDocumentStore } from "@/store/document-store";
+import { useDocumentStore, useLoadedDocument } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { DocumentTitle } from "@/components/document/DocumentTitle";
 import { ExportPanel } from "@/components/document/ExportPanel";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
 import { usePrintDocument, type PrintFormat } from "@/components/document-view/usePrintDocument";
 import { useWorkflowSession } from "@/workflow/session";
-import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
+import { DOCUMENT_WORKFLOW, DOCUMENT_PATHS } from "@/workflow/definitions";
+import { useMarkDocumentExported } from "@/api/hooks/documents";
 
 export function DocumentExportPage() {
-  const queryClient = useQueryClient();
+  const markExported = useMarkDocumentExported();
   const session = useWorkflowSession();
-  const document = useDocumentStore((s) => s.document)!;
+  const document = useLoadedDocument();
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
   const applyServerState = useDocumentStore((s) => s.applyServerState);
   const { print, printNode } = usePrintDocument();
@@ -24,16 +22,15 @@ export function DocumentExportPage() {
   const [format, setFormat] = useState<PrintFormat>("auto");
   const [exportedAt, setExportedAt] = useState<Date | null>(null);
 
-  const mergedTemplate = getMergedTemplate()!;
+  const mergedTemplate = getMergedTemplate();
+  if (!mergedTemplate) throw new Error("Snapshot du document absent : il ne peut pas être exporté");
 
   const handleExport = async () => {
     await session?.flush();
     await print({ template: mergedTemplate, format, title: filename.trim() || document.name });
-    const updated = await api.documents.markExported(document.id);
+    const updated = await markExported.mutateAsync(document.id);
     applyServerState(updated);
     setExportedAt(new Date());
-    queryClient.setQueryData(queryKeys.documents.detail(updated.id), updated);
-    void queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() });
   };
 
   return (
@@ -56,7 +53,7 @@ export function DocumentExportPage() {
             format={format}
             onFormatChange={setFormat}
             exportedAt={exportedAt}
-            editPath={DOCUMENT_WORKFLOW.steps[1]!.path(document.id)}
+            editPath={DOCUMENT_PATHS.fill(document.id)}
           />
         </aside>
         <div className="min-w-0 flex-1">

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import { api, type DocumentSummary } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import type { DocumentSummary } from "@/api/client";
+import { useDeleteDocument, useDocuments, useDuplicateDocument } from "@/api/hooks/documents";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { DocumentCard } from "@/components/document/DocumentCard";
 import { CreateButton, SpaceHeader } from "@/components/ui/SpaceHeader";
@@ -21,33 +20,14 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
 
 export function DocumentsListPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [template, setTemplate] = useState<string>("all");
 
-  const {
-    data: documents = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: queryKeys.documents.list(),
-    queryFn: () => api.documents.list(),
-  });
-
-  const duplicateMutation = useMutation({
-    mutationFn: (id: string) => api.documents.duplicate(id),
-    onSuccess: (doc) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() });
-      navigate(`/documents/${doc.id}/fill`);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.documents.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.documents.list() }),
-  });
+  const { data: documents = [], isLoading, error } = useDocuments();
+  const duplicateMutation = useDuplicateDocument();
+  const deleteMutation = useDeleteDocument();
 
   const handleDelete = async (doc: DocumentSummary) => {
     const ok = await confirm({
@@ -177,7 +157,9 @@ export function DocumentsListPage() {
             <DocumentCard
               key={doc.id}
               doc={doc}
-              onDuplicate={(d) => duplicateMutation.mutate(d.id)}
+              onDuplicate={(d) =>
+                duplicateMutation.mutate(d.id, { onSuccess: (copy) => navigate(`/documents/${copy.id}/fill`) })
+              }
               onDelete={handleDelete}
             />
           ))}

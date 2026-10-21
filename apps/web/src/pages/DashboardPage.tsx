@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { api, type DocumentSummary, type TemplateSummary } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import type { DocumentSummary, TemplateSummary } from "@/api/client";
+import { useCreateDocument, useDocuments, useDuplicateDocument } from "@/api/hooks/documents";
+import { useTemplates } from "@/api/hooks/templates";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 import { GettingStarted } from "@/components/ui/GettingStarted";
 import { BlueprintGlyph, ObjectTag, TemplateRef } from "@/components/ui/ObjectIdentity";
@@ -18,28 +18,17 @@ function shortDate(iso: string): string {
 export function DashboardPage() {
   const navigate = useNavigate();
 
-  const { data: allTemplates = [], isSuccess: templatesLoaded } = useQuery({
-    queryKey: queryKeys.templates.list(),
-    queryFn: () => api.templates.list(),
-  });
-  const { data: allDocuments = [], isSuccess: documentsLoaded } = useQuery({
-    queryKey: queryKeys.documents.list(),
-    queryFn: () => api.documents.list(),
-  });
+  const { data: allTemplates = [], isSuccess: templatesLoaded } = useTemplates();
+  const { data: allDocuments = [], isSuccess: documentsLoaded } = useDocuments();
 
   // Le dashboard est un point de reprise : les brouillons d'abord
   const drafts = allDocuments.filter((d) => d.status === "draft").slice(0, 5);
   const exported = allDocuments.filter((d) => d.status === "finalized").slice(0, 3);
   const templates = allTemplates.slice(0, 5);
 
-  const createFrom = useMutation({
-    mutationFn: (templateId: string) => api.documents.create({ templateId }),
-    onSuccess: (doc) => navigate(`/documents/${doc.id}/fill`),
-  });
-  const duplicate = useMutation({
-    mutationFn: (id: string) => api.documents.duplicate(id),
-    onSuccess: (doc) => navigate(`/documents/${doc.id}/fill`),
-  });
+  const createFrom = useCreateDocument();
+  const duplicate = useDuplicateDocument();
+  const openDocument = (doc: { id: string }) => navigate(`/documents/${doc.id}/fill`);
 
   const today = useMemo(
     () =>
@@ -162,7 +151,7 @@ export function DashboardPage() {
                         <span className="font-mono text-[11px] text-gray-500">{shortDate(d.updatedAt)}</span>
                       </span>
                       <button
-                        onClick={() => duplicate.mutate(d.id)}
+                        onClick={() => duplicate.mutate(d.id, { onSuccess: openDocument })}
                         disabled={duplicate.isPending}
                         className="justify-self-end text-[13px] font-semibold text-doc-strong hover:underline disabled:opacity-50"
                       >
@@ -192,7 +181,7 @@ export function DashboardPage() {
                   <TemplateRow
                     key={t.id}
                     template={t}
-                    onCreate={() => createFrom.mutate(t.id)}
+                    onCreate={() => createFrom.mutate(t.id, { onSuccess: openDocument })}
                     creating={createFrom.isPending}
                   />
                 ))}

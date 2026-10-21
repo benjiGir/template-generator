@@ -5,7 +5,7 @@ import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
 import { ComponentPreview } from "@/components/document-view/ComponentPreview";
 import { DEFAULT_THEME } from "@template-generator/shared/types/template";
-import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { PRESET_WORKFLOW, PRESET_PATHS } from "@/workflow/definitions";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 
 const CATEGORY_LABELS: Record<ComponentCategory, string> = {
@@ -30,11 +30,11 @@ export function ComponentSelectPage() {
   const filtered =
     categoryFilter === "all" ? allComponents : allComponents.filter((c) => c.category === categoryFilter);
 
-  const grouped = CATEGORY_ORDER.reduce<Record<string, typeof allComponents>>((acc, cat) => {
-    const items = filtered.filter((c) => c.category === cat);
-    if (items.length > 0) acc[cat] = items;
-    return acc;
-  }, {});
+  // Catégories non vides, dans l'ordre de la bibliothèque
+  const grouped = CATEGORY_ORDER.flatMap((cat) => {
+    const components = filtered.filter((c) => c.category === cat);
+    return components.length > 0 ? [{ cat, components }] : [];
+  });
 
   const choose = (type: string) => {
     setSelected(type);
@@ -42,7 +42,7 @@ export function ComponentSelectPage() {
     if (!def) return;
     // Revenir à cette étape sans changer de composant conserve la configuration
     if (type !== currentBaseType) setBaseType(type, def.defaultProps, def.category, def.label);
-    navigate(PRESET_WORKFLOW.steps[1]!.path("new"));
+    navigate(PRESET_PATHS.configure("new"));
   };
 
   return (
@@ -76,10 +76,10 @@ export function ComponentSelectPage() {
 
         {/* Components grid */}
         <div className="flex-1 overflow-y-auto p-6">
-          {Object.entries(grouped).map(([cat, components]) => (
+          {grouped.map(({ cat, components }) => (
             <div key={cat} className="mb-6">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                {CATEGORY_LABELS[cat as ComponentCategory]}
+                {CATEGORY_LABELS[cat]}
               </h3>
               <div className="grid grid-cols-4 gap-3">
                 {components.map((def) => (

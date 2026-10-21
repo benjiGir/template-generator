@@ -10,13 +10,8 @@ import type { EditableField } from "@template-generator/shared/types/template";
 
 /** Le composant le plus proche (vers le haut) sous l'élément cliqué ou survolé */
 function nodeIdFrom(target: EventTarget | null): string | null {
-  let el = target as HTMLElement | null;
-  while (el) {
-    const id = el.dataset?.["nodeId"];
-    if (id) return id;
-    el = el.parentElement;
-  }
-  return null;
+  if (!(target instanceof Element)) return null;
+  return target.closest("[data-node-id]")?.getAttribute("data-node-id") ?? null;
 }
 
 /**
@@ -49,12 +44,12 @@ export function InlineFillMode() {
 
   /** Remonte jusqu'au composant remplissable qui contient la cible (une carte dans sa rangée…) */
   const editableAncestor = (target: EventTarget | null): string | null => {
-    let el = target as HTMLElement | null;
+    let el = target instanceof Element ? target : null;
     while (el) {
       const id = nodeIdFrom(el);
       if (!id) return null;
       if (fieldsByNode.has(id)) return id;
-      el = (el.closest(`[data-node-id="${CSS.escape(id)}"]`)?.parentElement as HTMLElement | null) ?? null;
+      el = el.closest(`[data-node-id="${CSS.escape(id)}"]`)?.parentElement ?? null;
     }
     return null;
   };
@@ -88,8 +83,8 @@ export function InlineFillMode() {
     const empty = editableFields.filter((f) => !isFilled(data[fieldKey(f)]));
     if (empty.length === 0) return;
     const currentOrder = selected ? Math.max(...(fieldsByNode.get(selected) ?? []).map((f) => f.order)) : -1;
-    const next = empty.find((f) => f.order > currentOrder) ?? empty[0]!;
-    setSelected(next.nodeId);
+    const next = empty.find((f) => f.order > currentOrder) ?? empty[0];
+    if (next) setSelected(next.nodeId);
   };
 
   if (!mergedTemplate) return null;

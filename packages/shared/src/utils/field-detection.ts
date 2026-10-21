@@ -6,7 +6,7 @@ import { fieldKey } from "./fields";
 export interface ComponentInfo {
   label: string;
   category: ComponentCategory;
-  schema: PropSchema[];
+  schema: readonly PropSchema[];
 }
 export type ResolveComponent = (type: string) => ComponentInfo | undefined;
 
@@ -173,11 +173,17 @@ export function reconcileFields(stored: EditableField[], detected: DetectedField
   const byKey = new Map(detected.map((f) => [fieldKey(f), f]));
   const retained = stored
     .toSorted((a, b) => a.order - b.order)
-    .filter((f) => byKey.has(fieldKey(f)))
-    .map((f, i) => {
-      const d = byKey.get(fieldKey(f))!;
-      return { ...f, type: d.type, defaultValue: d.defaultValue, order: i, location: d.location };
-    });
+    .flatMap((field) => {
+      const detectedField = byKey.get(fieldKey(field));
+      return detectedField ? [{ field, detected: detectedField }] : [];
+    })
+    .map(({ field, detected: d }, i) => ({
+      ...field,
+      type: d.type,
+      defaultValue: d.defaultValue,
+      order: i,
+      location: d.location,
+    }));
   const retainedKeys = new Set(retained.map(fieldKey));
   return { retained, excluded: detected.filter((f) => !retainedKeys.has(fieldKey(f))) };
 }

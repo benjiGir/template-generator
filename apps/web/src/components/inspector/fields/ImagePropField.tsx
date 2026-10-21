@@ -4,13 +4,11 @@ import type { ImageValue } from "@template-generator/shared/types/component";
 interface Props {
   label: string;
   value: ImageValue;
-  onChange: (v: unknown) => void;
+  onChange: (v: ImageValue) => void;
 }
 
-const EMPTY: ImageValue = { type: "url", value: "" };
-
 export function ImagePropField({ label, value, onChange }: Props) {
-  const val: ImageValue = { ...EMPTY, ...(value as ImageValue | undefined) };
+  const val = value;
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {

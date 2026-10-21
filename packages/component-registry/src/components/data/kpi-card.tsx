@@ -1,17 +1,30 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { resolveColor, resolveLightBg } from "../../color-map";
 
-interface Props {
-  theme: Theme;
-  emoji?: string;
-  title?: string;
-  description?: string;
-  color?: string;
-}
+const schema = defineSchema([
+  { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊", group: "Contenu" },
+  { key: "title", label: "Titre", type: "text", defaultValue: "KPI", group: "Contenu" },
+  { key: "description", label: "Description", type: "textarea", defaultValue: "", group: "Contenu" },
+  {
+    key: "color",
+    label: "Couleur",
+    type: "select",
+    defaultValue: "blue",
+    group: "Style",
+    options: [
+      { label: "Bleu", value: "blue" },
+      { label: "Vert", value: "green" },
+      { label: "Ambre", value: "amber" },
+      { label: "Rouge", value: "red" },
+    ],
+  },
+]);
 
-function KpiCard({ theme, emoji = "📊", title = "KPI", description = "", color = "blue" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function KpiCard({ theme, emoji, title, description, color }: Props) {
   const accentColor = resolveColor(color, theme);
   const lightBg = resolveLightBg(color, theme);
 
@@ -52,31 +65,13 @@ function KpiCard({ theme, emoji = "📊", title = "KPI", description = "", color
   );
 }
 
-register({
+defineComponent({
   type: "kpi-card",
   label: "Carte KPI",
   icon: "BarChart3",
   category: "data",
   description: "Indicateur clé avec emoji, titre et description",
-  schema: [
-    { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊", group: "Contenu" },
-    { key: "title", label: "Titre", type: "text", defaultValue: "KPI", group: "Contenu" },
-    { key: "description", label: "Description", type: "textarea", defaultValue: "", group: "Contenu" },
-    {
-      key: "color",
-      label: "Couleur",
-      type: "select",
-      defaultValue: "blue",
-      group: "Style",
-      options: [
-        { label: "Bleu", value: "blue" },
-        { label: "Vert", value: "green" },
-        { label: "Ambre", value: "amber" },
-        { label: "Rouge", value: "red" },
-      ],
-    },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { emoji: "📊", title: "KPI", description: "", color: "blue" },
-  render: KpiCard as RegisteredComponent["render"],
+  render: KpiCard,
 });

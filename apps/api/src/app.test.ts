@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import app from "./app";
-import type { ApiErrorBody } from "./validation";
+import { apiErrorBody, type ApiErrorBody } from "./validation";
 
 /*
  * Validation et erreurs : ces requêtes sont refusées avant toute requête SQL,
@@ -9,7 +9,8 @@ import type { ApiErrorBody } from "./validation";
 
 const ID = "4ec6bca1-a856-4c12-a66b-f793bcda02d1";
 
-function send(method: string, body: unknown): RequestInit {
+/** Requête JSON ; un corps texte est envoyé tel quel (JSON volontairement mal formé) */
+function send(method: string, body: object | string): RequestInit {
   return {
     method,
     headers: { "Content-Type": "application/json" },
@@ -17,8 +18,9 @@ function send(method: string, body: unknown): RequestInit {
   };
 }
 
+/** Le corps de la réponse, vérifié contre la forme des erreurs de l'API */
 async function errorOf(res: Response): Promise<ApiErrorBody> {
-  return (await res.json()) as ApiErrorBody;
+  return apiErrorBody.parse(await res.json());
 }
 
 function paths(body: ApiErrorBody): string[] {

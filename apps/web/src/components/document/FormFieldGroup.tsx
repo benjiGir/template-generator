@@ -3,12 +3,13 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { FormField } from "./FormField";
 import { fieldKey, isFilled } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
+import type { PropValue, PropValues } from "@template-generator/shared/types/component";
 
 interface Props {
   group: string | null;
   fields: EditableField[];
-  data: Record<string, unknown>;
-  onUpdate: (fieldKey: string, value: unknown) => void;
+  data: PropValues;
+  onUpdate: (fieldKey: string, value: PropValue) => void;
   activeKey: string | null;
   onFocusField: (field: EditableField) => void;
 }

@@ -135,7 +135,7 @@ function ToolbarPlugin() {
 interface Props {
   label: string;
   value: string;
-  onChange: (v: unknown) => void;
+  onChange: (v: string) => void;
   placeholder?: string;
 }
 

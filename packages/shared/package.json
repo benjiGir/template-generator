@@ -11,7 +11,8 @@
     "./utils/markdown": "./src/utils/markdown.ts",
     "./themes/presets": "./src/themes/presets.ts",
     "./utils/fields": "./src/utils/fields.ts",
-    "./utils/field-detection": "./src/utils/field-detection.ts"
+    "./utils/field-detection": "./src/utils/field-detection.ts",
+    "./utils/prop-values": "./src/utils/prop-values.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { getAll } from "@template-generator/component-registry/registry";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { usePresets } from "@/api/hooks/presets";
 import { ComponentCard } from "./ComponentCard";
 import { PresetCard } from "./PresetCard";
 import { ObjectMark } from "@/components/ui/ObjectIdentity";
@@ -21,10 +19,7 @@ export function ComponentLibrary() {
   const allComponents = getAll();
   const [search, setSearch] = useState("");
 
-  const { data: presets = [] } = useQuery({
-    queryKey: queryKeys.presets.list(),
-    queryFn: () => api.presets.list(),
-  });
+  const { data: presets = [] } = usePresets();
 
   const q = search.trim().toLowerCase();
   const filtered = allComponents.filter(

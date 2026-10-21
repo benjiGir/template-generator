@@ -1,32 +1,52 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { resolveColor, resolveLightBg } from "../../color-map";
 
-interface Props {
-  theme: Theme;
-  value?: string;
-  label?: string;
-  trend?: "up" | "down" | "neutral";
-  trendValue?: string;
-  color?: string;
-}
+const schema = defineSchema([
+  { key: "value", label: "Valeur", type: "text", defaultValue: "0", group: "Contenu" },
+  { key: "label", label: "Libellé", type: "text", defaultValue: "Métrique", group: "Contenu" },
+  {
+    key: "trend",
+    label: "Tendance",
+    type: "select",
+    defaultValue: "neutral",
+    group: "Contenu",
+    options: [
+      { label: "Hausse ↑", value: "up" },
+      { label: "Baisse ↓", value: "down" },
+      { label: "Stable →", value: "neutral" },
+    ],
+  },
+  { key: "trendValue", label: "Valeur tendance", type: "text", defaultValue: "", group: "Contenu" },
+  {
+    key: "color",
+    label: "Couleur",
+    type: "select",
+    defaultValue: "blue",
+    group: "Style",
+    options: [
+      { label: "Bleu", value: "blue" },
+      { label: "Vert", value: "green" },
+      { label: "Ambre", value: "amber" },
+      { label: "Rouge", value: "red" },
+    ],
+  },
+]);
 
-const TREND_ICONS = { up: "↑", down: "↓", neutral: "→" } as const;
-const TREND_COLORS = { up: "#16A34A", down: "#DC2626", neutral: "#6B7280" } as const;
+type Props = PropsOf<typeof schema> & { theme: Theme };
 
-function MetricCard({
-  theme,
-  value = "0",
-  label = "Métrique",
-  trend = "neutral",
-  trendValue = "",
-  color = "blue",
-}: Props) {
+const NEUTRAL = { icon: "→", color: "#6B7280" };
+const TRENDS = new Map([
+  ["up", { icon: "↑", color: "#16A34A" }],
+  ["down", { icon: "↓", color: "#DC2626" }],
+  ["neutral", NEUTRAL],
+]);
+
+function MetricCard({ theme, value, label, trend, trendValue, color }: Props) {
   const accentColor = resolveColor(color, theme);
   const bgColor = resolveLightBg(color, theme);
-  const trendColor = TREND_COLORS[trend] ?? TREND_COLORS.neutral;
-  const trendIcon = TREND_ICONS[trend] ?? TREND_ICONS.neutral;
+  const { icon: trendIcon, color: trendColor } = TRENDS.get(trend) ?? NEUTRAL;
 
   return (
     <div
@@ -72,43 +92,13 @@ function MetricCard({
   );
 }
 
-register({
+defineComponent({
   type: "metric-card",
   label: "Carte métrique",
   icon: "TrendingUp",
   category: "data",
   description: "Indicateur de performance avec valeur, tendance et couleur",
-  schema: [
-    { key: "value", label: "Valeur", type: "text", defaultValue: "0", group: "Contenu" },
-    { key: "label", label: "Libellé", type: "text", defaultValue: "Métrique", group: "Contenu" },
-    {
-      key: "trend",
-      label: "Tendance",
-      type: "select",
-      defaultValue: "neutral",
-      group: "Contenu",
-      options: [
-        { label: "Hausse ↑", value: "up" },
-        { label: "Baisse ↓", value: "down" },
-        { label: "Stable →", value: "neutral" },
-      ],
-    },
-    { key: "trendValue", label: "Valeur tendance", type: "text", defaultValue: "", group: "Contenu" },
-    {
-      key: "color",
-      label: "Couleur",
-      type: "select",
-      defaultValue: "blue",
-      group: "Style",
-      options: [
-        { label: "Bleu", value: "blue" },
-        { label: "Vert", value: "green" },
-        { label: "Ambre", value: "amber" },
-        { label: "Rouge", value: "red" },
-      ],
-    },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { value: "0", label: "Métrique", trend: "neutral", trendValue: "", color: "blue" },
-  render: MetricCard as RegisteredComponent["render"],
+  render: MetricCard,
 });

@@ -35,9 +35,36 @@
     // Champs d'édition ouverts à la demande et dialogues : le focus initial est voulu
     "jsx-a11y/no-autofocus": "off",
     // Rôles ARIA sur des boutons ou des conteneurs stylés, en attendant des primitives d'interface
-    "jsx-a11y/prefer-tag-over-role": "off"
+    "jsx-a11y/prefer-tag-over-role": "off",
+
+    // Pas de conversion de type ni d'assertion non nulle : on vérifie (garde, Map, validation zod)
+    // au lieu d'affirmer. `as const` reste permis ; une exception se justifie en commentaire.
+    "typescript/consistent-type-assertions": ["error", { "assertionStyle": "never" }],
+    "typescript/no-non-null-assertion": "error",
+
+    // Les écrans passent par les hooks de apps/web/src/api/hooks : clés de cache, invalidations
+    // et messages d'échec y sont définis une fois
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@tanstack/react-query",
+            "importNames": ["useQuery", "useMutation", "useInfiniteQuery"],
+            "message": "Utiliser (ou ajouter) un hook de apps/web/src/api/hooks."
+          }
+        ]
+      }
+    ]
   },
   "overrides": [
+    {
+      // Seul endroit où les requêtes et mutations TanStack Query sont déclarées
+      "files": ["apps/web/src/api/**"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    },
     {
       // Scripts de seed : insertions volontairement séquentielles
       "files": ["apps/api/src/seed/**"],

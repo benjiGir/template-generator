@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { desc, eq, sql } from "drizzle-orm";
 import { buildDocumentSnapshot, computeCompletion } from "@template-generator/shared/utils/fields";
 import type { DocumentSnapshot } from "@template-generator/shared/types/document";
+import type { PropValues } from "@template-generator/shared/types/component";
 import type { EditableField, PagePreview } from "@template-generator/shared/types/template";
 import { db } from "../db/connection";
 import { documents, templates } from "../db/schema";
@@ -10,7 +11,7 @@ import { validate } from "../validation";
 
 const NOT_FOUND = { error: "Document introuvable" };
 
-function completionOf(snapshot: DocumentSnapshot, data: Record<string, unknown>): number {
+function completionOf(snapshot: DocumentSnapshot, data: PropValues): number {
   return computeCompletion(snapshot.editableFields ?? [], data).percent;
 }
 
@@ -70,7 +71,8 @@ const router = new Hono()
         completionPercent: completionOf(snapshot, {}),
       })
       .returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   /** Duplique un document (le cas courant : repartir du mois précédent) */
@@ -89,7 +91,8 @@ const router = new Hono()
         completionPercent: source.completionPercent,
       })
       .returning();
-    return c.json(result!, 201);
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
   })
 
   .put("/:id", validate("param", idParam), validate("json", documentRename), async (c) => {
@@ -115,7 +118,9 @@ const router = new Hono()
       .set({ data, completionPercent: completionOf(existing.templateSnapshot, data), updatedAt: new Date() })
       .where(eq(documents.id, id))
       .returning();
-    return c.json(result!, 200);
+    // Supprimé entre-temps par une autre requête
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
   })
 
   /** Appelé après l'export PDF : le document est finalisé */

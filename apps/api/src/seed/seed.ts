@@ -12,6 +12,8 @@ import {
   BUILTIN_THEMES,
 } from "@template-generator/shared/themes/presets";
 import type { Template } from "@template-generator/shared/types/template";
+import type { DocumentSnapshot } from "@template-generator/shared/types/document";
+import type { PropValues } from "@template-generator/shared/types/component";
 import {
   buildPublishedVersion,
   buildDocumentSnapshot,
@@ -976,23 +978,30 @@ const TEMPLATES: TemplateInsert[] = [
   },
 ];
 
+/** Valeur indispensable au seed : son absence arrête le script avec un message clair */
+function required<T>(value: T | undefined, what: string): T {
+  if (value === undefined) throw new Error(`Seed : ${what} introuvable`);
+  return value;
+}
+
 const insertedTemplates: Array<{ id: string; template: TemplateInsert }> = [];
 
 for (const tpl of TEMPLATES) {
   const existing = await db.select({ id: templates.id }).from(templates).where(eq(templates.name, tpl.name));
-  if (existing.length === 0) {
+  const [found] = existing;
+  if (!found) {
     const [row] = await db
       .insert(templates)
       .values({
         ...tpl,
         publishedAt: tpl.published ? new Date() : null,
         publishedVersion: tpl.published ? buildPublishedVersion(tpl) : null,
-      } as typeof templates.$inferInsert)
+      })
       .returning({ id: templates.id });
-    insertedTemplates.push({ id: row!.id, template: tpl });
+    insertedTemplates.push({ id: required(row, `insertion de « ${tpl.name} »`).id, template: tpl });
     console.log(`  ✓ Template inséré : ${tpl.name}`);
   } else {
-    insertedTemplates.push({ id: existing[0]!.id, template: tpl });
+    insertedTemplates.push({ id: found.id, template: tpl });
     console.log(`  — Template déjà présent : ${tpl.name}`);
   }
 }
@@ -1001,40 +1010,40 @@ for (const tpl of TEMPLATES) {
 
 console.log("\n── Presets de composants ──");
 
-const PRESETS = [
+const PRESETS: (typeof componentPresets.$inferInsert)[] = [
   {
     baseType: "kpi-card",
     label: "KPI Succès vert",
     description: "Carte KPI avec couleur verte pour indiquer un résultat positif.",
-    category: "data" as const,
+    category: "data",
     defaultProps: { emoji: "✅", title: "Indicateur", description: "Résultat positif atteint.", color: "green" },
   },
   {
     baseType: "kpi-card",
     label: "KPI Alerte orange",
     description: "Carte KPI avec couleur orange pour signaler un point d'attention.",
-    category: "data" as const,
+    category: "data",
     defaultProps: { emoji: "⚠️", title: "Point d'attention", description: "À surveiller ce mois.", color: "amber" },
   },
   {
     baseType: "kpi-card",
     label: "KPI Neutre bleu",
     description: "Carte KPI bleue pour les informations neutres ou de contexte.",
-    category: "data" as const,
+    category: "data",
     defaultProps: { emoji: "📊", title: "Chiffre clé", description: "Donnée de contexte.", color: "blue" },
   },
   {
     baseType: "intro-box",
     label: "Intro standard bleue",
     description: "Bloc d'introduction avec accent bleu primaire.",
-    category: "content" as const,
+    category: "content",
     defaultProps: { content: "Saisissez ici l'introduction de votre document.", accentColor: "#2563EB" },
   },
   {
     baseType: "intro-box",
     label: "Intro alerte rouge",
     description: "Bloc d'introduction avec accent rouge pour les documents d'incident.",
-    category: "content" as const,
+    category: "content",
     defaultProps: {
       content: "⚠️ Ce document traite d'un incident ou d'une situation critique.",
       accentColor: "#DC2626",
@@ -1044,7 +1053,7 @@ const PRESETS = [
     baseType: "detail-block",
     label: "Bloc résultat positif",
     description: "Bloc de détail vert — résultat atteint.",
-    category: "content" as const,
+    category: "content",
     defaultProps: {
       title: "Titre du chantier",
       color: "green",
@@ -1059,7 +1068,7 @@ const PRESETS = [
     baseType: "detail-block",
     label: "Bloc en cours orange",
     description: "Bloc de détail orange — action en cours ou à risque.",
-    category: "content" as const,
+    category: "content",
     defaultProps: {
       title: "Titre du chantier",
       color: "amber",
@@ -1074,7 +1083,7 @@ const PRESETS = [
     baseType: "next-section",
     label: "Suite — 4 actions",
     description: "Bloc 'Et pour la suite ?' pré-rempli avec 4 actions à personnaliser.",
-    category: "content" as const,
+    category: "content",
     defaultProps: {
       title: "Et pour la suite ?",
       intro: "Les priorités pour le prochain mois :",
@@ -1104,10 +1113,13 @@ console.log("\n── Documents ──");
 // On récupère les IDs réels des templates insérés
 const tplByName = Object.fromEntries(insertedTemplates.map(({ id, template }) => [template.name, id]));
 
-const chantiersTplId = tplByName["KOMITY — Chantiers Techniques"]!;
-const rhTplId = tplByName["RH — Bilan Mensuel"]!;
-const financeTplId = tplByName["Finance — Rapport Trimestriel"]!;
-const pmTplId = tplByName["Incident — Rapport Post-Mortem"]!;
+const chantiersTplId = required(
+  tplByName["KOMITY — Chantiers Techniques"],
+  "template « KOMITY — Chantiers Techniques »",
+);
+const rhTplId = required(tplByName["RH — Bilan Mensuel"], "template « RH — Bilan Mensuel »");
+const financeTplId = required(tplByName["Finance — Rapport Trimestriel"], "template « Finance — Rapport Trimestriel »");
+const pmTplId = required(tplByName["Incident — Rapport Post-Mortem"], "template « Incident — Rapport Post-Mortem »");
 
 // On récupère les snapshots complets pour les documents
 const chantiersSnapshot = await db.select().from(templates).where(eq(templates.id, chantiersTplId));
@@ -1115,14 +1127,24 @@ const rhSnapshot = await db.select().from(templates).where(eq(templates.id, rhTp
 const financeSnapshot = await db.select().from(templates).where(eq(templates.id, financeTplId));
 const pmSnapshot = await db.select().from(templates).where(eq(templates.id, pmTplId));
 
-const DOCUMENTS = [
+/** Document de démonstration, tel qu'il est inséré */
+interface SeedDocument {
+  templateId: string;
+  name: string;
+  status: "draft" | "finalized";
+  completionPercent: number;
+  templateSnapshot: DocumentSnapshot;
+  data: PropValues;
+}
+
+const DOCUMENTS: SeedDocument[] = [
   // Chantiers Techniques — Janvier 2025 (finalisé)
   {
     templateId: chantiersTplId,
     name: "Chantiers Techniques — Janvier 2025",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(chantiersSnapshot[0], "template chantiers")),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Janvier 2025",
       "ib-1.content":
@@ -1139,9 +1161,9 @@ const DOCUMENTS = [
   {
     templateId: chantiersTplId,
     name: "Chantiers Techniques — Février 2025",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(chantiersSnapshot[0], "template chantiers")),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Février 2025",
       "ib-1.content":
@@ -1158,9 +1180,9 @@ const DOCUMENTS = [
   {
     templateId: chantiersTplId,
     name: "Chantiers Techniques — Mars 2025",
-    status: "draft" as const,
+    status: "draft",
     completionPercent: 40,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(chantiersSnapshot[0], "template chantiers")),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Mars 2025",
       "kc-1.description": "En cours de saisie...",
@@ -1170,9 +1192,9 @@ const DOCUMENTS = [
   {
     templateId: rhTplId,
     name: "Bilan RH — Janvier 2025",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(rhSnapshot[0], "template rh")),
     data: {
       "rh-tb-1.subtitle": "Janvier 2025",
       "rh-kc-1.description": "142 collaborateurs actifs.",
@@ -1190,9 +1212,9 @@ const DOCUMENTS = [
   {
     templateId: rhTplId,
     name: "Bilan RH — Février 2025",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(rhSnapshot[0], "template rh")),
     data: {
       "rh-tb-1.subtitle": "Février 2025",
       "rh-kc-1.description": "145 collaborateurs actifs (+3).",
@@ -1210,9 +1232,9 @@ const DOCUMENTS = [
   {
     templateId: rhTplId,
     name: "Bilan RH — Mars 2025",
-    status: "draft" as const,
+    status: "draft",
     completionPercent: 25,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(rhSnapshot[0], "template rh")),
     data: {
       "rh-tb-1.subtitle": "Mars 2025",
     },
@@ -1221,9 +1243,9 @@ const DOCUMENTS = [
   {
     templateId: financeTplId,
     name: "Rapport Financier — Q1 2025",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(financeSnapshot[0], "template finance")),
     data: {
       "fi-tb-1.subtitle": "Q1 2025 — Janvier · Février · Mars",
       "fi-kc-1.description": "€ 1,24M — +12% vs Q1 2024.",
@@ -1238,9 +1260,9 @@ const DOCUMENTS = [
   {
     templateId: financeTplId,
     name: "Rapport Financier — Q2 2025",
-    status: "draft" as const,
+    status: "draft",
     completionPercent: 15,
-    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(financeSnapshot[0], "template finance")),
     data: {
       "fi-tb-1.subtitle": "Q2 2025 — Avril · Mai · Juin",
     },
@@ -1249,9 +1271,9 @@ const DOCUMENTS = [
   {
     templateId: pmTplId,
     name: "Post-Mortem — INC-2025-0042",
-    status: "finalized" as const,
+    status: "finalized",
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(pmSnapshot[0], "template pm")),
     data: {
       "pm-tb-1.subtitle": "INC-2025-0042 — 8 février 2025",
       "pm-kc-1.description": "2h14 d'interruption partielle.",
@@ -1271,9 +1293,9 @@ const DOCUMENTS = [
   {
     templateId: pmTplId,
     name: "Post-Mortem — INC-2025-0067",
-    status: "draft" as const,
+    status: "draft",
     completionPercent: 30,
-    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0]!),
+    templateSnapshot: buildDocumentSnapshot(required(pmSnapshot[0], "template pm")),
     data: {
       "pm-tb-1.subtitle": "INC-2025-0067 — 2 mars 2025",
       "pm-kc-1.description": "45 min de latence dégradée.",
@@ -1292,7 +1314,7 @@ for (const doc of DOCUMENTS) {
       ...doc,
       completionPercent: percent,
       exportedAt: doc.status === "finalized" ? new Date() : null,
-    } as typeof documents.$inferInsert);
+    });
     console.log(`  ✓ Document inséré : ${doc.name}`);
   } else {
     console.log(`  — Document déjà présent : ${doc.name}`);

@@ -1,10 +1,10 @@
-import type { PropType } from "./component";
+import type { PropType, PropValue, PropValues } from "./component";
 
 /** Un noeud dans l'arbre de composants */
 export interface ComponentNode {
   id: string;
   type: string;
-  props: Record<string, unknown>;
+  props: PropValues;
   children?: ComponentNode[];
 }
 
@@ -94,7 +94,7 @@ export interface EditableField {
   propKey: string;
   label: string;
   type: PropType;
-  defaultValue: unknown;
+  defaultValue: PropValue;
   required: boolean;
   group?: string;
   order: number;

@@ -4,13 +4,11 @@ import type { SpacingValue } from "@template-generator/shared/types/component";
 interface Props {
   label: string;
   value: SpacingValue;
-  onChange: (v: unknown) => void;
+  onChange: (v: SpacingValue) => void;
 }
 
-const EMPTY: SpacingValue = { top: 0, right: 0, bottom: 0, left: 0 };
-
 export function SpacingPropField({ label, value, onChange }: Props) {
-  const val: SpacingValue = { ...EMPTY, ...(value as SpacingValue | undefined) };
+  const val = value;
   const [linked, setLinked] = useState(false);
 
   const update = (side: keyof SpacingValue, n: number) => {

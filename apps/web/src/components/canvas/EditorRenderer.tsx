@@ -82,27 +82,21 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
   }
 
   const Component = definition.render;
-  const mergedProps = { ...definition.defaultProps, ...resolveThemeVars(node.props, theme), theme };
+  const values = resolveThemeVars(node.props, theme);
 
   if (!definition.acceptsChildren) {
-    const isInlineEditing = inlineEditingNodeId === node.id && !!inlineEditingPropKey;
+    // Clé de la prop éditée sur place dans ce composant, s'il y en a une
+    const editedKey = inlineEditingNodeId === node.id ? inlineEditingPropKey : null;
+    const editedValue = editedKey ? String(node.props[editedKey] ?? "") : "";
     return (
       <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
         <div style={{ position: "relative" }}>
-          <Component {...mergedProps} />
-          {isInlineEditing &&
-            (definition.schema.find((p) => p.key === inlineEditingPropKey)?.type === "text" ? (
-              <InlineTextEditor
-                nodeId={node.id}
-                propKey={inlineEditingPropKey!}
-                value={String(node.props[inlineEditingPropKey!] ?? "")}
-              />
+          <Component values={values} theme={theme} />
+          {editedKey &&
+            (definition.schema.find((p) => p.key === editedKey)?.type === "text" ? (
+              <InlineTextEditor nodeId={node.id} propKey={editedKey} value={editedValue} />
             ) : (
-              <InlineEditor
-                nodeId={node.id}
-                propKey={inlineEditingPropKey!}
-                value={String(node.props[inlineEditingPropKey!] ?? "")}
-              />
+              <InlineEditor nodeId={node.id} propKey={editedKey} value={editedValue} />
             ))}
         </div>
       </SelectableWrapper>
@@ -159,7 +153,9 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
 
   return (
     <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
-      <Component {...mergedProps}>{innerContent}</Component>
+      <Component values={values} theme={theme}>
+        {innerContent}
+      </Component>
     </SelectableWrapper>
   );
 }

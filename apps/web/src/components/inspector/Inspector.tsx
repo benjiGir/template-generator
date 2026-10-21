@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEditorStore } from "@/store/editor-store";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
 import { get } from "@template-generator/component-registry/registry";
 import { findNode } from "@template-generator/shared/utils/tree";
 import type { ComponentNode } from "@template-generator/shared/types/template";
-import type { PropSchema } from "@template-generator/shared/types/component";
+import type { PropSchema, PropValue } from "@template-generator/shared/types/component";
 import { PropField } from "./PropField";
 import { TemplateSettings } from "./TemplateSettings";
 import { PageSettings } from "./PageSettings";
 import { SavePresetDialog } from "./SavePresetDialog";
 import { ThemePanel } from "./ThemePanel";
+import { useSavePreset } from "@/api/hooks/presets";
 
 /** Types de props qui portent du contenu ; le reste règle l'apparence */
 const CONTENT_TYPES = new Set(["text", "textarea", "richtext", "list", "emoji", "image", "icon"]);
@@ -29,15 +27,16 @@ function StyleSections({
   node,
   onUpdate,
 }: {
-  schema: PropSchema[];
+  schema: readonly PropSchema[];
   node: ComponentNode;
-  onUpdate: (key: string, value: unknown) => void;
+  onUpdate: (key: string, value: PropValue) => void;
 }) {
   const groups = new Map<string, PropSchema[]>();
   for (const p of schema) {
     const g = p.group && p.group !== "Style" ? p.group : "Apparence";
-    if (!groups.has(g)) groups.set(g, []);
-    groups.get(g)!.push(p);
+    const group = groups.get(g);
+    if (group) group.push(p);
+    else groups.set(g, [p]);
   }
   const [open, setOpen] = useState<Record<string, boolean>>({ Apparence: true });
 
@@ -81,11 +80,7 @@ export function Inspector() {
   const removeNode = useEditorStore((s) => s.removeNode);
   const duplicateNode = useEditorStore((s) => s.duplicateNode);
   const selectNode = useEditorStore((s) => s.selectNode);
-  const queryClient = useQueryClient();
-  const createPresetMutation = useMutation({
-    mutationFn: (data: Parameters<typeof api.presets.create>[0]) => api.presets.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() }),
-  });
+  const createPresetMutation = useSavePreset();
 
   const [showPresetDialog, setShowPresetDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<"props" | "theme">("props");
@@ -120,14 +115,12 @@ export function Inspector() {
     duplicateNode(nodePageIndex, selectedNodeId);
   };
 
-  const handleSavePreset = async (label: string) => {
+  const handleSavePreset = (label: string) => {
     if (!selectedNode) return;
-    await createPresetMutation.mutateAsync({
-      baseType: selectedNode.type,
-      label,
-      defaultProps: selectedNode.props,
-    });
-    setShowPresetDialog(false);
+    createPresetMutation.mutate(
+      { baseType: selectedNode.type, label, defaultProps: selectedNode.props },
+      { onSuccess: () => setShowPresetDialog(false) },
+    );
   };
 
   const showNoSelection = selectedNodeId === null && template;
@@ -137,12 +130,12 @@ export function Inspector() {
   const inlineEditingPropKey = useEditorStore((s) => s.inlineEditingPropKey);
 
   // Réglages du composant : contenu d'un côté, style de l'autre ; conditions d'affichage appliquées
-  const renderSchema = (schema: PropSchema[], node: ComponentNode) => {
+  const renderSchema = (schema: readonly PropSchema[], node: ComponentNode) => {
     const visible = schema.filter((s) => !s.condition || node.props[s.condition.prop] === s.condition.value);
     const content = visible.filter(isContentProp);
     const style = visible.filter((p) => !isContentProp(p));
     const tab = content.length === 0 ? "style" : style.length === 0 ? "content" : propTab;
-    const onUpdate = (key: string, val: unknown) => updateNodeProps(node.id, { [key]: val });
+    const onUpdate = (key: string, val: PropValue) => updateNodeProps(node.id, { [key]: val });
 
     return (
       <>

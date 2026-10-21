@@ -96,6 +96,9 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
     commit(retained.map((f) => ((f.group ?? null) === from ? { ...f, group: name } : f)));
   };
 
+  /** Action « dissoudre » d'un groupe nommé ; aucune pour les champs sans groupe */
+  const dissolveFor = (name: string | null) => (name ? () => dissolveGroup(name) : undefined);
+
   const dissolveGroup = (name: string) => {
     setExtraGroups((gs) => gs.filter((g) => g !== name));
     commit(retained.map((f) => (f.group === name ? { ...f, group: undefined } : f)));
@@ -174,7 +177,7 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
                     name={item.name}
                     count={retained.filter((f) => (f.group ?? null) === item.name).length}
                     onRename={(to) => renameGroup(item.name, to)}
-                    onDissolve={item.name ? () => dissolveGroup(item.name!) : undefined}
+                    onDissolve={dissolveFor(item.name)}
                   />
                 ) : (
                   <FieldRow

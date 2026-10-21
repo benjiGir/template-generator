@@ -166,6 +166,9 @@ GET    /api/health                    Health check
 - **Client typé** : le front appelle l'API avec `hc<AppType>` (`apps/web/src/api/client.ts`) ; paramètres, corps et
   réponses sont inférés depuis les routes. Changer une route casse la compilation du front là où elle est utilisée.
 - **Tests** : `apps/api/src/app.test.ts` couvre la validation et les erreurs sans base de données.
+- **Côté front** : les écrans passent par les hooks de `apps/web/src/api/hooks` (une règle oxlint interdit `useQuery` et
+  `useMutation` ailleurs). Les invalidations du cache sont écrites une fois dans `apps/web/src/api/cache.ts`, et toute
+  mutation qui échoue affiche un message (texte dans `meta.errorMessage` du hook).
 
 ## Composants disponibles
 

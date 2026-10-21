@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDocumentStore } from "@/store/document-store";
+import { useDocumentStore, useLoadedDocument } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { DocumentTitle } from "@/components/document/DocumentTitle";
 import { FormFillMode, FOCUS_PARAM } from "@/components/document/FormFillMode";
@@ -9,7 +9,7 @@ import { FillModeToggle } from "@/components/document/FillModeToggle";
 import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
 
 export function DocumentFillPage() {
-  const document = useDocumentStore((s) => s.document)!;
+  const document = useLoadedDocument();
   const fillMode = useDocumentStore((s) => s.fillMode);
   const setFillMode = useDocumentStore((s) => s.setFillMode);
   const [searchParams] = useSearchParams();

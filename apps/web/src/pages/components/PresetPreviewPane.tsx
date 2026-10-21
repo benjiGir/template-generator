@@ -2,12 +2,13 @@ import { BUILTIN_THEMES } from "@template-generator/shared/themes/presets";
 import { DEFAULT_THEME } from "@template-generator/shared/types/template";
 import { ComponentPreview } from "@/components/document-view/ComponentPreview";
 import { useComponentDraftStore } from "@/store/component-draft-store";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 /**
  * Aperçu du preset dans une page simulée. Un preset n'a pas de thème propre :
  * il prendra celui du template qui l'utilise, d'où le choix du thème d'aperçu.
  */
-export function PresetPreviewPane({ type, props }: { type: string; props: Record<string, unknown> }) {
+export function PresetPreviewPane({ type, props }: { type: string; props: PropValues }) {
   const previewTheme = useComponentDraftStore((s) => s.previewTheme);
   const setPreviewTheme = useComponentDraftStore((s) => s.setPreviewTheme);
   const theme = BUILTIN_THEMES.find((t) => t.name === previewTheme) ?? DEFAULT_THEME;

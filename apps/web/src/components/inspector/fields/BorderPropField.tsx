@@ -4,10 +4,8 @@ import type { BorderValue } from "@template-generator/shared/types/component";
 interface Props {
   label: string;
   value: BorderValue;
-  onChange: (v: unknown) => void;
+  onChange: (v: BorderValue) => void;
 }
-
-const EMPTY: BorderValue = { style: "solid", width: 1, color: "#000000", radius: 0 };
 
 const BORDER_STYLES: { label: string; value: BorderValue["style"] }[] = [
   { label: "Aucun", value: "none" },
@@ -17,7 +15,7 @@ const BORDER_STYLES: { label: string; value: BorderValue["style"] }[] = [
 ];
 
 export function BorderPropField({ label, value, onChange }: Props) {
-  const val: BorderValue = { ...EMPTY, ...(value as BorderValue | undefined) };
+  const val = value;
 
   const update = <K extends keyof BorderValue>(key: K, v: BorderValue[K]) => {
     onChange({ ...val, [key]: v });

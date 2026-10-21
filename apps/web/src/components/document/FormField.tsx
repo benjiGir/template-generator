@@ -2,11 +2,13 @@ import { useState } from "react";
 import { PropField } from "@/components/inspector/PropField";
 import { isFilled } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
+import type { PropValue } from "@template-generator/shared/types/component";
 
 interface Props {
   field: EditableField;
-  value: unknown;
-  onChange: (value: unknown) => void;
+  /** Absente tant que rien n'est saisi */
+  value: PropValue | undefined;
+  onChange: (value: PropValue) => void;
   onFocus?: () => void;
   active?: boolean;
 }
@@ -15,7 +17,7 @@ interface Props {
 const PLACEHOLDER_TYPES = new Set(["text", "textarea", "richtext", "list"]);
 
 /** Texte lisible du contenu par défaut (le Markdown du texte enrichi est retiré) */
-function defaultAsText(value: unknown): string {
+function defaultAsText(value: PropValue): string {
   if (Array.isArray(value)) return value.filter(Boolean).join(" · ");
   if (typeof value !== "string") return "";
   return value

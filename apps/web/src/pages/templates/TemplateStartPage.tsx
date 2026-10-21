@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { Eye, FilePlus2, LayoutTemplate, Loader2, Search, Sparkles, Upload } from "lucide-react";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
-import { api, type TemplateSummary } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { type TemplateSummary } from "@/api/client";
 import { newTemplateDraft } from "@/store/editor-store";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 import { TemplatePreviewDialog } from "@/components/document-view/TemplatePreviewDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
-import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
+import { TEMPLATE_WORKFLOW, TEMPLATE_PATHS } from "@/workflow/definitions";
+import { useCreateTemplate, useDuplicateTemplate, useTemplate, useTemplates } from "@/api/hooks/templates";
 
 /**
  * Étape 1 de l'Atelier. Le cas courant est de repartir du template du trimestre précédent :
@@ -21,26 +20,21 @@ export function TemplateStartPage() {
   const [creating, setCreating] = useState<string | null>(null);
   const [previewed, setPreviewed] = useState<TemplateSummary | null>(null);
   const [search, setSearch] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const { data: templates = [], isLoading } = useQuery({
-    queryKey: queryKeys.templates.list(),
-    queryFn: () => api.templates.list(),
-  });
+  const { data: templates = [], isLoading } = useTemplates();
+  const createTemplate = useCreateTemplate();
+  const duplicateTemplate = useDuplicateTemplate();
 
   // Le template est créé tout de suite ; on remplace l'URL pour que « retour » ne relance pas une création
   const start = async (source: TemplateSummary | null) => {
     if (creating) return;
     setCreating(source?.id ?? "blank");
-    setError(null);
     try {
       const created = source
-        ? await api.templates.duplicate(source.id)
-        : await api.templates.create(newTemplateDraft());
-      navigate(TEMPLATE_WORKFLOW.steps[1]!.path(created.id), { replace: true });
-    } catch (e) {
-      console.error("Erreur création template:", e);
-      setError("La création du template a échoué. Réessayez.");
+        ? await duplicateTemplate.mutateAsync(source.id)
+        : await createTemplate.mutateAsync(newTemplateDraft());
+      navigate(TEMPLATE_PATHS.theme(created.id), { replace: true });
+    } catch {
+      // Échec signalé par le message d'erreur global ; on peut choisir de nouveau
       setCreating(null);
     }
   };
@@ -59,8 +53,6 @@ export function TemplateStartPage() {
     >
       <div className="h-full overflow-y-auto bg-gray-50 px-8 py-6">
         <div className="mx-auto max-w-5xl space-y-8">
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
           {(isLoading || templates.length > 0) && (
             <section>
               <div className="mb-4 flex items-end justify-between gap-4">
@@ -229,10 +221,7 @@ function AtelierTemplatePreview({
   onChoose: () => void;
   onClose: () => void;
 }) {
-  const { data: full } = useQuery({
-    queryKey: queryKeys.templates.detail(template.id),
-    queryFn: () => api.templates.get(template.id),
-  });
+  const { data: full } = useTemplate(template.id);
   return (
     <TemplatePreviewDialog
       title={template.name}

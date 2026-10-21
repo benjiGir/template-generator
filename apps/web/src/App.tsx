@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-router-dom";
 import { RootLayout } from "@/layouts/RootLayout";
+import { RouteError } from "@/components/ui/RouteError";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { TemplatesListPage } from "@/pages/templates/TemplatesListPage";
 import { TemplateStartPage } from "@/pages/templates/TemplateStartPage";
@@ -28,54 +29,61 @@ function LegacyTemplateEdit() {
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteError />,
     children: [
-      { path: "/", element: <DashboardPage /> },
-
-      // Studio de Publication
-      { path: "/documents", element: <DocumentsListPage /> },
-      { path: "/documents/new", element: <DocumentSelectPage /> },
       {
-        path: "/documents/:id",
-        element: <DocumentWorkflowRoute />,
+        // Un écran qui plante est remplacé par un message, la navigation reste autour
+        errorElement: <RouteError />,
         children: [
-          { index: true, element: <DocumentEntryRedirect /> },
-          { path: "fill", element: <DocumentFillPage /> },
-          { path: "preview", element: <DocumentPreviewPage /> },
-          { path: "export", element: <DocumentExportPage /> },
+          { path: "/", element: <DashboardPage /> },
+
+          // Studio de Publication
+          { path: "/documents", element: <DocumentsListPage /> },
+          { path: "/documents/new", element: <DocumentSelectPage /> },
+          {
+            path: "/documents/:id",
+            element: <DocumentWorkflowRoute />,
+            children: [
+              { index: true, element: <DocumentEntryRedirect /> },
+              { path: "fill", element: <DocumentFillPage /> },
+              { path: "preview", element: <DocumentPreviewPage /> },
+              { path: "export", element: <DocumentExportPage /> },
+            ],
+          },
+
+          // Atelier Templates
+          { path: "/templates", element: <TemplatesListPage /> },
+          { path: "/templates/new", element: <TemplateStartPage /> },
+          { path: "/templates/:id/edit", element: <LegacyTemplateEdit /> },
+          {
+            path: "/templates/:id",
+            element: <TemplateWorkflowRoute />,
+            children: [
+              { index: true, element: <Navigate to="build" replace /> },
+              { path: "theme", element: <TemplateThemePage /> },
+              { path: "build", element: <TemplateBuildPage /> },
+              { path: "publish", element: <TemplatePublishPage /> },
+            ],
+          },
+
+          // Bibliothèque de presets (« new » ou identifiant du preset modifié)
+          { path: "/components", element: <ComponentsListPage /> },
+          {
+            path: "/components/:presetId",
+            element: <PresetWorkflowRoute />,
+            children: [
+              { index: true, element: <PresetEntry /> },
+              { path: "configure", element: <ComponentEditPage /> },
+              { path: "save", element: <ComponentSavePage /> },
+            ],
+          },
+
+          { path: "/aide", element: <HelpPage /> },
+          { path: "/aide/:slug", element: <HelpPage /> },
+
+          { path: "*", element: <Navigate to="/" replace /> },
         ],
       },
-
-      // Atelier Templates
-      { path: "/templates", element: <TemplatesListPage /> },
-      { path: "/templates/new", element: <TemplateStartPage /> },
-      { path: "/templates/:id/edit", element: <LegacyTemplateEdit /> },
-      {
-        path: "/templates/:id",
-        element: <TemplateWorkflowRoute />,
-        children: [
-          { index: true, element: <Navigate to="build" replace /> },
-          { path: "theme", element: <TemplateThemePage /> },
-          { path: "build", element: <TemplateBuildPage /> },
-          { path: "publish", element: <TemplatePublishPage /> },
-        ],
-      },
-
-      // Bibliothèque de presets (« new » ou identifiant du preset modifié)
-      { path: "/components", element: <ComponentsListPage /> },
-      {
-        path: "/components/:presetId",
-        element: <PresetWorkflowRoute />,
-        children: [
-          { index: true, element: <PresetEntry /> },
-          { path: "configure", element: <ComponentEditPage /> },
-          { path: "save", element: <ComponentSavePage /> },
-        ],
-      },
-
-      { path: "/aide", element: <HelpPage /> },
-      { path: "/aide/:slug", element: <HelpPage /> },
-
-      { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
 ]);

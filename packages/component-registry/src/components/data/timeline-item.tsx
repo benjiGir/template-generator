@@ -1,18 +1,31 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { resolveColor } from "../../color-map";
 import { RichBlock } from "../../rich-text";
 
-interface Props {
-  theme: Theme;
-  date?: string;
-  title?: string;
-  description?: string;
-  color?: string;
-}
+const schema = defineSchema([
+  { key: "date", label: "Date", type: "text", defaultValue: "Janv. 2025", group: "Contenu" },
+  { key: "title", label: "Titre", type: "text", defaultValue: "Événement", group: "Contenu" },
+  { key: "description", label: "Description", type: "richtext", defaultValue: "", group: "Contenu" },
+  {
+    key: "color",
+    label: "Couleur",
+    type: "select",
+    defaultValue: "blue",
+    group: "Style",
+    options: [
+      { label: "Bleu", value: "blue" },
+      { label: "Vert", value: "green" },
+      { label: "Ambre", value: "amber" },
+      { label: "Rouge", value: "red" },
+    ],
+  },
+]);
 
-function TimelineItem({ theme, date = "", title = "", description = "", color = "blue" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function TimelineItem({ theme, date, title, description, color }: Props) {
   const accentColor = resolveColor(color, theme);
 
   return (
@@ -78,31 +91,13 @@ function TimelineItem({ theme, date = "", title = "", description = "", color = 
   );
 }
 
-register({
+defineComponent({
   type: "timeline-item",
   label: "Élément de timeline",
   icon: "Clock",
   category: "data",
   description: "Entrée chronologique avec date, titre et description",
-  schema: [
-    { key: "date", label: "Date", type: "text", defaultValue: "Janv. 2025", group: "Contenu" },
-    { key: "title", label: "Titre", type: "text", defaultValue: "Événement", group: "Contenu" },
-    { key: "description", label: "Description", type: "richtext", defaultValue: "", group: "Contenu" },
-    {
-      key: "color",
-      label: "Couleur",
-      type: "select",
-      defaultValue: "blue",
-      group: "Style",
-      options: [
-        { label: "Bleu", value: "blue" },
-        { label: "Vert", value: "green" },
-        { label: "Ambre", value: "amber" },
-        { label: "Rouge", value: "red" },
-      ],
-    },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { date: "Janv. 2025", title: "Événement", description: "", color: "blue" },
-  render: TimelineItem as RegisteredComponent["render"],
+  render: TimelineItem,
 });

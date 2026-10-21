@@ -2,10 +2,11 @@ import { useState } from "react";
 import { FormFieldGroup } from "@/components/document/FormFieldGroup";
 import { groupOrder } from "@template-generator/shared/utils/field-detection";
 import type { EditableField } from "@template-generator/shared/types/template";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 /** Le formulaire que verra le contributeur dans le Studio ; les saisies d'essai ne sont pas enregistrées */
 export function FormPreview({ fields }: { fields: EditableField[] }) {
-  const [data, setData] = useState<Record<string, unknown>>({});
+  const [data, setData] = useState<PropValues>({});
   const [active, setActive] = useState<string | null>(null);
 
   const groups = groupOrder(fields);

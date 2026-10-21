@@ -32,14 +32,14 @@ function injectGoogleFont(font: string) {
 interface Props {
   label: string;
   value: string;
-  onChange: (v: unknown) => void;
+  onChange: (v: string) => void;
 }
 
 export function FontPropField({ label, value, onChange }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const current = (value as string | undefined) ?? "";
+  const current = value;
 
   useEffect(() => {
     if (current) injectGoogleFont(current);
@@ -47,7 +47,7 @@ export function FontPropField({ label, value, onChange }: Props) {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (containerRef.current && !(e.target instanceof Node && containerRef.current.contains(e.target))) {
         setOpen(false);
         setQuery("");
       }

@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeOff, MousePointerClick, RotateCcw, Send } from "lucide-react";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
-import { useEditorStore } from "@/store/editor-store";
+import { useEditorStore, useLoadedTemplate } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
@@ -16,6 +13,7 @@ import { templateStatus } from "@template-generator/shared/utils/fields";
 import { detectFields, reconcileFields, suggestedFields } from "@template-generator/shared/utils/field-detection";
 import { FieldsEditor } from "./fields/FieldsEditor";
 import { FormPreview } from "./fields/FormPreview";
+import { usePublishTemplate } from "@/api/hooks/templates";
 
 type Tab = "fields" | "form" | "info";
 
@@ -26,10 +24,10 @@ type Tab = "fields" | "form" | "info";
  */
 export function TemplatePublishPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const publishTemplate = usePublishTemplate();
   const confirm = useConfirm();
   const session = useWorkflowSession();
-  const template = useEditorStore((s) => s.template)!;
+  const template = useLoadedTemplate();
   const updateTemplateMeta = useEditorStore((s) => s.updateTemplateMeta);
   const setEditableFields = useEditorStore((s) => s.setEditableFields);
   const applyServerState = useEditorStore((s) => s.applyServerState);
@@ -67,9 +65,9 @@ export function TemplatePublishPage() {
 
   // Clic dans le document : le composant le plus proche qui a des contenus modifiables
   const handlePick = (e: React.MouseEvent) => {
-    let el = e.target as HTMLElement | null;
+    let el = e.target instanceof Element ? e.target : null;
     while (el) {
-      const nodeId = el.dataset?.["nodeId"];
+      const nodeId = el.getAttribute("data-node-id");
       if (nodeId && detected.some((f) => f.nodeId === nodeId)) {
         setSelectedNode(nodeId);
         setPickMessage(null);
@@ -87,12 +85,11 @@ export function TemplatePublishPage() {
 
   const publish = async () => {
     await session?.flush();
-    const result = await api.templates.publish(template.id, {
+    const result = await publishTemplate.mutateAsync({
+      id: template.id,
       editableFields: retained.map(({ location: _l, ...f }) => f),
     });
     applyServerState(result);
-    queryClient.setQueryData(queryKeys.templates.detail(result.id), result);
-    await queryClient.invalidateQueries({ queryKey: ["templates", "list"] });
     navigate("/templates");
   };
 

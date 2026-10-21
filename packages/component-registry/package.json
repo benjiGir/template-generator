@@ -6,7 +6,8 @@
   "exports": {
     "./registry": "./src/registry.ts",
     "./renderer": "./src/renderer.tsx",
-    "./components": "./src/components.ts"
+    "./components": "./src/components.ts",
+    "./icons": "./src/icons.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

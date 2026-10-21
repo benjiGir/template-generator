@@ -1,4 +1,4 @@
-import { useEditorStore } from "@/store/editor-store";
+import { useLoadedTemplate } from "@/store/editor-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { ThemePanel } from "@/components/inspector/ThemePanel";
@@ -7,7 +7,7 @@ import { SAMPLE_PAGE } from "@/components/document-view/samplePage";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
 
 export function TemplateThemePage() {
-  const template = useEditorStore((s) => s.template)!;
+  const template = useLoadedTemplate();
   const isEmpty = template.pages.every((p) => p.children.length === 0);
 
   return (

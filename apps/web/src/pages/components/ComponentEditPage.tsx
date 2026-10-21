@@ -5,9 +5,9 @@ import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { PropField } from "@/components/inspector/PropField";
 import { PresetPreviewPane } from "./PresetPreviewPane";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { PRESET_WORKFLOW, PRESET_PATHS } from "@/workflow/definitions";
 import { NotFoundState } from "@/workflow/EntityState";
-import type { PropSchema } from "@template-generator/shared/types/component";
+import type { PropSchema, PropValue, PropValues } from "@template-generator/shared/types/component";
 
 export function ComponentEditPage() {
   const { presetId } = useParams<{ presetId: string }>();
@@ -21,7 +21,7 @@ export function ComponentEditPage() {
     return (
       <NotFoundState
         message="Aucun composant choisi."
-        backTo={PRESET_WORKFLOW.steps[0]!.path("new")}
+        backTo={PRESET_PATHS.select()}
         backLabel="Choisir un composant"
       />
     );
@@ -45,8 +45,9 @@ export function ComponentEditPage() {
   const groupMap = new Map<string, PropSchema[]>();
   for (const s of visibleSchema) {
     const g = s.group ?? "Général";
-    if (!groupMap.has(g)) groupMap.set(g, []);
-    groupMap.get(g)!.push(s);
+    const group = groupMap.get(g);
+    if (group) group.push(s);
+    else groupMap.set(g, [s]);
   }
 
   const handleReset = () => {
@@ -106,8 +107,8 @@ function GroupedProps({
   onUpdate,
 }: {
   groupMap: Map<string, PropSchema[]>;
-  props: Record<string, unknown>;
-  onUpdate: (key: string, value: unknown) => void;
+  props: PropValues;
+  onUpdate: (key: string, value: PropValue) => void;
 }) {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const toggle = (g: string) => setCollapsed((c) => ({ ...c, [g]: !c[g] }));

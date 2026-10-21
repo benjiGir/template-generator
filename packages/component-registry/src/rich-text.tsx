@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { parseMarkdown, parseBlocks } from "@template-generator/shared/utils/markdown";
 import type { Block } from "@template-generator/shared/utils/markdown";
 
@@ -40,41 +40,35 @@ export function RichBlock({ text, style }: { text: string; style?: CSSProperties
   const blocks = parseBlocks(text);
   if (blocks.length === 0) return null;
 
-  const elements: React.ReactNode[] = [];
+  const elements: ReactNode[] = [];
   let i = 0;
 
-  while (i < blocks.length) {
-    const block = blocks[i] as Block;
+  // Les puces consécutives d'un même type forment une liste
+  const takeItems = (type: Block["type"]): string[] => {
+    const items: string[] = [];
+    for (let next = blocks[i]; next?.type === type; next = blocks[i]) {
+      items.push(next.content);
+      i++;
+    }
+    return items;
+  };
 
-    if (block.type === "ul-item") {
-      const items: string[] = [];
-      while (i < blocks.length && blocks[i]?.type === "ul-item") {
-        items.push(blocks[i]!.content);
-        i++;
-      }
+  for (let block = blocks[i]; block; block = blocks[i]) {
+    if (block.type === "ul-item" || block.type === "ol-item") {
+      const List = block.type === "ul-item" ? "ul" : "ol";
+      const listStyle: CSSProperties =
+        block.type === "ul-item"
+          ? { margin: "0 0 4px", paddingLeft: 16, listStyleType: "disc" }
+          : { margin: "0 0 4px", paddingLeft: 16 };
+      const items = takeItems(block.type);
       elements.push(
-        <ul key={`ul-${i}`} style={{ margin: "0 0 4px", paddingLeft: 16, listStyleType: "disc" }}>
+        <List key={`${List}-${i}`} style={listStyle}>
           {items.map((content, j) => (
             <li key={j} style={style}>
               <RichText text={content} />
             </li>
           ))}
-        </ul>,
-      );
-    } else if (block.type === "ol-item") {
-      const items: string[] = [];
-      while (i < blocks.length && blocks[i]?.type === "ol-item") {
-        items.push(blocks[i]!.content);
-        i++;
-      }
-      elements.push(
-        <ol key={`ol-${i}`} style={{ margin: "0 0 4px", paddingLeft: 16 }}>
-          {items.map((content, j) => (
-            <li key={j} style={style}>
-              <RichText text={content} />
-            </li>
-          ))}
-        </ol>,
+        </List>,
       );
     } else {
       elements.push(

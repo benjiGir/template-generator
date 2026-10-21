@@ -19,16 +19,38 @@ export interface WorkflowDef {
   steps: WorkflowStepDef[];
 }
 
+/** Adresses des étapes, à utiliser pour naviguer d'un écran à l'autre */
+export const TEMPLATE_PATHS = {
+  start: () => "/templates/new",
+  theme: (id: string) => `/templates/${id}/theme`,
+  build: (id: string) => `/templates/${id}/build`,
+  publish: (id: string) => `/templates/${id}/publish`,
+};
+
+export const DOCUMENT_PATHS = {
+  select: () => "/documents/new",
+  fill: (id: string) => `/documents/${id}/fill`,
+  preview: (id: string) => `/documents/${id}/preview`,
+  export: (id: string) => `/documents/${id}/export`,
+};
+
+/** L'identifiant vaut « new » pour un preset en cours de création */
+export const PRESET_PATHS = {
+  select: () => "/components/new",
+  configure: (id: string) => `/components/${id}/configure`,
+  save: (id: string) => `/components/${id}/save`,
+};
+
 export const TEMPLATE_WORKFLOW: WorkflowDef = {
   space: "Atelier",
   kind: "tpl",
   listPath: "/templates",
   listLabel: "Templates",
   steps: [
-    { key: "start", label: "Point de départ", path: () => "/templates/new" },
-    { key: "theme", label: "Thème", path: (id) => `/templates/${id}/theme` },
-    { key: "build", label: "Construire", path: (id) => `/templates/${id}/build` },
-    { key: "publish", label: "Champs et publication", path: (id) => `/templates/${id}/publish` },
+    { key: "start", label: "Point de départ", path: TEMPLATE_PATHS.start },
+    { key: "theme", label: "Thème", path: TEMPLATE_PATHS.theme },
+    { key: "build", label: "Construire", path: TEMPLATE_PATHS.build },
+    { key: "publish", label: "Champs et publication", path: TEMPLATE_PATHS.publish },
   ],
 };
 
@@ -38,10 +60,10 @@ export const DOCUMENT_WORKFLOW: WorkflowDef = {
   listPath: "/documents",
   listLabel: "Documents",
   steps: [
-    { key: "select", label: "Choisir un template", path: () => "/documents/new" },
-    { key: "fill", label: "Remplir", path: (id) => `/documents/${id}/fill` },
-    { key: "preview", label: "Relire", path: (id) => `/documents/${id}/preview` },
-    { key: "export", label: "Exporter", path: (id) => `/documents/${id}/export` },
+    { key: "select", label: "Choisir un template", path: DOCUMENT_PATHS.select },
+    { key: "fill", label: "Remplir", path: DOCUMENT_PATHS.fill },
+    { key: "preview", label: "Relire", path: DOCUMENT_PATHS.preview },
+    { key: "export", label: "Exporter", path: DOCUMENT_PATHS.export },
   ],
 };
 
@@ -52,8 +74,8 @@ export const PRESET_WORKFLOW: WorkflowDef = {
   listPath: "/components",
   listLabel: "Presets",
   steps: [
-    { key: "select", label: "Composant de base", path: () => "/components/new" },
-    { key: "configure", label: "Configurer", path: (id) => `/components/${id}/configure` },
-    { key: "save", label: "Nommer et ranger", path: (id) => `/components/${id}/save` },
+    { key: "select", label: "Composant de base", path: PRESET_PATHS.select },
+    { key: "configure", label: "Configurer", path: PRESET_PATHS.configure },
+    { key: "save", label: "Nommer et ranger", path: PRESET_PATHS.save },
   ],
 };

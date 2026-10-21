@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, Outlet, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import { Navigate, Outlet } from "react-router-dom";
+import { useRouteParam } from "@/workflow/params";
 import { useComponentDraftStore } from "@/store/component-draft-store";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { WorkflowSessionProvider, useWorkflowExitGuard } from "@/workflow/session";
 import { LoadingState, NotFoundState } from "@/workflow/EntityState";
-import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { PRESET_PATHS } from "@/workflow/definitions";
 import { ComponentSelectPage } from "./ComponentSelectPage";
+import { usePreset } from "@/api/hooks/presets";
 
 /**
  * Route parente du workflow preset : `/components/new/*` pour une création,
@@ -16,7 +15,7 @@ import { ComponentSelectPage } from "./ComponentSelectPage";
  * quitter avant demande confirmation.
  */
 export function PresetWorkflowRoute() {
-  const { presetId } = useParams<{ presetId: string }>();
+  const presetId = useRouteParam("presetId");
   const isNew = presetId === "new";
   const confirm = useConfirm();
   const editingId = useComponentDraftStore((s) => s.editingId);
@@ -25,25 +24,21 @@ export function PresetWorkflowRoute() {
   const [ready, setReady] = useState(false);
   const loadedFor = useRef<string | null>(null);
 
-  const query = useQuery({
-    queryKey: queryKeys.presets.detail(presetId!),
-    queryFn: () => api.presets.get(presetId!),
-    enabled: !isNew && editingId !== presetId,
-  });
+  const query = usePreset(presetId, { enabled: !isNew && editingId !== presetId });
 
   useEffect(() => {
     if (loadedFor.current === presetId) return;
     if (isNew) {
       // Un brouillon de création en cours est conservé ; celui d'une modification ne l'est pas
       if (useComponentDraftStore.getState().editingId) reset();
-      loadedFor.current = presetId!;
+      loadedFor.current = presetId;
       setReady(true);
     } else if (editingId === presetId) {
-      loadedFor.current = presetId!;
+      loadedFor.current = presetId;
       setReady(true);
     } else if (query.data) {
       loadPreset(query.data);
-      loadedFor.current = presetId!;
+      loadedFor.current = presetId;
       setReady(true);
     }
   }, [presetId, isNew, editingId, query.data, loadPreset, reset]);
@@ -84,7 +79,7 @@ export function PresetWorkflowRoute() {
 
 /** Index : choix du composant pour une création, configuration directe pour une modification */
 export function PresetEntry() {
-  const { presetId } = useParams<{ presetId: string }>();
+  const presetId = useRouteParam("presetId");
   if (presetId === "new") return <ComponentSelectPage />;
-  return <Navigate to={PRESET_WORKFLOW.steps[1]!.path(presetId!)} replace />;
+  return <Navigate to={PRESET_PATHS.configure(presetId)} replace />;
 }

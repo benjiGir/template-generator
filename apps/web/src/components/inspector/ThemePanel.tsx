@@ -1,14 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
 import { ThemePresetPicker } from "./ThemePresetPicker";
 import { COLOR_GROUPS, ColorTokenRow } from "./ThemeColorEditor";
 import { ThemeTypographyEditor } from "./ThemeTypographyEditor";
 import { ThemeSpacingEditor } from "./ThemeSpacingEditor";
 import { ThemeBorderEditor } from "./ThemeBorderEditor";
+import { useCreateTheme } from "@/api/hooks/themes";
 
 /** Recherche insensible à la casse et aux accents */
 function normalize(text: string): string {
@@ -81,7 +79,7 @@ const OTHER_SECTIONS = [
  * on cherche « la couleur des encadrés de résultat », pas « backgroundAlt ».
  */
 export function ThemePanel() {
-  const queryClient = useQueryClient();
+  const createTheme = useCreateTheme();
   const theme = useEditorStore((s) => s.template?.theme);
   const [query, setQuery] = useState("");
   const [saving, setSaving] = useState(false);
@@ -98,11 +96,12 @@ export function ThemePanel() {
     if (!saveName.trim()) return;
     setSaving(true);
     try {
-      await api.themes.create({ name: saveName.trim(), theme: { ...theme, name: saveName.trim() } });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.themes.list() });
+      await createTheme.mutateAsync({ name: saveName.trim(), theme: { ...theme, name: saveName.trim() } });
       setSavedMessage(`Thème « ${saveName.trim()} » ajouté aux thèmes prédéfinis.`);
       setShowSaveForm(false);
       setSaveName("");
+    } catch {
+      // Échec signalé par le message d'erreur global ; le formulaire reste ouvert pour réessayer
     } finally {
       setSaving(false);
     }

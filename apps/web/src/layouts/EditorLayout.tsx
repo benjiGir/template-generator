@@ -50,8 +50,11 @@ export function EditorLayout() {
       }
 
       if (e.key === "Delete") {
-        const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        const target = e.target;
+        if (
+          target instanceof HTMLElement &&
+          (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+        ) {
           return;
         }
         if (!selectedNodeId || !template) return;

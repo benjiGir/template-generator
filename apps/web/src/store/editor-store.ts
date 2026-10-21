@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { current, isDraft } from "immer";
 import type {
   Template,
   ComponentNode,
@@ -16,6 +17,7 @@ import {
   duplicateNode as treeDuplicateNode,
   generateNodeId,
 } from "@template-generator/shared/utils/tree";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 interface EditorState {
   template: Template | null;
@@ -50,7 +52,7 @@ interface EditorState {
     newParentId: string | null,
     newIndex: number,
   ) => void;
-  updateNodeProps: (nodeId: string, props: Record<string, unknown>) => void;
+  updateNodeProps: (nodeId: string, props: PropValues) => void;
   duplicateNode: (pageIndex: number, nodeId: string) => void;
 
   selectNode: (nodeId: string | null) => void;
@@ -69,7 +71,8 @@ interface EditorState {
 }
 
 function cloneTemplate(t: Template): Template {
-  return JSON.parse(JSON.stringify(t)) as Template;
+  // Dans un producteur immer, `t` est un brouillon (Proxy) : on copie son état courant
+  return structuredClone(isDraft(t) ? current(t) : t);
 }
 
 function pushHistory(state: EditorState, template: Template): void {
@@ -214,7 +217,7 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         const page = s.template.pages[pageIndex];
         if (!page) return;
-        page.children = insertNode(page.children as ComponentNode[], parentId, index, node) as typeof page.children;
+        page.children = insertNode(page.children, parentId, index, node);
         s.selectedNodeId = node.id;
         s.revision++;
       }),
@@ -225,7 +228,7 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         const page = s.template.pages[pageIndex];
         if (!page) return;
-        page.children = treeRemoveNode(page.children as ComponentNode[], nodeId) as typeof page.children;
+        page.children = treeRemoveNode(page.children, nodeId);
         if (s.selectedNodeId === nodeId) s.selectedNodeId = null;
         s.revision++;
       }),
@@ -236,16 +239,11 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         const fromPage = s.template.pages[fromPageIndex];
         if (!fromPage) return;
-        const node = findNode(fromPage.children as ComponentNode[], nodeId);
+        const node = findNode(fromPage.children, nodeId);
         if (!node) return;
-        fromPage.children = treeRemoveNode(fromPage.children as ComponentNode[], nodeId) as typeof fromPage.children;
+        fromPage.children = treeRemoveNode(fromPage.children, nodeId);
         const toPage = s.template.pages[toPageIndex] ?? fromPage;
-        toPage.children = insertNode(
-          toPage.children as ComponentNode[],
-          newParentId,
-          newIndex,
-          node,
-        ) as typeof toPage.children;
+        toPage.children = insertNode(toPage.children, newParentId, newIndex, node);
         s.revision++;
       }),
 
@@ -254,9 +252,9 @@ export const useEditorStore = create<EditorState>()(
         if (!s.template) return;
         pushHistory(s, s.template);
         for (const page of s.template.pages) {
-          const node = findNode(page.children as ComponentNode[], nodeId);
+          const node = findNode(page.children, nodeId);
           if (node) {
-            node.props = { ...node.props, ...props } as typeof node.props;
+            node.props = { ...node.props, ...props };
             break;
           }
         }
@@ -269,7 +267,7 @@ export const useEditorStore = create<EditorState>()(
         pushHistory(s, s.template);
         const page = s.template.pages[pageIndex];
         if (!page) return;
-        page.children = treeDuplicateNode(page.children as ComponentNode[], nodeId) as typeof page.children;
+        page.children = treeDuplicateNode(page.children, nodeId);
         s.revision++;
       }),
 
@@ -342,4 +340,14 @@ export function newTemplateDraft(): Pick<
     editableFields: [],
     tags: [],
   };
+}
+
+/**
+ * Template en cours d'édition, pour les étapes de l'Atelier : leur route parente ne les affiche
+ * qu'une fois le template chargé. Hors de ce parcours, l'erreur est explicite.
+ */
+export function useLoadedTemplate(): Template {
+  const template = useEditorStore((s) => s.template);
+  if (!template) throw new Error("Template non chargé : cet écran s'affiche dans le parcours de l'Atelier");
+  return template;
 }

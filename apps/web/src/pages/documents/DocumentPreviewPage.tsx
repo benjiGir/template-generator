@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { useDocumentStore } from "@/store/document-store";
+import { useDocumentStore, useLoadedDocument } from "@/store/document-store";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { DocumentTitle } from "@/components/document/DocumentTitle";
 import { FOCUS_PARAM } from "@/components/document/FormFillMode";
 import { PreviewPane } from "@/components/document-view/PreviewPane";
-import { DOCUMENT_WORKFLOW } from "@/workflow/definitions";
+import { DOCUMENT_WORKFLOW, DOCUMENT_PATHS } from "@/workflow/definitions";
 import { computeCompletion, fieldKey } from "@template-generator/shared/utils/fields";
 
 /** Relecture : le document tel qu'il sortira en PDF, sans aucun outil d'édition */
 export function DocumentPreviewPage() {
-  const document = useDocumentStore((s) => s.document)!;
+  const document = useLoadedDocument();
   const editableFields = useDocumentStore((s) => s.editableFields);
   const data = useDocumentStore((s) => s.data);
   const getMergedTemplate = useDocumentStore((s) => s.getMergedTemplate);
@@ -19,7 +19,7 @@ export function DocumentPreviewPage() {
 
   const mergedTemplate = getMergedTemplate();
   const { missingRequired } = computeCompletion(editableFields, data);
-  const fillPath = DOCUMENT_WORKFLOW.steps[1]!.path(document.id);
+  const fillPath = DOCUMENT_PATHS.fill(document.id);
 
   return (
     <WorkflowLayout workflow={DOCUMENT_WORKFLOW} current="preview" entityId={document.id} title={<DocumentTitle />}>

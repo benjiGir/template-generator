@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy, LayoutTemplate, Trash2 } from "lucide-react";
-import { api, type TemplateSummary } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
+import type { TemplateSummary } from "@/api/client";
+import { useDeleteTemplate, useDuplicateTemplate, useTemplates } from "@/api/hooks/templates";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
@@ -11,27 +10,11 @@ import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 
 export function TemplatesListPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
 
-  const {
-    data: templates = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: queryKeys.templates.list(),
-    queryFn: () => api.templates.list(),
-  });
-
-  const duplicateMutation = useMutation({
-    mutationFn: (id: string) => api.templates.duplicate(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["templates", "list"] }),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.templates.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["templates", "list"] }),
-  });
+  const { data: templates = [], isLoading, error } = useTemplates();
+  const duplicateMutation = useDuplicateTemplate();
+  const deleteMutation = useDeleteTemplate();
 
   const handleDelete = async (e: React.MouseEvent, t: TemplateSummary) => {
     e.stopPropagation();

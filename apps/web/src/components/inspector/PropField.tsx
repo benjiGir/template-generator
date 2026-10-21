@@ -1,4 +1,5 @@
-import type { PropSchema, SpacingValue, BorderValue, ImageValue } from "@template-generator/shared/types/component";
+import type { PropType, PropValue } from "@template-generator/shared/types/component";
+import { editorValue } from "@template-generator/shared/utils/prop-values";
 import { TextPropField } from "./fields/TextPropField";
 import { TextareaPropField } from "./fields/TextareaPropField";
 import { RichtextPropField } from "./RichtextPropField";
@@ -14,10 +15,22 @@ import { BorderPropField } from "./fields/BorderPropField";
 import { ImagePropField } from "./fields/ImagePropField";
 import { IconPropField } from "./fields/IconPropField";
 
+/** Ce dont un éditeur de prop a besoin : une prop du registre, ou un champ du formulaire du Studio */
+export interface PropFieldSpec {
+  key: string;
+  label: string;
+  type: PropType;
+  defaultValue?: PropValue;
+  options?: readonly { label: string; value: string }[];
+  placeholder?: string;
+  required?: boolean;
+}
+
 interface Props {
-  schema: PropSchema;
-  value: unknown;
-  onChange: (value: unknown) => void;
+  schema: PropFieldSpec;
+  /** Absente tant que rien n'est saisi : l'éditeur montre la valeur par défaut */
+  value: PropValue | undefined;
+  onChange: (value: PropValue) => void;
 }
 
 /** Types dont le composant de saisie n'affiche pas son propre libellé */
@@ -35,81 +48,40 @@ export function PropField(props: Props) {
 }
 
 function PropInput({ schema, value, onChange }: Props) {
-  const str = (value as string | undefined) ?? String(schema.defaultValue ?? "");
-  const num = (value as number | undefined) ?? (schema.defaultValue as number) ?? 0;
-  const bool = (value as boolean | undefined) ?? (schema.defaultValue as boolean) ?? false;
-  const list = (value as string[] | undefined) ?? (schema.defaultValue as string[]) ?? [];
+  const { label, placeholder, defaultValue } = schema;
+  // Valeur du type de l'éditeur : saisie, sinon défaut, sinon vide
+  const valueAs = <T extends PropType>(type: T) => editorValue(type, value, defaultValue);
 
   switch (schema.type) {
     case "text":
-      return <TextPropField value={str} placeholder={schema.placeholder} onChange={onChange} />;
-
+      return <TextPropField value={valueAs("text")} placeholder={placeholder} onChange={onChange} />;
     case "textarea":
-      return <TextareaPropField value={str} placeholder={schema.placeholder} onChange={onChange} />;
-
+      return <TextareaPropField value={valueAs("textarea")} placeholder={placeholder} onChange={onChange} />;
     case "richtext":
       return (
-        <RichtextPropField label={schema.label} value={str} placeholder={schema.placeholder} onChange={onChange} />
+        <RichtextPropField label={label} value={valueAs("richtext")} placeholder={placeholder} onChange={onChange} />
       );
-
     case "number":
-      return <NumberPropField value={num} onChange={onChange} />;
-
+      return <NumberPropField value={valueAs("number")} onChange={onChange} />;
     case "boolean":
-      return <BooleanPropField label={schema.label} value={bool} onChange={onChange} />;
-
+      return <BooleanPropField label={label} value={valueAs("boolean")} onChange={onChange} />;
     case "select":
-      return <SelectPropField value={str} options={schema.options ?? []} onChange={onChange} />;
-
+      return <SelectPropField value={valueAs("select")} options={schema.options ?? []} onChange={onChange} />;
     case "color":
-      return <ColorPropField label={schema.label} value={str} onChange={onChange} />;
-
+      return <ColorPropField label={label} value={valueAs("color")} onChange={onChange} />;
     case "list":
-      return <ListPropField label={schema.label} value={list} onChange={onChange} />;
-
+      return <ListPropField label={label} value={valueAs("list")} onChange={onChange} />;
     case "emoji":
-      return <EmojiPropField value={str} onChange={onChange} />;
-
+      return <EmojiPropField value={valueAs("emoji")} onChange={onChange} />;
     case "spacing":
-      return (
-        <SpacingPropField
-          label={schema.label}
-          value={
-            (value as SpacingValue | undefined) ??
-            (schema.defaultValue as SpacingValue) ?? { top: 0, right: 0, bottom: 0, left: 0 }
-          }
-          onChange={onChange}
-        />
-      );
-
+      return <SpacingPropField label={label} value={valueAs("spacing")} onChange={onChange} />;
     case "font":
-      return <FontPropField label={schema.label} value={str} onChange={onChange} />;
-
+      return <FontPropField label={label} value={valueAs("font")} onChange={onChange} />;
     case "border":
-      return (
-        <BorderPropField
-          label={schema.label}
-          value={
-            (value as BorderValue | undefined) ??
-            (schema.defaultValue as BorderValue) ?? { style: "solid", width: 1, color: "#000000", radius: 0 }
-          }
-          onChange={onChange}
-        />
-      );
-
+      return <BorderPropField label={label} value={valueAs("border")} onChange={onChange} />;
     case "image":
-      return (
-        <ImagePropField
-          label={schema.label}
-          value={(value as ImageValue | undefined) ?? (schema.defaultValue as ImageValue) ?? { type: "url", value: "" }}
-          onChange={onChange}
-        />
-      );
-
+      return <ImagePropField label={label} value={valueAs("image")} onChange={onChange} />;
     case "icon":
-      return <IconPropField label={schema.label} value={str} onChange={onChange} />;
-
-    default:
-      return null;
+      return <IconPropField label={label} value={valueAs("icon")} onChange={onChange} />;
   }
 }

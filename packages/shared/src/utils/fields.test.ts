@@ -38,7 +38,6 @@ function template(overrides: Partial<Template> = {}): Template {
 describe("isFilled", () => {
   it("rejette vide, espaces et listes vides", () => {
     expect(isFilled(undefined)).toBe(false);
-    expect(isFilled(null)).toBe(false);
     expect(isFilled("  ")).toBe(false);
     expect(isFilled([])).toBe(false);
   });
@@ -66,8 +65,8 @@ describe("mergeDocumentData", () => {
   it("applique les données sans muter le snapshot", () => {
     const snap = buildDocumentSnapshot(template());
     const merged = mergeDocumentData(snap, { "n1.title": "Q3 2026" });
-    expect(merged.pages[0]!.children[0]!.props["title"]).toBe("Q3 2026");
-    expect(snap.pages[0]!.children[0]!.props["title"]).toBe("Défaut");
+    expect(merged.pages[0]?.children[0]?.props["title"]).toBe("Q3 2026");
+    expect(snap.pages[0]?.children[0]?.props["title"]).toBe("Défaut");
   });
 });
 
@@ -97,7 +96,7 @@ describe("buildPublishedVersion", () => {
     const version = buildPublishedVersion(
       template({ editableFields: [{ ...field("n1", "title"), defaultValue: "" }] }),
     );
-    expect(version.editableFields[0]!.defaultValue).toBe("Défaut");
+    expect(version.editableFields[0]?.defaultValue).toBe("Défaut");
   });
 });
 

@@ -15,17 +15,17 @@ export function MarkedNode({ node, theme }: { node: ComponentNode; theme: Theme 
   if (!definition) return <ComponentRenderer node={node} theme={theme} />;
 
   const Component = definition.render;
-  const props = { ...definition.defaultProps, ...resolveThemeVars(node.props, theme), theme };
+  const values = resolveThemeVars(node.props, theme);
   return (
     <div data-node-id={node.id} style={{ display: "contents" }}>
       {definition.acceptsChildren && node.children ? (
-        <Component {...props}>
+        <Component values={values} theme={theme}>
           {node.children.map((child) => (
             <MarkedNode key={child.id} node={child} theme={theme} />
           ))}
         </Component>
       ) : (
-        <Component {...props} />
+        <Component values={values} theme={theme} />
       )}
     </div>
   );

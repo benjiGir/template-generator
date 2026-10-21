@@ -1,14 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { get } from "@template-generator/component-registry/registry";
 import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { useComponentDraftStore } from "@/store/component-draft-store";
-import { api } from "@/api/client";
-import { queryKeys } from "@/api/queryKeys";
-import { PRESET_WORKFLOW } from "@/workflow/definitions";
+import { PRESET_WORKFLOW, PRESET_PATHS } from "@/workflow/definitions";
 import { NotFoundState } from "@/workflow/EntityState";
 import { PresetPreviewPane } from "./PresetPreviewPane";
-import type { ComponentCategory } from "@template-generator/shared/types/component";
+import { COMPONENT_CATEGORIES, type ComponentCategory } from "@template-generator/shared/types/component";
+import { useSavePreset } from "@/api/hooks/presets";
 
 const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
   { value: "layout", label: "Mise en page" },
@@ -20,7 +18,7 @@ const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
 export function ComponentSavePage() {
   const navigate = useNavigate();
   const { presetId } = useParams<{ presetId: string }>();
-  const queryClient = useQueryClient();
+  const savePreset = useSavePreset();
   const baseType = useComponentDraftStore((s) => s.baseType);
   const props = useComponentDraftStore((s) => s.props);
   const editingId = useComponentDraftStore((s) => s.editingId);
@@ -35,29 +33,26 @@ export function ComponentSavePage() {
   const setDescription = (v: string) => setMeta({ description: v });
   const setCategory = (v: ComponentCategory) => setMeta({ category: v });
 
-  const saveMutation = useMutation({
-    mutationFn: () => {
-      const payload = {
-        baseType: baseType!,
-        label: label.trim(),
-        description: description.trim() || undefined,
-        defaultProps: props,
-        category,
-      };
-      return editingId ? api.presets.update(editingId, payload) : api.presets.create(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() });
-      reset();
-      navigate("/components");
-    },
-  });
+  // Création, ou enregistrement du preset en cours de modification
+  const save = async () => {
+    if (!baseType) return;
+    await savePreset.mutateAsync({
+      id: editingId,
+      baseType,
+      label: label.trim(),
+      description: description.trim() || null,
+      defaultProps: props,
+      category,
+    });
+    reset();
+    navigate("/components");
+  };
 
   if (!baseType || !def) {
     return (
       <NotFoundState
         message="Aucun composant en cours de création."
-        backTo={PRESET_WORKFLOW.steps[0]!.path("new")}
+        backTo={PRESET_PATHS.select()}
         backLabel="Recommencer"
       />
     );
@@ -73,9 +68,7 @@ export function ComponentSavePage() {
       guard={label.trim() ? undefined : { ok: false, reason: "Donnez un nom au preset" }}
       finalAction={{
         label: editingId ? "Enregistrer les modifications" : "Ranger dans la bibliothèque",
-        onClick: async () => {
-          await saveMutation.mutateAsync();
-        },
+        onClick: save,
         disabled: !label.trim(),
       }}
     >
@@ -115,7 +108,10 @@ export function ComponentSavePage() {
               <span className="block text-xs font-medium text-gray-600 mb-1">Catégorie</span>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value as ComponentCategory)}
+                onChange={(e) => {
+                  const chosen = COMPONENT_CATEGORIES.find((c) => c === e.target.value);
+                  if (chosen) setCategory(chosen);
+                }}
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink bg-white"
               >
                 {CATEGORY_OPTIONS.map((opt) => (

@@ -6,7 +6,7 @@ interface Option {
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  options: Option[];
+  options: readonly Option[];
 }
 
 export function SelectPropField({ value, onChange, options }: Props) {

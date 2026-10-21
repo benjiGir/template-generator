@@ -8,6 +8,7 @@ import {
   type ComponentInfo,
 } from "./field-detection";
 import type { ComponentNode, TemplatePage } from "../types/template";
+import type { PropValues } from "../types/component";
 
 const DEFS: Record<string, ComponentInfo> = {
   "page-header": {
@@ -59,7 +60,7 @@ const DEFS: Record<string, ComponentInfo> = {
 };
 const resolve = (type: string) => DEFS[type];
 
-function n(id: string, type: string, props: Record<string, unknown> = {}, children?: ComponentNode[]): ComponentNode {
+function n(id: string, type: string, props: PropValues = {}, children?: ComponentNode[]): ComponentNode {
   return { id, type, props, children };
 }
 
@@ -83,7 +84,11 @@ const PAGES: TemplatePage[] = [
 
 describe("detectFields", () => {
   const fields = detectFields({ pages: PAGES }, resolve);
-  const byKey = (k: string) => fields.find((f) => `${f.nodeId}.${f.propKey}` === k)!;
+  const byKey = (k: string) => {
+    const field = fields.find((f) => `${f.nodeId}.${f.propKey}` === k);
+    if (!field) throw new Error(`Champ ${k} non détecté`);
+    return field;
+  };
 
   it("exclut les textes de structure de la pré-sélection", () => {
     expect(byKey("ph.brandName").suggested).toBe(false);
