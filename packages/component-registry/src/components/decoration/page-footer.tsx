@@ -32,6 +32,7 @@ function PageFooter({ theme, text }: Props) {
 
 defineComponent({
   type: "page-footer",
+  formGroup: "Pied de page",
   label: "Pied de page",
   icon: "PanelBottom",
   category: "decoration",

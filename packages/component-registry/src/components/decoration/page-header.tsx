@@ -3,8 +3,8 @@ import type { PropsOf } from "@template-generator/shared/types/component";
 import { defineComponent, defineSchema } from "../../registry";
 
 const schema = defineSchema([
-  { key: "brandName", label: "Nom de marque", type: "text", defaultValue: "Marque" },
-  { key: "brandSub", label: "Sous-titre", type: "text", defaultValue: "" },
+  { key: "brandName", label: "Nom de marque", type: "text", role: "structure", defaultValue: "Marque" },
+  { key: "brandSub", label: "Sous-titre", type: "text", role: "structure", defaultValue: "" },
   { key: "showChevron", label: "Afficher chevrons", type: "boolean", defaultValue: true },
 ]);
 

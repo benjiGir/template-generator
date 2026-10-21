@@ -1,4 +1,4 @@
-// Importer chaque composant déclenche son enregistrement dans le registre via register()
+// Importer chaque composant déclenche son enregistrement dans le registre via defineComponent()
 import "./components/layout/page-container";
 import "./components/layout/two-column-grid";
 import "./components/layout/three-column-grid";

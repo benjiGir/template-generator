@@ -4,7 +4,7 @@ import { defineComponent, defineSchema } from "../../registry";
 
 const schema = defineSchema([
   { key: "image", label: "Image", type: "image", defaultValue: { type: "url", value: "" }, group: "Contenu" },
-  { key: "alt", label: "Texte alternatif", type: "text", defaultValue: "", group: "Contenu" },
+  { key: "alt", label: "Texte alternatif", type: "text", role: "structure", defaultValue: "", group: "Contenu" },
   { key: "caption", label: "Légende", type: "text", defaultValue: "", group: "Contenu" },
   {
     key: "width",

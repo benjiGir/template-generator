@@ -216,6 +216,23 @@ GET    /api/health                    Health check
 - `summary-bar` — Barre de résumé
 - `watermark` — Filigrane
 
+### Ajouter un composant
+
+Un composant tient dans un fichier de `packages/component-registry/src/components/`, importé dans `components.ts`.
+Son schéma (`defineSchema`) est la seule source de vérité : `defineComponent()` en déduit les props reçues par le rendu
+(`PropsOf<typeof schema>`) et les valeurs par défaut. Rien d'autre à modifier, ni dans l'éditeur ni dans la détection
+des champs remplissables, qui lit le `role` de chaque prop de texte :
+
+| Rôle                  | Exemple                         | Pré-sélectionné | Effet                                |
+| --------------------- | ------------------------------- | --------------- | ------------------------------------ |
+| `content` (si absent) | description d'un KPI            | oui             | —                                    |
+| `heading`             | titre d'un jalon, d'un encadré  | oui             | nomme les autres champs du composant |
+| `name`                | titre d'une carte KPI           | non             | nomme les autres champs du composant |
+| `section`             | titre d'un en-tête de section   | non             | ouvre un groupe du formulaire        |
+| `structure`           | nom de marque, texte alternatif | non             | —                                    |
+
+Un composant qui forme à lui seul un groupe du formulaire le déclare avec `formGroup` (le pied de page).
+
 ## Raccourcis clavier (éditeur)
 
 | Raccourci      | Action                                                    |

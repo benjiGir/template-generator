@@ -5,7 +5,7 @@ import { resolveColor, resolveLightBg } from "../../color-map";
 
 const schema = defineSchema([
   { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "📊", group: "Contenu" },
-  { key: "title", label: "Titre", type: "text", defaultValue: "KPI", group: "Contenu" },
+  { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "KPI", group: "Contenu" },
   { key: "description", label: "Description", type: "textarea", defaultValue: "", group: "Contenu" },
   {
     key: "color",

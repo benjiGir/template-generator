@@ -1,4 +1,4 @@
-import type { ComponentCategory, PropSchema, PropType } from "../types/component";
+import type { ComponentCategory, PropRole, PropSchema, PropType } from "../types/component";
 import type { ComponentNode, EditableField, Template } from "../types/template";
 import { fieldKey } from "./fields";
 
@@ -7,6 +7,8 @@ export interface ComponentInfo {
   label: string;
   category: ComponentCategory;
   schema: readonly PropSchema[];
+  /** Groupe du formulaire ouvert par le composant lui-même (« Pied de page ») */
+  formGroup?: string;
 }
 export type ResolveComponent = (type: string) => ComponentInfo | undefined;
 
@@ -18,38 +20,23 @@ export interface DetectedField extends EditableField {
   suggested: boolean;
 }
 
+/*
+ * La détection ne connaît aucun composant par son nom : tout vient du schéma de ses props.
+ * Ajouter un composant au registre ne demande donc rien ici ; il suffit de déclarer le rôle
+ * de ses textes (`role` dans le schéma, « content » par défaut).
+ */
+
 /** Contenus possibles ; les nombres du registre sont des réglages de mise en page (espacement, opacité…) */
 const EDITABLE_TYPES = new Set<PropType>(["text", "textarea", "richtext", "list", "image"]);
 
-/** Composants dont le texte sert de titre de section : ils structurent le formulaire */
-const SECTION_TITLES: Record<string, string> = {
-  "section-header": "text",
-  "kpi-row": "sectionTitle",
-  "next-section": "title",
-};
+/** Rôles qui changent d'une édition à l'autre : ils forment la pré-sélection */
+const PRESELECTED_ROLES = new Set<PropRole>(["content", "heading"]);
 
-/** Noms stables : le titre du document, le nom d'un indicateur ou d'un bloc ne changent pas d'une édition à l'autre */
-const STABLE_NAMES: Record<string, string> = {
-  "title-block": "title",
-  "kpi-card": "title",
-  "metric-card": "label",
-  "detail-block": "title",
-};
+/** Rôles dont la valeur nomme le composant (« Chiffre d'affaires » pour une carte KPI) */
+const NAMING_ROLES = new Set<PropRole>(["heading", "name", "section"]);
 
-/** Props dont la valeur nomme le composant (« Chiffre d'affaires » pour une carte KPI) */
-const NAMING_PROPS = ["title", "label", "date"];
-
-/**
- * Textes de structure, qui ne changent pas d'une édition à l'autre :
- * titres de section, libellés fixes, identité de marque.
- */
-function isStructural(type: string, prop: PropSchema): boolean {
-  if (SECTION_TITLES[type] === prop.key) return true;
-  if (STABLE_NAMES[type] === prop.key) return true;
-  if (/label$/i.test(prop.key) && prop.key !== "label") return true;
-  if (type === "page-header") return true;
-  if (prop.key === "alt") return true;
-  return false;
+function roleOf(prop: PropSchema): PropRole {
+  return prop.role ?? "content";
 }
 
 function shorten(text: string, max = 40): string {
@@ -60,13 +47,21 @@ function shorten(text: string, max = 40): string {
   return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain;
 }
 
+/** Le premier texte non vide qui nomme le composant, dans l'ordre du schéma */
 function contextName(node: ComponentNode, info: ComponentInfo): { prop: string; value: string } | null {
-  for (const key of NAMING_PROPS) {
-    const schema = info.schema.find((s) => s.key === key && s.type === "text");
-    const value = node.props[key];
-    if (schema && typeof value === "string" && value.trim()) return { prop: key, value: shorten(value) };
+  for (const prop of info.schema) {
+    if (!NAMING_ROLES.has(roleOf(prop)) || prop.type !== "text") continue;
+    const value = node.props[prop.key];
+    if (typeof value === "string" && value.trim()) return { prop: prop.key, value: shorten(value) };
   }
   return null;
+}
+
+/** Titre de section porté par le composant, s'il en a un */
+function sectionTitle(node: ComponentNode, info: ComponentInfo): string | null {
+  const prop = info.schema.find((p) => roleOf(p) === "section");
+  const value = prop ? node.props[prop.key] : undefined;
+  return typeof value === "string" && value.trim() ? shorten(value, 50) : null;
 }
 
 /**
@@ -87,13 +82,12 @@ export function detectFields(template: Pick<Template, "pages">, resolve: Resolve
       const info = resolve(node.type);
       if (!info) return;
 
-      const titleKey = SECTION_TITLES[node.type];
-      const titleValue = titleKey ? node.props[titleKey] : undefined;
-      if (typeof titleValue === "string" && titleValue.trim()) {
-        section = shorten(titleValue, 50);
+      const title = sectionTitle(node, info);
+      if (title) {
+        section = title;
         counters = new Map();
       }
-      if (node.type === "page-footer") section = "Pied de page";
+      if (info.formGroup) section = info.formGroup;
 
       const editable = info.schema.filter((s) => EDITABLE_TYPES.has(s.type));
       const name = contextName(node, info);
@@ -102,7 +96,6 @@ export function detectFields(template: Pick<Template, "pages">, resolve: Resolve
       const numbered = `${info.label}${index > 1 ? ` ${index}` : ""}`;
 
       for (const prop of editable) {
-        const structural = isStructural(node.type, prop);
         let label: string;
         if (editable.length === 1) label = name && name.prop !== prop.key ? name.value : numbered;
         else if (name && name.prop !== prop.key) label = `${name.value} — ${prop.label}`;
@@ -118,7 +111,7 @@ export function detectFields(template: Pick<Template, "pages">, resolve: Resolve
           group: section ?? undefined,
           order: order++,
           location: `${pageLabel} · ${info.label}${name ? ` « ${name.value} »` : ""}`,
-          suggested: !structural,
+          suggested: PRESELECTED_ROLES.has(roleOf(prop)),
         });
       }
 

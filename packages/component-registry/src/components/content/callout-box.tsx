@@ -7,7 +7,7 @@ import { RichBlock } from "../../rich-text";
 
 const schema = defineSchema([
   { key: "icon", label: "Icône", type: "icon", defaultValue: "Info", group: "Contenu" },
-  { key: "title", label: "Titre", type: "text", defaultValue: "", group: "Contenu" },
+  { key: "title", label: "Titre", type: "text", role: "heading", defaultValue: "", group: "Contenu" },
   { key: "content", label: "Contenu", type: "richtext", defaultValue: "Votre message ici…", group: "Contenu" },
   {
     key: "variant",

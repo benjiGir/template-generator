@@ -5,7 +5,7 @@ import { resolveColor, resolveLightBg } from "../../color-map";
 
 const schema = defineSchema([
   { key: "value", label: "Valeur", type: "text", defaultValue: "0", group: "Contenu" },
-  { key: "label", label: "Libellé", type: "text", defaultValue: "Métrique", group: "Contenu" },
+  { key: "label", label: "Libellé", type: "text", role: "name", defaultValue: "Métrique", group: "Contenu" },
   {
     key: "trend",
     label: "Tendance",

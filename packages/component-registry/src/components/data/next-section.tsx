@@ -3,7 +3,7 @@ import type { PropsOf } from "@template-generator/shared/types/component";
 import { defineComponent, defineSchema } from "../../registry";
 
 const schema = defineSchema([
-  { key: "title", label: "Titre", type: "text", defaultValue: "Et pour la suite ?" },
+  { key: "title", label: "Titre", type: "text", role: "section", defaultValue: "Et pour la suite ?" },
   { key: "intro", label: "Introduction", type: "textarea", defaultValue: "" },
   { key: "items", label: "Éléments", type: "list", defaultValue: [] },
   { key: "summary", label: "Résumé", type: "text", defaultValue: "" },

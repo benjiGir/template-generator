@@ -4,10 +4,17 @@ import { defineComponent, defineSchema } from "../../registry";
 import { resolveColor, resolveLightBg } from "../../color-map";
 
 const schema = defineSchema([
-  { key: "title", label: "Titre", type: "text", defaultValue: "Titre du chantier", group: "Contenu" },
+  { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "Titre du chantier", group: "Contenu" },
   { key: "paragraphs", label: "Paragraphes", type: "list", defaultValue: [], group: "Contenu" },
   { key: "benefits", label: "Bénéfices", type: "list", defaultValue: [], group: "Contenu" },
-  { key: "benefitsLabel", label: "Label bénéfices", type: "text", defaultValue: "Bénéfices", group: "Contenu" },
+  {
+    key: "benefitsLabel",
+    label: "Label bénéfices",
+    type: "text",
+    role: "structure",
+    defaultValue: "Bénéfices",
+    group: "Contenu",
+  },
   { key: "result", label: "Résultat", type: "textarea", defaultValue: "", group: "Contenu" },
   { key: "suite", label: "Suite", type: "textarea", defaultValue: "", group: "Contenu" },
   {

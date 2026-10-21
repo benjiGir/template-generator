@@ -66,6 +66,18 @@ export type PropValue = PropTypeValues[PropType];
 /** Props d'un composant, ou données saisies d'un document (clé « nœud.prop ») */
 export type PropValues = Record<string, PropValue>;
 
+/**
+ * Rôle d'une prop de contenu (texte, liste, image) dans le document. La détection des champs remplissables
+ * le lit pour pré-sélectionner, grouper et nommer les champs : elle ne connaît aucun composant par son nom.
+ *  - content : contenu qui change à chaque édition (rôle par défaut) ; pré-sélectionné
+ *  - heading : contenu qui change, et qui nomme le composant dans les libellés (titre d'un jalon) ; pré-sélectionné
+ *  - name : nom stable du composant (titre d'un indicateur) ; nomme le composant, non pré-sélectionné
+ *  - section : titre de section ; ouvre un groupe du formulaire, nomme le composant, non pré-sélectionné
+ *  - structure : texte fixe (libellé, marque, texte alternatif) ; non pré-sélectionné
+ */
+export const PROP_ROLES = ["content", "heading", "name", "section", "structure"] as const;
+export type PropRole = (typeof PROP_ROLES)[number];
+
 interface PropSchemaBase<T extends PropType> {
   key: string;
   label: string;
@@ -75,6 +87,8 @@ interface PropSchemaBase<T extends PropType> {
   options?: readonly { label: string; value: string }[];
   placeholder?: string;
   group?: string;
+  /** Rôle dans le document, pour la détection des champs ; « content » si absent */
+  role?: PropRole;
   /** La prop n'est proposée que si une autre prop a cette valeur */
   condition?: {
     prop: string;
@@ -102,6 +116,8 @@ export interface ComponentDefinition {
   childrenLayout?: "vertical" | "horizontal";
   allowedChildren?: string[];
   maxChildren?: number;
+  /** Groupe du formulaire ouvert par le composant lui-même (« Pied de page ») */
+  formGroup?: string;
   /** Valeurs par défaut, tirées du schéma */
   defaultProps: PropValues;
 }

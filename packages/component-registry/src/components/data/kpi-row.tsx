@@ -3,7 +3,9 @@ import type { Theme } from "@template-generator/shared/types/template";
 import type { PropsOf } from "@template-generator/shared/types/component";
 import { defineComponent, defineSchema } from "../../registry";
 
-const schema = defineSchema([{ key: "sectionTitle", label: "Titre de section", type: "text", defaultValue: "" }]);
+const schema = defineSchema([
+  { key: "sectionTitle", label: "Titre de section", type: "text", role: "section", defaultValue: "" },
+]);
 
 type Props = PropsOf<typeof schema> & { theme: Theme; children?: ReactNode };
 

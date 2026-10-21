@@ -14,32 +14,32 @@ const DEFS: Record<string, ComponentInfo> = {
   "page-header": {
     label: "En-tête de page",
     category: "decoration",
-    schema: [{ key: "brandName", label: "Marque", type: "text", defaultValue: "" }],
+    schema: [{ key: "brandName", label: "Marque", type: "text", role: "structure", defaultValue: "" }],
   },
   "title-block": {
     label: "Bloc titre",
     category: "content",
     schema: [
-      { key: "title", label: "Titre", type: "text", defaultValue: "" },
+      { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "" },
       { key: "subtitle", label: "Sous-titre", type: "text", defaultValue: "" },
     ],
   },
   "section-header": {
     label: "En-tête de section",
     category: "content",
-    schema: [{ key: "text", label: "Texte", type: "text", defaultValue: "" }],
+    schema: [{ key: "text", label: "Texte", type: "text", role: "section", defaultValue: "" }],
   },
   "kpi-row": {
     label: "Ligne de KPIs",
     category: "data",
-    schema: [{ key: "sectionTitle", label: "Titre de section", type: "text", defaultValue: "" }],
+    schema: [{ key: "sectionTitle", label: "Titre de section", type: "text", role: "section", defaultValue: "" }],
   },
   "kpi-card": {
     label: "Carte KPI",
     category: "data",
     schema: [
       { key: "emoji", label: "Emoji", type: "emoji", defaultValue: "" },
-      { key: "title", label: "Titre", type: "text", defaultValue: "" },
+      { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "" },
       { key: "description", label: "Description", type: "textarea", defaultValue: "" },
     ],
   },
@@ -47,8 +47,8 @@ const DEFS: Record<string, ComponentInfo> = {
     label: "Bloc de détails",
     category: "content",
     schema: [
-      { key: "title", label: "Titre", type: "text", defaultValue: "" },
-      { key: "benefitsLabel", label: "Label bénéfices", type: "text", defaultValue: "" },
+      { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "" },
+      { key: "benefitsLabel", label: "Label bénéfices", type: "text", role: "structure", defaultValue: "" },
       { key: "result", label: "Résultat", type: "textarea", defaultValue: "" },
     ],
   },
@@ -128,6 +128,53 @@ describe("detectFields", () => {
     expect(byKey("tb.subtitle").group).toBe("En-tête");
     expect(byKey("k1.description").group).toBe("Indicateurs clés");
     expect(byKey("d1.result").group).toBe("Analyse détaillée");
+  });
+
+  it("traite un composant qu'elle ne connaît pas d'après les rôles de son schéma", () => {
+    const custom: Record<string, ComponentInfo> = {
+      chapter: {
+        label: "Chapitre",
+        category: "content",
+        schema: [{ key: "heading", label: "Intitulé", type: "text", role: "section", defaultValue: "" }],
+      },
+      milestone: {
+        label: "Jalon",
+        category: "data",
+        schema: [
+          { key: "when", label: "Quand", type: "text", defaultValue: "" },
+          { key: "what", label: "Quoi", type: "text", role: "heading", defaultValue: "" },
+          { key: "kind", label: "Nature", type: "text", role: "structure", defaultValue: "" },
+        ],
+      },
+      closing: {
+        label: "Clôture",
+        category: "decoration",
+        formGroup: "Fin du document",
+        schema: [{ key: "text", label: "Texte", type: "textarea", defaultValue: "" }],
+      },
+    };
+    const detected = detectFields(
+      {
+        pages: [
+          {
+            id: "p",
+            children: [
+              n("c", "chapter", { heading: "Calendrier" }),
+              n("m", "milestone", { when: "Mars", what: "Lancement", kind: "Jalon" }),
+              n("z", "closing", { text: "Fin" }),
+            ],
+          },
+        ],
+      },
+      (type) => custom[type],
+    );
+    const field = (k: string) => detected.find((f) => `${f.nodeId}.${f.propKey}` === k);
+    expect(field("c.heading")?.suggested).toBe(false);
+    expect(field("m.when")?.group).toBe("Calendrier");
+    expect(field("m.when")?.label).toBe("Lancement — Quand");
+    expect(field("m.what")?.suggested).toBe(true);
+    expect(field("m.kind")?.suggested).toBe(false);
+    expect(field("z.text")?.group).toBe("Fin du document");
   });
 
   it("situe chaque champ dans le document", () => {
