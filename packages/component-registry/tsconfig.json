@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
+    "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "allowImportingTsExtensions": true

@@ -2,7 +2,9 @@ import { Fragment } from "react";
 import type { TemplatePage, Theme, PageFormat } from "@template-generator/shared/types/template";
 import { EditorRenderer } from "./EditorRenderer";
 import { DropZone } from "./DropZone";
+import { DocumentPage } from "@/components/document-view/DocumentPage";
 import { useEditorStore } from "@/store/editor-store";
+import { useDropTarget } from "@/hooks/useDragAndDrop";
 
 interface Props {
   page: TemplatePage;
@@ -15,22 +17,28 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
   const selectedPageIndex = useEditorStore((s) => s.selectedPageIndex);
   const selectPage = useEditorStore((s) => s.selectPage);
   const selectNode = useEditorStore((s) => s.selectNode);
+  const hoverNode = useEditorStore((s) => s.hoverNode);
   const isActivePage = selectedPageIndex === pageIndex;
+  const { drop } = useDropTarget();
+  const isDropTarget = drop !== null && drop.parentId === null && drop.pageIndex === pageIndex;
 
   return (
-    <div data-page-wrapper style={{ marginBottom: 24 }}>
+    <div data-page-wrapper style={{ marginBottom: 24 }} onMouseOver={() => hoverNode(null)}>
       {/* Onglet */}
       <button
         data-page-tab
-        onClick={() => { selectPage(pageIndex); selectNode(null); }}
+        onClick={() => {
+          selectPage(pageIndex);
+          selectNode(null);
+        }}
         style={{
           display: "inline-block",
           marginBottom: 4,
           padding: "3px 10px",
           fontSize: 11,
           fontWeight: 600,
-          backgroundColor: isActivePage ? "#2563EB" : "#E5E7EB",
-          color: isActivePage ? "#fff" : "#6B7280",
+          backgroundColor: isActivePage ? "#2448C8" : "#DDD8CE",
+          color: isActivePage ? "#fff" : "#6E6A62",
           border: "none",
           borderRadius: "4px 4px 0 0",
           cursor: "pointer",
@@ -41,23 +49,17 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       </button>
 
       {/* Page */}
-      <div
-        data-doc-page
-        style={{
-          width: pageFormat.width,
-          minHeight: pageFormat.height,
-          padding: pageFormat.padding,
-          backgroundColor: theme.colors.background,
-          fontFamily: theme.typography.fontFamily,
-          fontSize: theme.typography.baseFontSize,
-          color: theme.colors.text,
-          boxSizing: "border-box",
-          position: "relative",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
-          borderRadius: 2,
-          outline: isActivePage ? "2px solid #BFDBFE" : "none",
+      <DocumentPage
+        theme={theme}
+        format={pageFormat}
+        chromeStyle={{
+          outline: isDropTarget ? "2px dashed #2448C8" : isActivePage ? "2px solid #C9D3F6" : "none",
+          outlineOffset: 2,
         }}
-        onClick={() => { selectPage(pageIndex); selectNode(null); }}
+        onClick={() => {
+          selectPage(pageIndex);
+          selectNode(null);
+        }}
       >
         {/* DropZones entre chaque composant racine */}
         <DropZone pageIndex={pageIndex} parentId={null} index={0} />
@@ -76,7 +78,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#D1D5DB",
+              color: "#C9C3B7",
               fontSize: 13,
               fontFamily: "system-ui, sans-serif",
               pointerEvents: "none",
@@ -85,7 +87,7 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
             Page vide — glissez des composants ici
           </div>
         )}
-      </div>
+      </DocumentPage>
     </div>
   );
 }

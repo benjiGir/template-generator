@@ -1,40 +1,64 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { Template, ComponentNode, TemplatePage, Theme, PageFormat } from "@template-generator/shared/types/template";
+import { current, isDraft } from "immer";
+import type {
+  Template,
+  ComponentNode,
+  TemplatePage,
+  Theme,
+  PageFormat,
+  EditableField,
+} from "@template-generator/shared/types/template";
 import { DEFAULT_THEME, DEFAULT_PAGE_FORMAT } from "@template-generator/shared/types/template";
 import {
   findNode,
   insertNode,
   removeNode as treeRemoveNode,
-  moveNode as treeMoveNode,
   duplicateNode as treeDuplicateNode,
   generateNodeId,
 } from "@template-generator/shared/utils/tree";
+import type { PropValues } from "@template-generator/shared/types/component";
 
 interface EditorState {
   template: Template | null;
   selectedNodeId: string | null;
   selectedPageIndex: number;
-  isDirty: boolean;
+  /** Incrémenté à chaque modification ; comparé à savedRevision pour savoir s'il reste à sauvegarder */
+  revision: number;
+  savedRevision: number;
   history: Template[];
   historyIndex: number;
 
   loadTemplate: (template: Template) => void;
-  updateTemplateMeta: (name: string, description?: string) => void;
+  markSaved: (revision: number) => void;
+  /** Applique un état venu du serveur (publication) sans toucher à l'historique */
+  applyServerState: (template: Template) => void;
+  updateTemplateMeta: (name: string, description?: string | null) => void;
   updateTheme: (theme: Partial<Theme>) => void;
   updatePageFormat: (format: Partial<PageFormat>) => void;
 
   addPage: () => void;
   removePage: (pageIndex: number) => void;
+  renamePage: (pageIndex: number, label: string) => void;
   reorderPages: (fromIndex: number, toIndex: number) => void;
+  setEditableFields: (fields: EditableField[]) => void;
 
   addNode: (pageIndex: number, parentId: string | null, index: number, node: ComponentNode) => void;
   removeNode: (pageIndex: number, nodeId: string) => void;
-  moveNode: (fromPageIndex: number, toPageIndex: number, nodeId: string, newParentId: string | null, newIndex: number) => void;
-  updateNodeProps: (nodeId: string, props: Record<string, unknown>) => void;
+  moveNode: (
+    fromPageIndex: number,
+    toPageIndex: number,
+    nodeId: string,
+    newParentId: string | null,
+    newIndex: number,
+  ) => void;
+  updateNodeProps: (nodeId: string, props: PropValues) => void;
   duplicateNode: (pageIndex: number, nodeId: string) => void;
 
   selectNode: (nodeId: string | null) => void;
+  /** Composant survolé le plus interne (les poignées ne s'affichent que sur lui) */
+  hoveredNodeId: string | null;
+  hoverNode: (nodeId: string | null) => void;
   selectPage: (pageIndex: number) => void;
 
   inlineEditingNodeId: string | null;
@@ -47,16 +71,26 @@ interface EditorState {
 }
 
 function cloneTemplate(t: Template): Template {
-  return JSON.parse(JSON.stringify(t)) as Template;
+  // Dans un producteur immer, `t` est un brouillon (Proxy) : on copie son état courant
+  return structuredClone(isDraft(t) ? current(t) : t);
 }
 
-function pushHistory(state: EditorState, template: Template): void {
-  const snap = cloneTemplate(template);
-  const newHistory = state.history.slice(0, state.historyIndex + 1);
-  newHistory.push(snap);
-  if (newHistory.length > 50) newHistory.splice(0, newHistory.length - 50);
-  state.history = newHistory;
-  state.historyIndex = newHistory.length - 1;
+/** Étapes que l'on peut annuler */
+const HISTORY_STEPS = 50;
+
+/**
+ * Enregistre une modification qui vient d'être appliquée : l'historique garde l'état obtenu
+ * (après l'état chargé, une entrée par étape), et la révision avance pour la sauvegarde automatique.
+ * Ce qui pouvait être rétabli est abandonné.
+ */
+function commit(state: EditorState): void {
+  if (!state.template) return;
+  const history = state.history.slice(0, state.historyIndex + 1);
+  history.push(cloneTemplate(state.template));
+  if (history.length > HISTORY_STEPS + 1) history.splice(0, history.length - (HISTORY_STEPS + 1));
+  state.history = history;
+  state.historyIndex = history.length - 1;
+  state.revision++;
 }
 
 export const useEditorStore = create<EditorState>()(
@@ -66,7 +100,9 @@ export const useEditorStore = create<EditorState>()(
     selectedPageIndex: 0,
     inlineEditingNodeId: null,
     inlineEditingPropKey: null,
-    isDirty: false,
+    hoveredNodeId: null,
+    revision: 0,
+    savedRevision: 0,
     history: [],
     historyIndex: -1,
 
@@ -76,55 +112,66 @@ export const useEditorStore = create<EditorState>()(
         normalized.theme = {
           ...DEFAULT_THEME,
           ...normalized.theme,
-          colors:     { ...DEFAULT_THEME.colors,     ...normalized.theme.colors },
+          colors: { ...DEFAULT_THEME.colors, ...normalized.theme.colors },
           typography: { ...DEFAULT_THEME.typography, ...normalized.theme.typography },
-          spacing:    { ...DEFAULT_THEME.spacing,    ...normalized.theme.spacing },
-          borders:    { ...DEFAULT_THEME.borders,    ...normalized.theme.borders },
+          spacing: { ...DEFAULT_THEME.spacing, ...normalized.theme.spacing },
+          borders: { ...DEFAULT_THEME.borders, ...normalized.theme.borders },
         };
         s.template = normalized;
         s.selectedNodeId = null;
         s.selectedPageIndex = 0;
-        s.isDirty = false;
+        s.revision = 0;
+        s.savedRevision = 0;
         s.history = [cloneTemplate(normalized)];
         s.historyIndex = 0;
+      }),
+
+    markSaved: (revision) =>
+      set((s) => {
+        s.savedRevision = Math.max(s.savedRevision, revision);
+      }),
+
+    applyServerState: (template) =>
+      set((s) => {
+        if (!s.template || s.template.id !== template.id) return;
+        s.template.published = template.published;
+        s.template.publishedAt = template.publishedAt;
+        s.template.publishedVersion = template.publishedVersion;
+        s.template.updatedAt = template.updatedAt;
       }),
 
     updateTemplateMeta: (name, description) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.name = name;
         if (description !== undefined) s.template.description = description;
-        s.isDirty = true;
+        commit(s);
       }),
 
     updateTheme: (theme) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.theme = {
           ...s.template.theme,
           ...theme,
-          colors:     { ...s.template.theme.colors,     ...(theme.colors     ?? {}) },
-          typography: { ...s.template.theme.typography, ...(theme.typography ?? {}) },
-          spacing:    { ...s.template.theme.spacing,    ...(theme.spacing    ?? {}) },
-          borders:    { ...s.template.theme.borders,    ...(theme.borders    ?? {}) },
+          colors: { ...s.template.theme.colors, ...theme.colors },
+          typography: { ...s.template.theme.typography, ...theme.typography },
+          spacing: { ...s.template.theme.spacing, ...theme.spacing },
+          borders: { ...s.template.theme.borders, ...theme.borders },
         };
-        s.isDirty = true;
+        commit(s);
       }),
 
     updatePageFormat: (format) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         s.template.pageFormat = { ...s.template.pageFormat, ...format };
-        s.isDirty = true;
+        commit(s);
       }),
 
     addPage: () =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         const newPage: TemplatePage = {
           id: generateNodeId(),
           label: `Page ${s.template.pages.length + 1}`,
@@ -132,85 +179,89 @@ export const useEditorStore = create<EditorState>()(
         };
         s.template.pages.push(newPage);
         s.selectedPageIndex = s.template.pages.length - 1;
-        s.isDirty = true;
+        commit(s);
       }),
 
     removePage: (pageIndex) =>
       set((s) => {
         if (!s.template || s.template.pages.length <= 1) return;
-        pushHistory(s, s.template);
         s.template.pages.splice(pageIndex, 1);
         s.selectedPageIndex = Math.min(s.selectedPageIndex, s.template.pages.length - 1);
-        s.isDirty = true;
+        commit(s);
+      }),
+
+    renamePage: (pageIndex, label) =>
+      set((s) => {
+        const page = s.template?.pages[pageIndex];
+        if (!s.template || !page || page.label === label) return;
+        page.label = label;
+        commit(s);
+      }),
+
+    setEditableFields: (fields) =>
+      set((s) => {
+        if (!s.template) return;
+        s.template.editableFields = fields;
+        s.revision++;
       }),
 
     reorderPages: (fromIndex, toIndex) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const [page] = s.template.pages.splice(fromIndex, 1);
-        if (page) s.template.pages.splice(toIndex, 0, page);
-        s.isDirty = true;
+        const [page] = s.template?.pages.splice(fromIndex, 1) ?? [];
+        if (!s.template || !page) return;
+        s.template.pages.splice(toIndex, 0, page);
+        commit(s);
       }),
 
     addNode: (pageIndex, parentId, index, node) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
-        page.children = insertNode(page.children as ComponentNode[], parentId, index, node) as typeof page.children;
+        page.children = insertNode(page.children, parentId, index, node);
         s.selectedNodeId = node.id;
-        s.isDirty = true;
+        commit(s);
       }),
 
     removeNode: (pageIndex, nodeId) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
-        page.children = treeRemoveNode(page.children as ComponentNode[], nodeId) as typeof page.children;
+        page.children = treeRemoveNode(page.children, nodeId);
         if (s.selectedNodeId === nodeId) s.selectedNodeId = null;
-        s.isDirty = true;
+        commit(s);
       }),
 
     moveNode: (fromPageIndex, toPageIndex, nodeId, newParentId, newIndex) =>
       set((s) => {
         if (!s.template) return;
-        pushHistory(s, s.template);
         const fromPage = s.template.pages[fromPageIndex];
         if (!fromPage) return;
-        const node = findNode(fromPage.children as ComponentNode[], nodeId);
+        const node = findNode(fromPage.children, nodeId);
         if (!node) return;
-        fromPage.children = treeRemoveNode(fromPage.children as ComponentNode[], nodeId) as typeof fromPage.children;
+        fromPage.children = treeRemoveNode(fromPage.children, nodeId);
         const toPage = s.template.pages[toPageIndex] ?? fromPage;
-        toPage.children = insertNode(toPage.children as ComponentNode[], newParentId, newIndex, node) as typeof toPage.children;
-        s.isDirty = true;
+        toPage.children = insertNode(toPage.children, newParentId, newIndex, node);
+        commit(s);
       }),
 
     updateNodeProps: (nodeId, props) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        for (const page of s.template.pages) {
-          const node = findNode(page.children as ComponentNode[], nodeId);
+        for (const page of s.template?.pages ?? []) {
+          const node = findNode(page.children, nodeId);
           if (node) {
-            node.props = { ...node.props, ...props } as typeof node.props;
-            break;
+            node.props = { ...node.props, ...props };
+            commit(s);
+            return;
           }
         }
-        s.isDirty = true;
       }),
 
     duplicateNode: (pageIndex, nodeId) =>
       set((s) => {
-        if (!s.template) return;
-        pushHistory(s, s.template);
-        const page = s.template.pages[pageIndex];
+        const page = s.template?.pages[pageIndex];
         if (!page) return;
-        page.children = treeDuplicateNode(page.children as ComponentNode[], nodeId) as typeof page.children;
-        s.isDirty = true;
+        page.children = treeDuplicateNode(page.children, nodeId);
+        commit(s);
       }),
 
     selectNode: (nodeId) =>
@@ -218,6 +269,11 @@ export const useEditorStore = create<EditorState>()(
         s.selectedNodeId = nodeId;
         s.inlineEditingNodeId = null;
         s.inlineEditingPropKey = null;
+      }),
+
+    hoverNode: (nodeId) =>
+      set((s) => {
+        s.hoveredNodeId = nodeId;
       }),
 
     startInlineEdit: (nodeId, propKey) =>
@@ -246,7 +302,7 @@ export const useEditorStore = create<EditorState>()(
         const snap = s.history[s.historyIndex];
         if (snap) {
           s.template = cloneTemplate(snap);
-          s.isDirty = true;
+          s.revision++;
         }
       }),
 
@@ -257,22 +313,34 @@ export const useEditorStore = create<EditorState>()(
         const snap = s.history[s.historyIndex];
         if (snap) {
           s.template = cloneTemplate(snap);
-          s.isDirty = true;
+          s.revision++;
         }
       }),
-  }))
+  })),
 );
 
-export const DEFAULT_NEW_TEMPLATE: Omit<Template, "id" | "createdAt" | "updatedAt"> = {
-  name: "Nouveau template",
-  description: "",
-  theme: DEFAULT_THEME,
-  pageFormat: DEFAULT_PAGE_FORMAT,
-  pages: [
-    {
-      id: generateNodeId(),
-      label: "Page 1",
-      children: [],
-    },
-  ],
-};
+/** Contenu d'un template vierge (identifiant de page neuf à chaque appel) */
+export function newTemplateDraft(): Pick<
+  Template,
+  "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "tags"
+> {
+  return {
+    name: "Nouveau template",
+    description: "",
+    theme: DEFAULT_THEME,
+    pageFormat: DEFAULT_PAGE_FORMAT,
+    pages: [{ id: generateNodeId(), label: "Page 1", children: [] }],
+    editableFields: [],
+    tags: [],
+  };
+}
+
+/**
+ * Template en cours d'édition, pour les étapes de l'Atelier : leur route parente ne les affiche
+ * qu'une fois le template chargé. Hors de ce parcours, l'erreur est explicite.
+ */
+export function useLoadedTemplate(): Template {
+  const template = useEditorStore((s) => s.template);
+  if (!template) throw new Error("Template non chargé : cet écran s'affiche dans le parcours de l'Atelier");
+  return template;
+}

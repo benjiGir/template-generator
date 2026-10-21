@@ -1,17 +1,38 @@
-import type { CSSProperties } from "react";
 import type { Theme } from "@template-generator/shared/types/template";
-import type { ImageValue } from "@template-generator/shared/types/component";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  image?: ImageValue;
-  alt?: string;
-  caption?: string;
-  width?: "full" | "half" | "third";
-  alignment?: "left" | "center" | "right";
-}
+const schema = defineSchema([
+  { key: "image", label: "Image", type: "image", defaultValue: { type: "url", value: "" }, group: "Contenu" },
+  { key: "alt", label: "Texte alternatif", type: "text", role: "structure", defaultValue: "", group: "Contenu" },
+  { key: "caption", label: "Légende", type: "text", defaultValue: "", group: "Contenu" },
+  {
+    key: "width",
+    label: "Largeur",
+    type: "select",
+    defaultValue: "full",
+    group: "Style",
+    options: [
+      { label: "Pleine largeur", value: "full" },
+      { label: "Moitié", value: "half" },
+      { label: "Tiers", value: "third" },
+    ],
+  },
+  {
+    key: "alignment",
+    label: "Alignement",
+    type: "select",
+    defaultValue: "center",
+    group: "Style",
+    options: [
+      { label: "Gauche", value: "left" },
+      { label: "Centre", value: "center" },
+      { label: "Droite", value: "right" },
+    ],
+  },
+]);
+
+type Props = PropsOf<typeof schema> & { theme: Theme };
 
 const WIDTH_MAP: Record<string, string> = {
   full: "100%",
@@ -19,12 +40,22 @@ const WIDTH_MAP: Record<string, string> = {
   third: "33.333%",
 };
 
-function ImageBlock({ theme, image, alt = "", caption = "", width = "full", alignment = "center" }: Props) {
+const FLEX_ALIGN = new Map([
+  ["left", "flex-start"],
+  ["center", "center"],
+  ["right", "flex-end"],
+]);
+const TEXT_ALIGN = new Map<string, "left" | "center" | "right">([
+  ["left", "left"],
+  ["center", "center"],
+  ["right", "right"],
+]);
+
+function ImageBlock({ theme, image, alt, caption, width, alignment }: Props) {
   const src = image?.value ?? null;
   const w = WIDTH_MAP[width] ?? "100%";
 
-  const alignMap: Record<string, string> = { left: "flex-start", center: "center", right: "flex-end" };
-  const justify = alignMap[alignment] ?? "center";
+  const justify = FLEX_ALIGN.get(alignment) ?? "center";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: justify, marginBottom: 12 }}>
@@ -45,7 +76,7 @@ function ImageBlock({ theme, image, alt = "", caption = "", width = "full", alig
                 margin: "6px 0 0",
                 fontSize: 11,
                 color: theme.colors.textMuted,
-                textAlign: alignment as CSSProperties["textAlign"],
+                textAlign: TEXT_ALIGN.get(alignment) ?? "center",
                 fontStyle: "italic",
               }}
             >
@@ -75,42 +106,13 @@ function ImageBlock({ theme, image, alt = "", caption = "", width = "full", alig
   );
 }
 
-register({
+defineComponent({
   type: "image-block",
   label: "Image",
   icon: "Image",
   category: "content",
   description: "Image avec légende, alignement et taille configurable",
-  schema: [
-    { key: "image", label: "Image", type: "image", defaultValue: { type: "url", value: "" }, group: "Contenu" },
-    { key: "alt", label: "Texte alternatif", type: "text", defaultValue: "", group: "Contenu" },
-    { key: "caption", label: "Légende", type: "text", defaultValue: "", group: "Contenu" },
-    {
-      key: "width",
-      label: "Largeur",
-      type: "select",
-      defaultValue: "full",
-      group: "Style",
-      options: [
-        { label: "Pleine largeur", value: "full" },
-        { label: "Moitié", value: "half" },
-        { label: "Tiers", value: "third" },
-      ],
-    },
-    {
-      key: "alignment",
-      label: "Alignement",
-      type: "select",
-      defaultValue: "center",
-      group: "Style",
-      options: [
-        { label: "Gauche", value: "left" },
-        { label: "Centre", value: "center" },
-        { label: "Droite", value: "right" },
-      ],
-    },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { image: { type: "url", value: "" }, alt: "", caption: "", width: "full", alignment: "center" },
-  render: ImageBlock as RegisteredComponent["render"],
+  render: ImageBlock,
 });

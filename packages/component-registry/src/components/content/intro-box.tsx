@@ -1,15 +1,16 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { RichBlock } from "../../rich-text";
 
-interface Props {
-  theme: Theme;
-  content?: string;
-  accentColor?: string;
-}
+const schema = defineSchema([
+  { key: "content", label: "Contenu", type: "richtext", defaultValue: "Introduction..." },
+  { key: "accentColor", label: "Couleur d'accent", type: "color", defaultValue: "" },
+]);
 
-function IntroBox({ theme, content = "", accentColor }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function IntroBox({ theme, content, accentColor }: Props) {
   const borderColor = accentColor ?? theme.colors.primary;
 
   return (
@@ -22,25 +23,18 @@ function IntroBox({ theme, content = "", accentColor }: Props) {
         marginBottom: 16,
       }}
     >
-      <RichBlock
-        text={content}
-        style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.colors.text }}
-      />
+      <RichBlock text={content} style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.colors.text }} />
     </div>
   );
 }
 
-register({
+defineComponent({
   type: "intro-box",
   label: "Encadré introduction",
   icon: "Quote",
   category: "content",
   description: "Texte d'introduction avec bordure colorée",
-  schema: [
-    { key: "content", label: "Contenu", type: "richtext", defaultValue: "Introduction..." },
-    { key: "accentColor", label: "Couleur d'accent", type: "color", defaultValue: "" },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { content: "Introduction...", accentColor: "" },
-  render: IntroBox as RegisteredComponent["render"],
+  render: IntroBox,
 });

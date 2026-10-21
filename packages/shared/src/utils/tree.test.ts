@@ -1,24 +1,12 @@
 import { describe, it, expect } from "vitest";
-import {
-  findNode,
-  findParent,
-  removeNode,
-  insertNode,
-  moveNode,
-  duplicateNode,
-  generateNodeId,
-} from "./tree";
+import { findNode, findParent, removeNode, insertNode, moveNode, duplicateNode, generateNodeId } from "./tree";
 import type { ComponentNode } from "../types/template";
 
 function node(id: string, children?: ComponentNode[]): ComponentNode {
   return { id, type: "test", props: {}, children };
 }
 
-const TREE: ComponentNode[] = [
-  node("a", [node("a1"), node("a2")]),
-  node("b"),
-  node("c", [node("c1", [node("c1a")])]),
-];
+const TREE: ComponentNode[] = [node("a", [node("a1"), node("a2")]), node("b"), node("c", [node("c1", [node("c1a")])])];
 
 describe("findNode", () => {
   it("trouve un noeud racine", () => {

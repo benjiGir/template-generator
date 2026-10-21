@@ -1,29 +1,40 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { resolveColor, resolveLightBg } from "../../color-map";
 
-interface Props {
-  theme: Theme;
-  title?: string;
-  color?: string;
-  paragraphs?: string[];
-  benefitsLabel?: string;
-  benefits?: string[];
-  result?: string;
-  suite?: string;
-}
+const schema = defineSchema([
+  { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "Titre du chantier", group: "Contenu" },
+  { key: "paragraphs", label: "Paragraphes", type: "list", defaultValue: [], group: "Contenu" },
+  { key: "benefits", label: "Bénéfices", type: "list", defaultValue: [], group: "Contenu" },
+  {
+    key: "benefitsLabel",
+    label: "Label bénéfices",
+    type: "text",
+    role: "structure",
+    defaultValue: "Bénéfices",
+    group: "Contenu",
+  },
+  { key: "result", label: "Résultat", type: "textarea", defaultValue: "", group: "Contenu" },
+  { key: "suite", label: "Suite", type: "textarea", defaultValue: "", group: "Contenu" },
+  {
+    key: "color",
+    label: "Couleur",
+    type: "select",
+    defaultValue: "blue",
+    group: "Style",
+    options: [
+      { label: "Bleu", value: "blue" },
+      { label: "Vert", value: "green" },
+      { label: "Ambre", value: "amber" },
+      { label: "Rouge", value: "red" },
+    ],
+  },
+]);
 
-function DetailBlock({
-  theme,
-  title = "Titre",
-  color = "blue",
-  paragraphs = [],
-  benefitsLabel = "Bénéfices",
-  benefits = [],
-  result,
-  suite,
-}: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function DetailBlock({ theme, title, color, paragraphs, benefitsLabel, benefits, result, suite }: Props) {
   const accentColor = resolveColor(color, theme);
   const lightBg = resolveLightBg(color, theme);
 
@@ -144,42 +155,13 @@ function DetailBlock({
   );
 }
 
-register({
+defineComponent({
   type: "detail-block",
   label: "Bloc de détails",
   icon: "LayoutList",
   category: "content",
   description: "Bloc structuré avec titre, contenu, bénéfices et résultat",
-  schema: [
-    { key: "title", label: "Titre", type: "text", defaultValue: "Titre du chantier", group: "Contenu" },
-    { key: "paragraphs", label: "Paragraphes", type: "list", defaultValue: [], group: "Contenu" },
-    { key: "benefits", label: "Bénéfices", type: "list", defaultValue: [], group: "Contenu" },
-    { key: "benefitsLabel", label: "Label bénéfices", type: "text", defaultValue: "Bénéfices", group: "Contenu" },
-    { key: "result", label: "Résultat", type: "textarea", defaultValue: "", group: "Contenu" },
-    { key: "suite", label: "Suite", type: "textarea", defaultValue: "", group: "Contenu" },
-    {
-      key: "color",
-      label: "Couleur",
-      type: "select",
-      defaultValue: "blue",
-      group: "Style",
-      options: [
-        { label: "Bleu", value: "blue" },
-        { label: "Vert", value: "green" },
-        { label: "Ambre", value: "amber" },
-        { label: "Rouge", value: "red" },
-      ],
-    },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: {
-    title: "Titre du chantier",
-    color: "blue",
-    paragraphs: [],
-    benefitsLabel: "Bénéfices",
-    benefits: [],
-    result: "",
-    suite: "",
-  },
-  render: DetailBlock as RegisteredComponent["render"],
+  render: DetailBlock,
 });

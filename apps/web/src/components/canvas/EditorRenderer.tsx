@@ -1,10 +1,11 @@
 import { Fragment } from "react";
 import { get } from "@template-generator/component-registry/registry";
+import { resolveThemeVars } from "@template-generator/component-registry/renderer";
 import type { ComponentNode, Theme } from "@template-generator/shared/types/template";
 import { useEditorStore } from "@/store/editor-store";
 import { SelectableWrapper } from "./SelectableWrapper";
 import { DropZone } from "./DropZone";
-import { InlineEditor } from "@/components/inspector/InlineEditor";
+import { InlineEditor, InlineTextEditor } from "@/components/inspector/InlineEditor";
 import { useDroppable, useDndContext } from "@dnd-kit/core";
 import type { DropZoneData } from "@/hooks/useDragAndDrop";
 
@@ -33,17 +34,17 @@ function GridDropZone({ pageIndex, parentId, index, isEmpty }: GridDropZoneProps
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: isOver ? "2px solid #2563EB" : (isEmpty || isDragging) ? "1.5px dashed #CBD5E1" : "none",
+        border: isOver ? "2px solid #2448C8" : isEmpty || isDragging ? "1.5px dashed #C9C3B7" : "none",
         borderRadius: 4,
-        backgroundColor: isOver ? "#EFF6FF" : "transparent",
+        backgroundColor: isOver ? "#EEF1FC" : "transparent",
         transition: "all 0.15s ease",
         fontSize: 11,
-        color: "#94A3B8",
+        color: "#6E6A62",
       }}
     >
       {isEmpty && !isDragging && "Glissez des composants ici"}
       {isOver && (
-        <div style={{ width: "100%", height: 2, backgroundColor: "#2563EB", borderRadius: 1, position: "absolute" }} />
+        <div style={{ width: "100%", height: 2, backgroundColor: "#2448C8", borderRadius: 1, position: "absolute" }} />
       )}
     </div>
   );
@@ -70,7 +71,7 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
             border: "1px solid #FCA5A5",
             borderRadius: 4,
             fontSize: 12,
-            color: "#DC2626",
+            color: "#9E1B32",
             fontFamily: "monospace",
           }}
         >
@@ -81,21 +82,22 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
   }
 
   const Component = definition.render;
-  const mergedProps = { ...definition.defaultProps, ...node.props, theme };
+  const values = resolveThemeVars(node.props, theme);
 
   if (!definition.acceptsChildren) {
-    const isInlineEditing = inlineEditingNodeId === node.id && !!inlineEditingPropKey;
+    // Clé de la prop éditée sur place dans ce composant, s'il y en a une
+    const editedKey = inlineEditingNodeId === node.id ? inlineEditingPropKey : null;
+    const editedValue = editedKey ? String(node.props[editedKey] ?? "") : "";
     return (
       <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
         <div style={{ position: "relative" }}>
-          <Component {...mergedProps} />
-          {isInlineEditing && (
-            <InlineEditor
-              nodeId={node.id}
-              propKey={inlineEditingPropKey!}
-              value={String(node.props[inlineEditingPropKey!] ?? "")}
-            />
-          )}
+          <Component values={values} theme={theme} />
+          {editedKey &&
+            (definition.schema.find((p) => p.key === editedKey)?.type === "text" ? (
+              <InlineTextEditor nodeId={node.id} propKey={editedKey} value={editedValue} />
+            ) : (
+              <InlineEditor nodeId={node.id} propKey={editedKey} value={editedValue} />
+            ))}
         </div>
       </SelectableWrapper>
     );
@@ -127,7 +129,12 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
         {children.map((child) => (
           <EditorRenderer key={child.id} node={child} theme={theme} pageIndex={pageIndex} />
         ))}
-        <GridDropZone pageIndex={pageIndex} parentId={node.id} index={children.length} isEmpty={children.length === 0} />
+        <GridDropZone
+          pageIndex={pageIndex}
+          parentId={node.id}
+          index={children.length}
+          isEmpty={children.length === 0}
+        />
       </>
     );
   } else {
@@ -146,7 +153,9 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
 
   return (
     <SelectableWrapper nodeId={node.id} nodeType={node.type} pageIndex={pageIndex}>
-      <Component {...mergedProps}>{innerContent}</Component>
+      <Component values={values} theme={theme}>
+        {innerContent}
+      </Component>
     </SelectableWrapper>
   );
 }

@@ -1,13 +1,12 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  text?: string;
-}
+const schema = defineSchema([{ key: "text", label: "Texte", type: "textarea", defaultValue: "Pour la suite..." }]);
 
-function SuiteText({ theme, text = "" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function SuiteText({ theme, text }: Props) {
   return (
     <p
       style={{
@@ -24,16 +23,13 @@ function SuiteText({ theme, text = "" }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "suite-text",
   label: 'Texte "Pour la suite"',
   icon: "ArrowRight",
   category: "content",
   description: "Texte de suite ou de prochaine étape",
-  schema: [
-    { key: "text", label: "Texte", type: "textarea", defaultValue: "Pour la suite..." },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { text: "Pour la suite..." },
-  render: SuiteText as RegisteredComponent["render"],
+  render: SuiteText,
 });

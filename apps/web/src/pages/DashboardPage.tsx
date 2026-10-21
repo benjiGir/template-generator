@@ -1,110 +1,265 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTemplatesStore } from "@/store/templates-store";
-import { DEFAULT_NEW_TEMPLATE } from "@/store/editor-store";
+import { useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import type { DocumentSummary, TemplateSummary } from "@/api/client";
+import { useCreateDocument, useDocuments, useDuplicateDocument } from "@/api/hooks/documents";
+import { useTemplates } from "@/api/hooks/templates";
+import { DocumentThumbnail } from "@/components/document-view/DocumentView";
+import { GettingStarted } from "@/components/ui/GettingStarted";
+import { BlueprintGlyph, ObjectTag, TemplateRef } from "@/components/ui/ObjectIdentity";
+import { DocumentStatusBadge } from "@/components/ui/StatusBadge";
+import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
+import { documentPreview } from "@/components/document/DocumentCard";
+import { templateStatus } from "@template-generator/shared/utils/fields";
+import { Button } from "@/components/ui/Button";
+
+function shortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }).toUpperCase();
+}
 
 export function DashboardPage() {
-  const { templates, loading, error, fetchTemplates, createTemplate, duplicateTemplate, deleteTemplate } =
-    useTemplatesStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTemplates();
-  }, [fetchTemplates]);
+  const { data: allTemplates = [], isSuccess: templatesLoaded } = useTemplates();
+  const { data: allDocuments = [], isSuccess: documentsLoaded } = useDocuments();
 
-  const handleCreate = async () => {
-    const created = await createTemplate(DEFAULT_NEW_TEMPLATE);
-    navigate(`/editor/${created.id}`);
-  };
+  // Le dashboard est un point de reprise : les brouillons d'abord
+  const drafts = allDocuments.filter((d) => d.status === "draft").slice(0, 5);
+  const exported = allDocuments.filter((d) => d.status === "finalized").slice(0, 3);
+  const templates = allTemplates.slice(0, 5);
 
-  const handleDuplicate = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    await duplicateTemplate(id);
-  };
+  const createFrom = useCreateDocument();
+  const duplicate = useDuplicateDocument();
+  const openDocument = (doc: { id: string }) => navigate(`/documents/${doc.id}/fill`);
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (!confirm("Supprimer ce template ?")) return;
-    await deleteTemplate(id);
-  };
+  const today = useMemo(
+    () =>
+      new Date()
+        .toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+        .toUpperCase(),
+    [],
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">DocForge</h1>
-        <button
-          onClick={handleCreate}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
-        >
-          + Nouveau template
-        </button>
-      </div>
-
-      {/* Contenu */}
-      <div className="px-8 py-8">
-        {loading && (
-          <p className="text-sm text-gray-400">Chargement...</p>
+    <div className="h-full overflow-y-auto bg-paper">
+      <div className="mx-auto flex max-w-[1100px] flex-col gap-9 px-14 py-10">
+        {templatesLoaded && documentsLoaded && (
+          <GettingStarted templates={allTemplates} documentCount={allDocuments.length} />
         )}
 
-        {error && (
-          <p className="text-sm text-red-500">Erreur : {error}</p>
-        )}
-
-        {!loading && templates.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-sm mb-4">Aucun template. Créez-en un pour commencer.</p>
-            <button
-              onClick={handleCreate}
-              className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
-            >
-              Créer mon premier template
-            </button>
+        <header className="flex flex-wrap items-end justify-between gap-5 border-b-2 border-ink pb-6">
+          <div>
+            <div className="font-mono text-xs tracking-[0.06em] text-ink-subtle">{today}</div>
+            <h1 className="mt-1.5 text-[32px] font-bold leading-tight tracking-tight">Reprendre le travail</h1>
           </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4 max-w-5xl">
-          {templates.map((t) => (
-            <div
-              key={t.id}
-              onClick={() => navigate(`/editor/${t.id}`)}
-              className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:border-blue-300 hover:shadow-sm transition-all group"
+          <div className="flex flex-wrap gap-2.5">
+            <Link
+              to="/documents/new"
+              data-tour="action-document"
+              className="inline-flex min-h-[42px] items-center gap-2 rounded-sm bg-doc px-4 font-semibold text-white hover:brightness-95"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h3>
-                  {t.description && (
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{t.description}</p>
-                  )}
-                </div>
-                <div className="ml-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={(e) => handleDuplicate(e, t.id)}
-                    className="text-gray-400 hover:text-blue-500 text-xs p-1"
-                    title="Dupliquer"
-                  >
-                    ⧉
-                  </button>
-                  <button
-                    onClick={(e) => handleDelete(e, t.id)}
-                    className="text-gray-400 hover:text-red-500 text-xs p-1"
-                    title="Supprimer"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-              <p className="text-xs text-gray-400 mt-3">
-                {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </p>
+              <svg
+                width="14"
+                height="16"
+                viewBox="0 0 14 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
+                <rect x="1" y="1" width="12" height="14" />
+                <path d="M4 5h6M4 8h6M4 11h4" />
+              </svg>
+              Nouveau document
+            </Link>
+            <Link
+              to="/templates/new"
+              data-tour="action-template"
+              className="inline-flex min-h-[42px] items-center gap-2 rounded-sm bg-tpl px-4 font-semibold text-white hover:brightness-95"
+            >
+              <svg
+                width="14"
+                height="16"
+                viewBox="0 0 14 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
+                <rect x="1" y="1" width="12" height="14" strokeDasharray="2 2" />
+                <path d="M4 5h6M4 9h6" />
+              </svg>
+              Nouveau template
+            </Link>
+          </div>
+        </header>
+
+        <div className="flex flex-wrap items-start gap-10">
+          <section aria-labelledby="dash-docs" className="flex min-w-0 flex-[999_1_560px] flex-col gap-8">
+            <div className="flex items-center gap-3">
+              <ObjectTag kind="doc">Documents</ObjectTag>
+              <h2 id="dash-docs" className="text-sm text-ink-soft">
+                Ce que vous remplissez et exportez en PDF
+              </h2>
             </div>
-          ))}
+
+            <div data-tour="recent-documents">
+              <div className="mb-1.5 flex items-baseline justify-between gap-3">
+                <h3 className="text-base font-semibold">
+                  En cours{" "}
+                  <span className="font-mono text-xs font-normal text-ink-subtle">
+                    {drafts.length} brouillon{drafts.length > 1 ? "s" : ""}
+                  </span>
+                </h3>
+                <Link to="/documents" className="text-[13px] underline-offset-2 hover:underline">
+                  Tous les documents
+                </Link>
+              </div>
+              {documentsLoaded && drafts.length === 0 ? (
+                <p className="border-t border-rule py-4 text-sm text-ink-muted">Aucun brouillon en cours.</p>
+              ) : (
+                <ul>
+                  {drafts.map((d) => (
+                    <DocumentRow key={d.id} doc={d}>
+                      <div>
+                        <SegmentedProgress filled={d.completionPercent} total={100} />
+                        <div className="mt-1 font-mono text-[11px] text-ink-soft">
+                          {d.completionPercent} % rempli · {shortDate(d.updatedAt)}
+                        </div>
+                      </div>
+                      <Link
+                        to={`/documents/${d.id}`}
+                        className="justify-self-end text-[13px] font-semibold text-doc-strong hover:underline"
+                      >
+                        Reprendre →
+                      </Link>
+                    </DocumentRow>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {exported.length > 0 && (
+              <div>
+                <div className="mb-1.5 flex items-baseline justify-between gap-3">
+                  <h3 className="text-base font-semibold">Exportés récemment</h3>
+                  <span className="text-[13px] text-ink-subtle">Pour l'édition suivante, dupliquez le précédent.</span>
+                </div>
+                <ul>
+                  {exported.map((d) => (
+                    <DocumentRow key={d.id} doc={d}>
+                      <span className="flex items-center gap-2">
+                        <DocumentStatusBadge document={d} />
+                        <span className="font-mono text-[11px] text-ink-subtle">{shortDate(d.updatedAt)}</span>
+                      </span>
+                      <Button
+                        variant="link"
+                        tone="doc"
+                        disabled={duplicate.isPending}
+                        onClick={() => duplicate.mutate(d.id, { onSuccess: openDocument })}
+                        className="justify-self-end text-[13px] font-semibold"
+                      >
+                        Dupliquer →
+                      </Button>
+                    </DocumentRow>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+
+          <aside aria-labelledby="dash-tpls" className="min-w-0 flex-[1_1_300px] border border-tpl bg-tpl-tint p-5">
+            <div className="mb-3.5 flex flex-col gap-1.5">
+              <span className="self-start">
+                <ObjectTag kind="tpl">Templates</ObjectTag>
+              </span>
+              <h2 id="dash-tpls" className="text-sm text-ink">
+                Les modèles : mise en page fixe, champs à remplir. Chaque document part de l'un d'eux.
+              </h2>
+            </div>
+            {templatesLoaded && templates.length === 0 ? (
+              <p className="border-t border-tpl-rule py-4 text-sm text-ink-soft">Aucun template pour l'instant.</p>
+            ) : (
+              <ul>
+                {templates.map((t) => (
+                  <TemplateRow
+                    key={t.id}
+                    template={t}
+                    onCreate={() => createFrom.mutate(t.id, { onSuccess: openDocument })}
+                    creating={createFrom.isPending}
+                  />
+                ))}
+              </ul>
+            )}
+            <Link to="/templates" className="mt-3 inline-block text-[13px] font-semibold text-tpl hover:underline">
+              Dessiner ou modifier dans l'Atelier →
+            </Link>
+          </aside>
         </div>
       </div>
     </div>
+  );
+}
+
+/** Une ligne de document : miniature (feuille à ombre orange), nom, template d'origine, puis le contenu propre à la liste */
+function DocumentRow({ doc, children }: { doc: DocumentSummary; children: React.ReactNode }) {
+  const preview = documentPreview(doc);
+  return (
+    <li className="grid grid-cols-[48px_minmax(0,1fr)_170px_110px] items-center gap-4 border-t border-rule py-3">
+      <Link
+        to={`/documents/${doc.id}`}
+        aria-label={`Ouvrir ${doc.name}`}
+        className="block h-[54px] w-10 overflow-hidden border border-rule-strong bg-white shadow-[3px_3px_0_var(--color-doc)]"
+      >
+        {preview && <DocumentThumbnail template={preview} width={38} cropHeight={52} />}
+      </Link>
+      <div className="min-w-0">
+        <Link to={`/documents/${doc.id}`} className="block truncate font-semibold hover:underline">
+          {doc.name}
+        </Link>
+        {doc.templateName && <TemplateRef name={doc.templateName} />}
+      </div>
+      {children}
+    </li>
+  );
+}
+
+/** Un template : vignette « plan » (tracé blanc sur cobalt), nom, statut, et de quoi en tirer un document */
+function TemplateRow({
+  template,
+  onCreate,
+  creating,
+}: {
+  template: TemplateSummary;
+  onCreate: () => void;
+  creating: boolean;
+}) {
+  const status = templateStatus(template);
+  const published = status !== "draft";
+  return (
+    <li className="grid grid-cols-[40px_minmax(0,1fr)] items-center gap-3 border-t border-tpl-rule py-2.5">
+      <BlueprintGlyph />
+      <div className="min-w-0">
+        <Link to={`/templates/${template.id}/build`} className="block truncate font-semibold hover:underline">
+          {template.name}
+        </Link>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          <span className="font-mono text-[11px] text-ink-soft">
+            {published ? "PUBLIÉ" : "BROUILLON"} ·{" "}
+            {template.documentCount === 0
+              ? "AUCUN DOCUMENT"
+              : `${template.documentCount} DOCUMENT${template.documentCount > 1 ? "S" : ""}`}
+          </span>
+          {published ? (
+            <Button variant="link" tone="doc" disabled={creating} onClick={onCreate} className="text-xs font-semibold">
+              Créer un document →
+            </Button>
+          ) : (
+            <Link to={`/templates/${template.id}/publish`} className="text-xs font-semibold text-tpl hover:underline">
+              Finir et publier →
+            </Link>
+          )}
+        </div>
+      </div>
+    </li>
   );
 }

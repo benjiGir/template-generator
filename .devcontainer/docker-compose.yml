@@ -13,14 +13,14 @@ services:
       CORS_ORIGIN: "http://localhost:5173"
 
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: docforge
       POSTGRES_USER: docforge
       POSTGRES_PASSWORD: devpassword
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata18:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U docforge -d docforge"]
       interval: 5s
@@ -28,4 +28,4 @@ services:
       retries: 10
 
 volumes:
-  pgdata:
+  pgdata18:

@@ -1,16 +1,17 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { RichBlock } from "../../rich-text";
 
-interface Props {
-  theme: Theme;
-  quote?: string;
-  author?: string;
-  role?: string;
-}
+const schema = defineSchema([
+  { key: "quote", label: "Citation", type: "richtext", defaultValue: "Votre citation ici…" },
+  { key: "author", label: "Auteur", type: "text", defaultValue: "" },
+  { key: "role", label: "Rôle / Fonction", type: "text", defaultValue: "" },
+]);
 
-function QuoteBlock({ theme, quote = "", author = "", role = "" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function QuoteBlock({ theme, quote, author, role }: Props) {
   return (
     <div
       style={{
@@ -48,34 +49,21 @@ function QuoteBlock({ theme, quote = "", author = "", role = "" }: Props) {
 
       {(author || role) && (
         <div style={{ borderTop: `1px solid ${theme.colors.borderLight}`, paddingTop: 8, marginTop: 4 }}>
-          {author && (
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: theme.colors.text }}>
-              {author}
-            </p>
-          )}
-          {role && (
-            <p style={{ margin: 0, fontSize: 11, color: theme.colors.textMuted }}>
-              {role}
-            </p>
-          )}
+          {author && <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: theme.colors.text }}>{author}</p>}
+          {role && <p style={{ margin: 0, fontSize: 11, color: theme.colors.textMuted }}>{role}</p>}
         </div>
       )}
     </div>
   );
 }
 
-register({
+defineComponent({
   type: "quote-block",
   label: "Citation",
   icon: "MessageCircle",
   category: "content",
   description: "Bloc de citation avec auteur et rôle",
-  schema: [
-    { key: "quote", label: "Citation", type: "richtext", defaultValue: "Votre citation ici…" },
-    { key: "author", label: "Auteur", type: "text", defaultValue: "" },
-    { key: "role", label: "Rôle / Fonction", type: "text", defaultValue: "" },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { quote: "Votre citation ici…", author: "", role: "" },
-  render: QuoteBlock as RegisteredComponent["render"],
+  render: QuoteBlock,
 });

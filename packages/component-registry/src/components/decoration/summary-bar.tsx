@@ -1,13 +1,12 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  text?: string;
-}
+const schema = defineSchema([{ key: "text", label: "Texte", type: "text", defaultValue: "Résumé" }]);
 
-function SummaryBar({ theme, text = "" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function SummaryBar({ theme, text }: Props) {
   return (
     <div
       style={{
@@ -25,16 +24,13 @@ function SummaryBar({ theme, text = "" }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "summary-bar",
   label: "Barre de résumé",
   icon: "Minus",
   category: "decoration",
   description: "Bande colorée avec texte de résumé",
-  schema: [
-    { key: "text", label: "Texte", type: "text", defaultValue: "Résumé" },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { text: "Résumé" },
-  render: SummaryBar as RegisteredComponent["render"],
+  render: SummaryBar,
 });

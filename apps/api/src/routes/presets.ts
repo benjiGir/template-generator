@@ -1,37 +1,63 @@
 import { Hono } from "hono";
+import { desc, eq } from "drizzle-orm";
 import { db } from "../db/connection";
 import { componentPresets } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { idParam, presetCreate, presetUpdate } from "../schemas";
+import { validate } from "../validation";
 
-const router = new Hono();
+const NOT_FOUND = { error: "Preset introuvable" };
 
-router.get("/", async (c) => {
-  const result = await db.select().from(componentPresets).orderBy(componentPresets.createdAt);
-  return c.json(result);
-});
+const router = new Hono()
+  .get("/", async (c) => {
+    const result = await db.select().from(componentPresets).orderBy(desc(componentPresets.createdAt));
+    return c.json(result, 200);
+  })
 
-router.post("/", async (c) => {
-  const body = await c.req.json();
-  const [result] = await db.insert(componentPresets).values(body).returning();
-  return c.json(result, 201);
-});
+  .get("/:id", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [result] = await db.select().from(componentPresets).where(eq(componentPresets.id, id));
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
+  })
 
-router.put("/:id", async (c) => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  const [result] = await db
-    .update(componentPresets)
-    .set(body)
-    .where(eq(componentPresets.id, id))
-    .returning();
-  if (!result) return c.json({ error: "Not found" }, 404);
-  return c.json(result);
-});
+  .post("/", validate("json", presetCreate), async (c) => {
+    const [result] = await db.insert(componentPresets).values(c.req.valid("json")).returning();
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
+  })
 
-router.delete("/:id", async (c) => {
-  const id = c.req.param("id");
-  await db.delete(componentPresets).where(eq(componentPresets.id, id));
-  return c.json({ ok: true });
-});
+  .post("/:id/duplicate", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [source] = await db.select().from(componentPresets).where(eq(componentPresets.id, id));
+    if (!source) return c.json(NOT_FOUND, 404);
+    const { id: _id, createdAt: _createdAt, ...rest } = source;
+    const [result] = await db
+      .insert(componentPresets)
+      .values({ ...rest, label: `${source.label} (copie)` })
+      .returning();
+    if (!result) throw new Error("L'insertion n'a renvoyé aucune ligne");
+    return c.json(result, 201);
+  })
+
+  .put("/:id", validate("param", idParam), validate("json", presetUpdate), async (c) => {
+    const { id } = c.req.valid("param");
+    const [result] = await db
+      .update(componentPresets)
+      .set(c.req.valid("json"))
+      .where(eq(componentPresets.id, id))
+      .returning();
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
+  })
+
+  .delete("/:id", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [deleted] = await db
+      .delete(componentPresets)
+      .where(eq(componentPresets.id, id))
+      .returning({ id: componentPresets.id });
+    if (!deleted) return c.json(NOT_FOUND, 404);
+    return c.json({ ok: true }, 200);
+  });
 
 export default router;

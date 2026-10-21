@@ -4,13 +4,11 @@ import type { SpacingValue } from "@template-generator/shared/types/component";
 interface Props {
   label: string;
   value: SpacingValue;
-  onChange: (v: unknown) => void;
+  onChange: (v: SpacingValue) => void;
 }
 
-const EMPTY: SpacingValue = { top: 0, right: 0, bottom: 0, left: 0 };
-
 export function SpacingPropField({ label, value, onChange }: Props) {
-  const val: SpacingValue = { ...EMPTY, ...((value as SpacingValue | undefined) ?? {}) };
+  const val = value;
   const [linked, setLinked] = useState(false);
 
   const update = (side: keyof SpacingValue, n: number) => {
@@ -22,20 +20,18 @@ export function SpacingPropField({ label, value, onChange }: Props) {
   };
 
   const inputCls =
-    "w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-white text-center";
+    "w-full px-1.5 py-1 text-xs border border-rule rounded focus:outline-none focus:border-focus bg-white text-center";
 
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="text-xs font-medium text-gray-600">{label}</label>
+        <label className="text-xs font-medium text-ink-muted">{label}</label>
         <button
           type="button"
           title={linked ? "Délier les côtés" : "Lier les côtés"}
           onClick={() => setLinked((l) => !l)}
           className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
-            linked
-              ? "bg-blue-50 border-blue-300 text-blue-600"
-              : "border-gray-200 text-gray-400 hover:border-gray-300"
+            linked ? "bg-tpl-tint border-tpl-rule text-tpl" : "border-rule text-ink-faint hover:border-rule-strong"
           }`}
         >
           {linked ? "⛓" : "⛓‍💥"}
@@ -54,7 +50,7 @@ export function SpacingPropField({ label, value, onChange }: Props) {
               className={inputCls}
               title="Top"
             />
-            <p className="text-center text-[10px] text-gray-400 mt-0.5">top</p>
+            <p className="text-center text-[10px] text-ink-faint mt-0.5">top</p>
           </div>
         </div>
 
@@ -68,13 +64,13 @@ export function SpacingPropField({ label, value, onChange }: Props) {
               className={inputCls}
               title="Left"
             />
-            <p className="text-center text-[10px] text-gray-400 mt-0.5">left</p>
+            <p className="text-center text-[10px] text-ink-faint mt-0.5">left</p>
           </div>
           <div
-            className="flex-1 h-8 border-2 border-dashed border-gray-300 rounded flex items-center justify-center"
+            className="flex-1 h-8 border-2 border-dashed border-rule-strong rounded flex items-center justify-center"
             style={{ minWidth: 0 }}
           >
-            <span className="text-[10px] text-gray-300">px</span>
+            <span className="text-[10px] text-rule-strong">px</span>
           </div>
           <div className="w-14">
             <input
@@ -84,7 +80,7 @@ export function SpacingPropField({ label, value, onChange }: Props) {
               className={inputCls}
               title="Right"
             />
-            <p className="text-center text-[10px] text-gray-400 mt-0.5">right</p>
+            <p className="text-center text-[10px] text-ink-faint mt-0.5">right</p>
           </div>
         </div>
 
@@ -98,7 +94,7 @@ export function SpacingPropField({ label, value, onChange }: Props) {
               className={inputCls}
               title="Bottom"
             />
-            <p className="text-center text-[10px] text-gray-400 mt-0.5">bottom</p>
+            <p className="text-center text-[10px] text-ink-faint mt-0.5">bottom</p>
           </div>
         </div>
       </div>

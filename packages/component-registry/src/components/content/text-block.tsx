@@ -1,32 +1,27 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 import { RichBlock } from "../../rich-text";
 
-interface Props {
-  theme: Theme;
-  content?: string;
-}
+const schema = defineSchema([
+  { key: "content", label: "Contenu", type: "richtext", defaultValue: "Votre texte ici..." },
+]);
 
-function TextBlock({ theme, content = "" }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function TextBlock({ theme, content }: Props) {
   return (
-    <RichBlock
-      text={content}
-      style={{ margin: "0 0 8px", fontSize: 13, lineHeight: 1.65, color: theme.colors.text }}
-    />
+    <RichBlock text={content} style={{ margin: "0 0 8px", fontSize: 13, lineHeight: 1.65, color: theme.colors.text }} />
   );
 }
 
-register({
+defineComponent({
   type: "text-block",
   label: "Bloc texte",
   icon: "AlignLeft",
   category: "content",
   description: "Paragraphe de texte libre",
-  schema: [
-    { key: "content", label: "Contenu", type: "richtext", defaultValue: "Votre texte ici..." },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { content: "Votre texte ici..." },
-  render: TextBlock as RegisteredComponent["render"],
+  render: TextBlock,
 });

@@ -1,22 +1,21 @@
 import type { ReactNode } from "react";
-import type { Theme, PageFormat } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { Theme } from "@template-generator/shared/types/template";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  pageFormat?: PageFormat;
-  children?: ReactNode;
-}
+const schema = defineSchema([]);
 
-function PageContainer({ theme, pageFormat, children }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme; children?: ReactNode };
+
+/** Dimensions A4 fixes : ce conteneur ne reçoit pas le format de page du template */
+function PageContainer({ theme, children }: Props) {
   return (
     <div
       data-doc-page
       style={{
-        width: pageFormat?.width ?? "210mm",
-        minHeight: pageFormat?.height ?? "297mm",
-        padding: pageFormat?.padding ?? "28px 36px 32px",
+        width: "210mm",
+        minHeight: "297mm",
+        padding: "28px 36px 32px",
         backgroundColor: theme.colors.background,
         fontFamily: theme.typography.fontFamily,
         fontSize: theme.typography.baseFontSize,
@@ -31,14 +30,13 @@ function PageContainer({ theme, pageFormat, children }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "page-container",
   label: "Page",
   icon: "FileText",
   category: "layout",
   description: "Conteneur principal d'une page A4",
-  schema: [],
+  schema,
   acceptsChildren: true,
-  defaultProps: {},
-  render: PageContainer as RegisteredComponent["render"],
+  render: PageContainer,
 });

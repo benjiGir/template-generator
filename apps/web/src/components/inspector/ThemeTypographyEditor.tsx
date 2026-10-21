@@ -1,4 +1,5 @@
 import { useEditorStore } from "@/store/editor-store";
+import { Field, Input } from "@/components/ui/Field";
 
 const FONT_SUGGESTIONS = [
   "Inter, system-ui, sans-serif",
@@ -33,80 +34,74 @@ export function ThemeTypographyEditor() {
   return (
     <div className="px-4 space-y-3">
       {/* Fontes */}
-      <div>
-        <label className="text-xs text-gray-500 block mb-1">Fonte principale</label>
-        <input
-          list="font-suggestions"
-          type="text"
-          value={t.fontFamily}
-          onChange={(e) => update("fontFamily", e.target.value)}
-          className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
-        />
+      <Field label="Fonte principale">
+        <Input list="font-suggestions" value={t.fontFamily} onChange={(e) => update("fontFamily", e.target.value)} />
         <datalist id="font-suggestions">
-          {FONT_SUGGESTIONS.map((f) => <option key={f} value={f} />)}
+          {FONT_SUGGESTIONS.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
         </datalist>
-      </div>
+      </Field>
 
-      <div>
-        <label className="text-xs text-gray-500 block mb-1">Fonte titres</label>
-        <input
+      <Field label="Fonte titres">
+        <Input
           list="font-suggestions"
-          type="text"
           value={t.headingFontFamily}
           onChange={(e) => update("headingFontFamily", e.target.value)}
-          className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
         />
-      </div>
+      </Field>
 
       {/* Taille de base + interlignage */}
       <div className="grid grid-cols-2 gap-2">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Taille base (px)</label>
-          <input
+        <Field label="Taille base (px)">
+          <Input
             type="number"
-            min={10} max={20}
+            min={10}
+            max={20}
             value={t.baseFontSize}
             onChange={(e) => update("baseFontSize", Number(e.target.value))}
-            className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Interlignage</label>
-          <input
+        </Field>
+        <Field label="Interlignage">
+          <Input
             type="number"
-            min={1} max={2.5} step={0.05}
+            min={1}
+            max={2.5}
+            step={0.05}
             value={t.lineHeight}
             onChange={(e) => update("lineHeight", Number(e.target.value))}
-            className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
-        </div>
+        </Field>
       </div>
 
       {/* Tailles de titres */}
       <div>
-        <p className="text-xs text-gray-400 mb-1">Tailles des titres (px)</p>
+        <p className="text-xs text-ink-faint mb-1">Tailles des titres (px)</p>
         <div className="grid grid-cols-3 gap-2">
           {(["h1", "h2", "h3"] as const).map((h) => (
-            <div key={h}>
-              <label className="text-xs text-gray-500 block mb-1 uppercase">{h}</label>
-              <input
+            <Field key={h} label={h.toUpperCase()}>
+              <Input
                 type="number"
-                min={10} max={60}
+                min={10}
+                max={60}
                 value={t.headingSizes[h]}
                 onChange={(e) => updateHeading(h, Number(e.target.value))}
-                className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
               />
-            </div>
+            </Field>
           ))}
         </div>
       </div>
 
       {/* Preview */}
       <div
-        className="mt-2 p-2 bg-gray-50 rounded border border-gray-200"
+        className="mt-2 p-2 bg-paper rounded border border-rule"
         style={{ fontFamily: t.fontFamily, fontSize: t.baseFontSize, lineHeight: t.lineHeight }}
       >
-        <div style={{ fontSize: t.headingSizes.h1, fontWeight: t.fontWeights.extrabold, lineHeight: 1.2, marginBottom: 4 }}>
+        <div
+          style={{ fontSize: t.headingSizes.h1, fontWeight: t.fontWeights.extrabold, lineHeight: 1.2, marginBottom: 4 }}
+        >
           Titre H1
         </div>
         <div style={{ fontSize: t.headingSizes.h2, fontWeight: t.fontWeights.bold, lineHeight: 1.3, marginBottom: 4 }}>

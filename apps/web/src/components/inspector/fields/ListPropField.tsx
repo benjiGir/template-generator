@@ -1,19 +1,10 @@
 import { useState, type CSSProperties } from "react";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-  arrayMove,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { X } from "lucide-react";
+import { Button, IconButton } from "@/components/ui/Button";
+import { Input, Textarea } from "@/components/ui/Field";
 
 interface ItemProps {
   id: string;
@@ -39,25 +30,13 @@ function SortableItem({ id, value, onUpdate, onRemove }: ItemProps) {
         type="button"
         {...listeners}
         {...attributes}
-        className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing px-0.5 text-sm leading-none"
+        className="text-rule-strong hover:text-ink-subtle cursor-grab active:cursor-grabbing px-0.5 text-sm leading-none"
         tabIndex={-1}
       >
         ⠿
       </button>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onUpdate(e.target.value)}
-        className="flex-1 px-2.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-white"
-      />
-      <button
-        type="button"
-        onClick={onRemove}
-        className="text-gray-400 hover:text-red-500 text-sm leading-none px-1"
-        title="Supprimer"
-      >
-        ×
-      </button>
+      <Input value={value} onChange={(e) => onUpdate(e.target.value)} className="flex-1" />
+      <IconButton label="Supprimer l'élément" icon={<X size={12} />} tone="danger" size="sm" onClick={onRemove} />
     </div>
   );
 }
@@ -118,33 +97,26 @@ export function ListPropField({ label, value, onChange }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="text-xs font-medium text-gray-600">{label}</label>
-        <button
-          type="button"
-          onClick={bulkMode ? applyBulk : openBulk}
-          className="text-[10px] text-blue-500 hover:text-blue-700 transition-colors"
-        >
+        <label className="text-xs font-medium text-ink-muted">{label}</label>
+        <Button variant="link" tone="tpl" onClick={bulkMode ? applyBulk : openBulk} className="text-[10px]">
           {bulkMode ? "Appliquer" : "Édition groupée"}
-        </button>
+        </Button>
       </div>
 
       {bulkMode ? (
         <div>
-          <textarea
+          <Textarea
             value={bulkText}
             onChange={(e) => setBulkText(e.target.value)}
             rows={6}
             autoFocus
+            aria-label={`${label}, un élément par ligne`}
             placeholder="Un élément par ligne…"
-            className="w-full px-2.5 py-1.5 text-xs border border-blue-300 rounded focus:outline-none focus:border-blue-500 bg-white resize-none font-mono"
+            className="resize-none font-mono"
           />
-          <button
-            type="button"
-            onClick={() => setBulkMode(false)}
-            className="mt-1 w-full py-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <Button variant="ghost" size="sm" block onClick={() => setBulkMode(false)} className="mt-1">
             Annuler
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -163,13 +135,9 @@ export function ListPropField({ label, value, onChange }: Props) {
               </div>
             </SortableContext>
           </DndContext>
-          <button
-            type="button"
-            onClick={add}
-            className="mt-2 w-full py-1 text-xs text-blue-600 border border-dashed border-blue-300 rounded hover:bg-blue-50 transition-colors"
-          >
+          <Button variant="dashed" tone="tpl" size="sm" block onClick={add} className="mt-2">
             + Ajouter
-          </button>
+          </Button>
         </>
       )}
     </div>

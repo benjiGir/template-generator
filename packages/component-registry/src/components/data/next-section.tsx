@@ -1,22 +1,17 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  title?: string;
-  intro?: string;
-  items?: string[];
-  summary?: string;
-}
+const schema = defineSchema([
+  { key: "title", label: "Titre", type: "text", role: "section", defaultValue: "Et pour la suite ?" },
+  { key: "intro", label: "Introduction", type: "textarea", defaultValue: "" },
+  { key: "items", label: "Éléments", type: "list", defaultValue: [] },
+  { key: "summary", label: "Résumé", type: "text", defaultValue: "" },
+]);
 
-function NextSection({
-  theme,
-  title = "Et pour la suite ?",
-  intro = "",
-  items = [],
-  summary,
-}: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function NextSection({ theme, title, intro, items, summary }: Props) {
   return (
     <div
       style={{
@@ -99,24 +94,13 @@ function NextSection({
   );
 }
 
-register({
+defineComponent({
   type: "next-section",
   label: 'Section "Et pour la suite ?"',
   icon: "ListTodo",
   category: "data",
   description: "Section de prochaines étapes avec liste",
-  schema: [
-    { key: "title", label: "Titre", type: "text", defaultValue: "Et pour la suite ?" },
-    { key: "intro", label: "Introduction", type: "textarea", defaultValue: "" },
-    { key: "items", label: "Éléments", type: "list", defaultValue: [] },
-    { key: "summary", label: "Résumé", type: "text", defaultValue: "" },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: {
-    title: "Et pour la suite ?",
-    intro: "",
-    items: [],
-    summary: "",
-  },
-  render: NextSection as RegisteredComponent["render"],
+  render: NextSection,
 });

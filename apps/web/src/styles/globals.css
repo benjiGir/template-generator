@@ -1,59 +1,143 @@
 @import "tailwindcss";
 
+/*
+ * Direction visuelle « bureau d'études » : papier, encre, filets plutôt qu'ombres,
+ * et une couleur par type d'objet (document, template, preset).
+ * Les documents eux-mêmes gardent les couleurs de leur template (styles en ligne du registre).
+ *
+ * Couleurs : uniquement des noms de rôle. Les gammes de Tailwind (gray, blue, red…) sont retirées :
+ * `bg-blue-50` ne produit aucun style, il faut choisir le rôle (`bg-tpl-tint`, `bg-focus`…).
+ * Composants de base : apps/web/src/components/ui/{Button,Dialog,Field}.tsx
+ */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Surfaces et filets */
+  --color-paper: #f7f5f0; /* fond de l'application, zones en retrait */
+  --color-wash: #efece5; /* survol, puces, fonds discrets */
+  --color-table: #e2ded5; /* plan de travail sous les pages */
+  --color-rule: #ddd8ce; /* filets, bordures ordinaires */
+  --color-rule-strong: #c9c3b7; /* bordures appuyées, poignées au repos */
+
+  /* Encre : du texte principal au plus effacé */
+  --color-ink: #16161a; /* texte principal, actions principales */
+  --color-ink-soft: #48453f; /* texte courant secondaire */
+  --color-ink-muted: #57534b; /* libellés */
+  --color-ink-subtle: #6e6a62; /* aides, métadonnées */
+  --color-ink-faint: #9a958b; /* indications, icônes au repos */
+
+  /* Champ ou contrôle qui a le focus */
+  --color-focus: #16161a;
+
+  /* Document (Studio) : orange */
+  --color-doc: #c8441b;
+  --color-doc-strong: #b03b17;
+  --color-doc-tint: #fce9e0;
+
+  /* Template (Atelier) : cobalt ; aussi la sélection dans l'éditeur */
+  --color-tpl: #2448c8;
+  --color-tpl-strong: #1d3ba6;
+  --color-tpl-rule: #c9d3f6;
+  --color-tpl-tint: #eef1fc;
+
+  /* Preset (Bibliothèque) : vert */
+  --color-preset: #0f7a57;
+  --color-preset-strong: #0c6648;
+  --color-preset-rule: #b5e1d0;
+  --color-preset-tint: #ddf2ea;
+
+  /* États */
+  --color-danger: #9e1b32; /* destructif, erreur */
+  --color-danger-strong: #85162a;
+  --color-danger-rule: #ebaab4;
+  --color-danger-tint: #fbedef;
+  --color-warn: #8a5a00; /* à compléter, obligatoire */
+  --color-warn-strong: #6e4700;
+  --color-warn-rule: #ebd09a;
+  --color-warn-tint: #fbf4e6;
+  --color-success: #0c6648; /* confirmation d'une action */
+
+  /* Angles presque droits, pas d'ombres portées sur les surfaces */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 2px 0 rgba(22, 22, 26, 0.06), 0 8px 24px rgba(22, 22, 26, 0.1);
+  --shadow-xl: 0 2px 0 rgba(22, 22, 26, 0.06), 0 12px 32px rgba(22, 22, 26, 0.14);
+  --shadow-2xl: 0 2px 0 rgba(22, 22, 26, 0.06), 0 18px 48px rgba(22, 22, 26, 0.18);
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+}
+
+/* Aperçu servant à désigner des zones (Atelier, champs remplissables) */
+[data-pickable] [data-node-id] > * {
+  cursor: pointer;
+}
+
+/* Aperçu de composant : les voisins d'exemple sont estompés */
+[data-component-preview] [data-node-id^="ghost-"]:not([data-node-id="ghost-parent"]) > * {
+  opacity: 0.3;
+}
+
+/*
+ * Impression : seul le portail d'impression (usePrintDocument) est imprimé.
+ * Il contient le document rendu à l'échelle 1 avec les mêmes composants qu'à l'écran.
+ */
+@media screen {
+  [data-print-portal] {
+    position: fixed;
+    top: 0;
+    left: -100000px;
+    pointer-events: none;
+  }
+}
+
 @media print {
   html,
   body {
     height: auto !important;
     overflow: visible !important;
-  }
-
-  /* Masquer tout, ne montrer que le contenu du canvas */
-  body * {
-    visibility: hidden;
-  }
-
-  [data-print-root],
-  [data-print-root] * {
-    visibility: visible;
-  }
-
-  [data-print-root] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: auto;
-    height: auto !important;
-    overflow: visible !important;
-    background: none !important;
-    padding: 0 !important;
-  }
-
-  /* Conteneur des pages : supprimer le style éditeur */
-  [data-print-root] > div {
-    display: block !important;
-    background: none !important;
-    padding: 0 !important;
     margin: 0 !important;
+    background: #fff !important;
   }
 
-  /* Onglets de page : masqués à l'impression */
-  [data-page-tab] {
+  /* Les fonds de couleur sont imprimés sans avoir à cocher « Graphiques d'arrière-plan » */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body > *:not([data-print-portal]) {
     display: none !important;
-    visibility: hidden !important;
   }
 
-  /* Wrapper par page : supprimer l'espacement éditeur */
-  [data-page-wrapper] {
-    margin-bottom: 0 !important;
+  [data-print-portal] > div {
+    display: block !important;
+    gap: 0 !important;
   }
 
-  /* Styles des pages */
-  [data-doc-page] {
-    break-after: page;
-    break-inside: avoid;
+  [data-print-portal] [data-doc-page] {
     box-shadow: none !important;
-    border-radius: 0 !important;
-    outline: none !important;
     margin: 0 !important;
+    break-after: page;
+  }
+
+  [data-print-portal] [data-doc-page]:last-child {
+    break-after: auto;
   }
 }

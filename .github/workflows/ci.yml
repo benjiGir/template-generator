@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+# Un nouveau push sur la même branche annule la vérification en cours
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, format, types, tests, build
+    runs-on: ubuntu-latest
+    # Base des tests de l'API (créée et migrée par les tests eux-mêmes)
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: docforge
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: docforge_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U docforge" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://docforge:password@localhost:5432/docforge_test
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version lue dans le champ packageManager de package.json
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  e2e:
+    name: Tests de bout en bout
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: docforge
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: docforge_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U docforge" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://docforge:password@localhost:5432/docforge_test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @template-generator/e2e exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      # Rapport et traces pour comprendre un échec
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results

@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  sectionTitle?: string;
-  children?: ReactNode;
-}
+const schema = defineSchema([
+  { key: "sectionTitle", label: "Titre de section", type: "text", role: "section", defaultValue: "" },
+]);
+
+type Props = PropsOf<typeof schema> & { theme: Theme; children?: ReactNode };
 
 function KpiRow({ theme, sectionTitle, children }: Props) {
   return (
@@ -31,19 +31,16 @@ function KpiRow({ theme, sectionTitle, children }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "kpi-row",
   label: "Ligne de KPIs",
   icon: "LayoutGrid",
   category: "data",
   description: "Rangée de cartes KPI (max 4)",
-  schema: [
-    { key: "sectionTitle", label: "Titre de section", type: "text", defaultValue: "" },
-  ],
+  schema,
   acceptsChildren: true,
   childrenLayout: "horizontal",
   allowedChildren: ["kpi-card"],
   maxChildren: 4,
-  defaultProps: { sectionTitle: "" },
-  render: KpiRow as RegisteredComponent["render"],
+  render: KpiRow,
 });

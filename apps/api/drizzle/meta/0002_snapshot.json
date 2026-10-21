@@ -1,6 +1,6 @@
 {
-  "id": "6ab92d57-0d06-4e4b-812c-baef2f050d33",
-  "prevId": "5138b641-079d-42bb-8526-370e6c919833",
+  "id": "c2ca3421-c290-4f07-aa30-207fbe736a6e",
+  "prevId": "90c92de9-261a-46dd-b343-66b18fe31c72",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -38,6 +38,12 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -89,6 +95,27 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'draft'"
+        },
+        "completion_percent": {
+          "name": "completion_percent",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'::jsonb"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -160,6 +187,27 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
+        },
+        "published": {
+          "name": "published",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "editable_fields": {
+          "name": "editable_fields",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "tags": {
+          "name": "tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
         },
         "created_at": {
           "name": "created_at",

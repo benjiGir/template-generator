@@ -1,14 +1,15 @@
 import type { Theme } from "@template-generator/shared/types/template";
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  theme: Theme;
-  title?: string;
-  subtitle?: string;
-}
+const schema = defineSchema([
+  { key: "title", label: "Titre", type: "text", role: "name", defaultValue: "Titre de la page" },
+  { key: "subtitle", label: "Sous-titre", type: "text", defaultValue: "" },
+]);
 
-function TitleBlock({ theme, title = "Titre", subtitle }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function TitleBlock({ theme, title, subtitle }: Props) {
   return (
     <div style={{ marginBottom: 20 }}>
       <h1
@@ -39,17 +40,13 @@ function TitleBlock({ theme, title = "Titre", subtitle }: Props) {
   );
 }
 
-register({
+defineComponent({
   type: "title-block",
   label: "Bloc titre",
   icon: "Heading1",
   category: "content",
   description: "Titre principal et sous-titre de page",
-  schema: [
-    { key: "title", label: "Titre", type: "text", defaultValue: "Titre de la page" },
-    { key: "subtitle", label: "Sous-titre", type: "text", defaultValue: "" },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { title: "Titre de la page", subtitle: "" },
-  render: TitleBlock as RegisteredComponent["render"],
+  render: TitleBlock,
 });

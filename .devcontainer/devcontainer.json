@@ -6,8 +6,8 @@
 
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "22",
-      "pnpmVersion": "10"
+      "version": "24",
+      "pnpmVersion": "11.15.1"
     }
   },
 
@@ -28,8 +28,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
+        "oxc.oxc-vscode",
         "bradlc.vscode-tailwindcss",
         "ms-vscode.vscode-typescript-next",
         "mtxr.sqltools",
@@ -38,14 +37,12 @@
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "editor.formatOnSave": true,
+        "editor.defaultFormatter": "oxc.oxc-vscode",
         "typescript.preferences.importModuleSpecifier": "non-relative"
       }
     },
     "jetbrains": {
-      "plugins": [
-        "com.jetbrains.plugins.tailwindcss",
-        "intellij.prettierJS"
-      ]
+      "plugins": ["com.jetbrains.plugins.tailwindcss"]
     }
   }
 }

@@ -1,8 +1,10 @@
+import type { PropType, PropValue, PropValues } from "./component";
+
 /** Un noeud dans l'arbre de composants */
 export interface ComponentNode {
   id: string;
   type: string;
-  props: Record<string, unknown>;
+  props: PropValues;
   children?: ComponentNode[];
 }
 
@@ -86,17 +88,53 @@ export interface TemplatePage {
   children: ComponentNode[];
 }
 
-/** Le template complet */
-export interface Template {
-  id: string;
+/** Champ éditable exposé pour le remplissage dans le Studio */
+export interface EditableField {
+  nodeId: string;
+  propKey: string;
+  label: string;
+  type: PropType;
+  defaultValue: PropValue;
+  required: boolean;
+  group?: string;
+  order: number;
+}
+
+/**
+ * Version figée d'un template au moment de sa publication.
+ * C'est elle — et non l'état de travail de l'Atelier — qui sert à créer les documents du Studio.
+ */
+export interface PublishedVersion {
   name: string;
   description?: string;
   theme: Theme;
   pageFormat: PageFormat;
   pages: TemplatePage[];
+  editableFields: EditableField[];
+}
+
+/** Le template complet, tel que l'API le renvoie */
+export interface Template {
+  id: string;
+  name: string;
+  description: string | null;
+  theme: Theme;
+  pageFormat: PageFormat;
+  pages: TemplatePage[];
+  published: boolean;
+  publishedAt: string | null;
+  publishedVersion: PublishedVersion | null;
+  editableFields: EditableField[];
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 }
+
+/** De quoi dessiner une miniature : le thème, le format et la première page seulement */
+export type PagePreview = Pick<Template, "theme" | "pageFormat" | "pages">;
+
+/** Statut affiché d'un template dans les listes */
+export type TemplateStatus = "draft" | "published" | "published-with-changes";
 
 /** Thème par défaut (KOMITY Blue) */
 export const DEFAULT_THEME: Theme = {

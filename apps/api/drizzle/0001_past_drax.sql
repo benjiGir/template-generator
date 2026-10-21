@@ -1,0 +1,1 @@
+ALTER TABLE "component_presets" ADD COLUMN "category" text;

@@ -1,0 +1,5 @@
+# Commits de pure mise en forme, ignorés par git blame
+# (GitHub et GitLab lisent ce fichier ; en local : git config blame.ignoreRevsFile .git-blame-ignore-revs)
+
+# style: formatage du code avec oxfmt
+e8bf0c86a877eb8685519dddef784adfd79475a1

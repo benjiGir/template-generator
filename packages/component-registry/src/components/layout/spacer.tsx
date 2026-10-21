@@ -1,24 +1,22 @@
-import { register } from "../../registry";
-import type { RegisteredComponent } from "../../registry";
+import type { Theme } from "@template-generator/shared/types/template";
+import type { PropsOf } from "@template-generator/shared/types/component";
+import { defineComponent, defineSchema } from "../../registry";
 
-interface Props {
-  height?: number;
-}
+const schema = defineSchema([{ key: "height", label: "Hauteur (px)", type: "number", defaultValue: 24 }]);
 
-function Spacer({ height = 24 }: Props) {
+type Props = PropsOf<typeof schema> & { theme: Theme };
+
+function Spacer({ height }: Props) {
   return <div style={{ height }} />;
 }
 
-register({
+defineComponent({
   type: "spacer",
   label: "Espacement",
   icon: "ArrowUpDown",
   category: "layout",
   description: "Espace vertical entre les composants",
-  schema: [
-    { key: "height", label: "Hauteur (px)", type: "number", defaultValue: 24 },
-  ],
+  schema,
   acceptsChildren: false,
-  defaultProps: { height: 24 },
-  render: Spacer as RegisteredComponent["render"],
+  render: Spacer,
 });

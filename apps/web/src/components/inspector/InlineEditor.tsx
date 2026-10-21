@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
+import type { EditorState } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -8,10 +9,9 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
 import { FORMAT_TEXT_COMMAND } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
-import { EDITOR_NODES, MARKDOWN_TRANSFORMERS } from "./lexical-config";
+import { MARKDOWN_TRANSFORMERS, PassthroughErrorBoundary, markdownEditorConfig, readMarkdown } from "./lexical-config";
 import { useEditorStore } from "@/store/editor-store";
 
 const inlineEditorTheme = {
@@ -21,27 +21,52 @@ const inlineEditorTheme = {
   paragraph: "mb-1",
 };
 
-function InitPlugin({ value }: { value: string }) {
-  const [editor] = useLexicalComposerContext();
-  const initialized = useRef(false);
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    editor.update(() => $convertFromMarkdownString(value, MARKDOWN_TRANSFORMERS));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  return null;
-}
-
 function MiniToolbar() {
   const [editor] = useLexicalComposerContext();
-  const btn = "px-1.5 py-0.5 text-xs text-gray-600 hover:bg-gray-100 rounded";
+  const btn = "px-1.5 py-0.5 text-xs text-ink-muted hover:bg-wash rounded";
   return (
-    <div className="flex items-center gap-0.5 px-1 py-0.5 bg-white border border-gray-200 rounded shadow-md">
-      <button type="button" className={`${btn} font-bold`} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold"); }}>B</button>
-      <button type="button" className={`${btn} italic`} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic"); }}>I</button>
-      <span className="w-px h-3 bg-gray-200 mx-0.5" />
-      <button type="button" className={btn} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined); }}>•</button>
-      <button type="button" className={btn} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined); }}>1.</button>
+    <div className="flex items-center gap-0.5 px-1 py-0.5 bg-white border border-rule rounded shadow-md">
+      <button
+        type="button"
+        className={`${btn} font-bold`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+        }}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        className={`${btn} italic`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+        }}
+      >
+        I
+      </button>
+      <span className="w-px h-3 bg-rule mx-0.5" />
+      <button
+        type="button"
+        className={btn}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+        }}
+      >
+        •
+      </button>
+      <button
+        type="button"
+        className={btn}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+        }}
+      >
+        1.
+      </button>
     </div>
   );
 }
@@ -57,7 +82,7 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
   const stopInlineEdit = useEditorStore((s) => s.stopInlineEdit);
   const containerRef = useRef<HTMLDivElement>(null);
   const savedRef = useRef(value);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Escape → annule
   useEffect(() => {
@@ -74,7 +99,7 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
   // Clic extérieur → sauvegarde
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (containerRef.current && !(e.target instanceof Node && containerRef.current.contains(e.target))) {
         stopInlineEdit();
       }
     };
@@ -82,22 +107,15 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
     return () => document.removeEventListener("mousedown", handler);
   }, [stopInlineEdit]);
 
-  const handleChange = useCallback((editorState: import("lexical").EditorState) => {
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      editorState.read(() => {
-        const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-        updateNodeProps(nodeId, { [propKey]: md });
-      });
-    }, 200);
-  }, [nodeId, propKey, updateNodeProps]);
+  const handleChange = useCallback(
+    (editorState: EditorState) => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => updateNodeProps(nodeId, { [propKey]: readMarkdown(editorState) }), 200);
+    },
+    [nodeId, propKey, updateNodeProps],
+  );
 
-  const initialConfig = {
-    namespace: "inline-editor",
-    theme: inlineEditorTheme,
-    nodes: EDITOR_NODES,
-    onError: (err: Error) => console.error(err),
-  };
+  const initialConfig = markdownEditorConfig("inline-editor", inlineEditorTheme, value);
 
   return (
     <div
@@ -117,15 +135,55 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
             />
           }
           placeholder={null}
-          ErrorBoundary={({ children }) => <>{children}</>}
+          ErrorBoundary={PassthroughErrorBoundary}
         />
-        <InitPlugin value={value} />
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
         <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
       </LexicalComposer>
+    </div>
+  );
+}
+
+/** Édition sur place d'un texte simple (titre, libellé) : pas de mise en forme, Entrée valide */
+export function InlineTextEditor({ nodeId, propKey, value }: Props) {
+  const updateNodeProps = useEditorStore((s) => s.updateNodeProps);
+  const stopInlineEdit = useEditorStore((s) => s.stopInlineEdit);
+  const initial = useRef(value);
+
+  return (
+    <div
+      style={{ position: "absolute", inset: -2, zIndex: 200, display: "flex", alignItems: "center" }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <input
+        autoFocus
+        defaultValue={value}
+        onFocus={(e) => e.currentTarget.select()}
+        onChange={(e) => updateNodeProps(nodeId, { [propKey]: e.target.value })}
+        onBlur={stopInlineEdit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") stopInlineEdit();
+          if (e.key === "Escape") {
+            updateNodeProps(nodeId, { [propKey]: initial.current });
+            stopInlineEdit();
+          }
+        }}
+        aria-label="Modifier le texte"
+        style={{
+          width: "100%",
+          padding: "4px 6px",
+          fontSize: 14,
+          fontFamily: "system-ui, sans-serif",
+          border: "2px solid #2563EB",
+          borderRadius: 4,
+          outline: "none",
+          background: "#fff",
+          boxShadow: "0 4px 12px rgba(37,99,235,0.15)",
+        }}
+      />
     </div>
   );
 }
