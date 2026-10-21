@@ -15,7 +15,8 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:3001";
+// Vide par défaut : URLs relatives, relayées vers l'API par Vite (dev) ou nginx (Docker)
+const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) ?? "";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

@@ -117,6 +117,8 @@ Une fois les données vérifiées, l'ancien volume peut être supprimé (`docker
 | `DB_PASSWORD` | Mot de passe PostgreSQL (Docker) | `password` |
 | `PORT` | Port de l'API | `3001` |
 | `CORS_ORIGIN` | Origine autorisée par CORS | `http://localhost:5173` |
+| `API_PROXY_TARGET` | API vers laquelle le serveur Vite relaie `/api` (dev) | `http://localhost:3001` |
+| `VITE_API_URL` | URL de l'API appelée directement par le front (vide = relatif, via le proxy) | vide |
 | `WEB_PORT` | Port exposé pour le frontend (Docker) | `8080` |
 
 ## API
