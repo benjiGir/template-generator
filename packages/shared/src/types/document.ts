@@ -1,27 +1,31 @@
-import type { Template } from "./template";
+import type { PublishedVersion } from "./template";
 import type { ComponentCategory } from "./component";
+
+/** Ce qu'un document garde de son template : la version publiée qui l'a créé */
+export type DocumentSnapshot = PublishedVersion;
 
 /** Preset de composant sauvegardé */
 export interface ComponentPreset {
   id: string;
   baseType: string;
   label: string;
-  description?: string;
+  description: string | null;
   defaultProps: Record<string, unknown>;
-  category?: ComponentCategory;
+  category: ComponentCategory | null;
   createdAt: string;
 }
 
 /** Document généré (template + données) */
 export interface Document {
   id: string;
-  templateId: string;
+  /** null si le template a été supprimé depuis : le document garde son snapshot */
+  templateId: string | null;
   name: string;
   data: Record<string, unknown>;
-  templateSnapshot: Template;
+  templateSnapshot: DocumentSnapshot;
   status: "draft" | "finalized";
   completionPercent: number;
-  exportedAt?: string | null;
+  exportedAt: string | null;
   updatedAt: string;
   createdAt: string;
 }

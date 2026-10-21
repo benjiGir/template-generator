@@ -1,139 +1,141 @@
 import { Hono } from "hono";
+import { desc, eq, sql } from "drizzle-orm";
+import { buildDocumentSnapshot, computeCompletion } from "@template-generator/shared/utils/fields";
+import type { DocumentSnapshot } from "@template-generator/shared/types/document";
+import type { EditableField, PagePreview } from "@template-generator/shared/types/template";
 import { db } from "../db/connection";
 import { documents, templates } from "../db/schema";
-import { eq, desc, sql } from "drizzle-orm";
-import { buildDocumentSnapshot, computeCompletion } from "@template-generator/shared/utils/fields";
-import type { Template } from "@template-generator/shared/types/template";
+import { documentCreate, documentData, documentRename, idParam } from "../schemas";
+import { validate } from "../validation";
 
-const router = new Hono();
+const NOT_FOUND = { error: "Document introuvable" };
 
-function completionOf(snapshot: unknown, data: Record<string, unknown>): number {
-  const fields = (snapshot as Template | null)?.editableFields ?? [];
-  return computeCompletion(fields, data).percent;
+function completionOf(snapshot: DocumentSnapshot, data: Record<string, unknown>): number {
+  return computeCompletion(snapshot.editableFields ?? [], data).percent;
 }
 
-router.get("/", async (c) => {
-  const result = await db
-    .select({
-      id: documents.id,
-      templateId: documents.templateId,
-      templateName: sql<string | null>`"documents"."template_snapshot" ->> 'name'`,
-      // Première page du snapshot et données saisies : de quoi dessiner une miniature fidèle
-      preview: sql<unknown>`jsonb_build_object(
-        'theme', "documents"."template_snapshot" -> 'theme',
-        'pageFormat', "documents"."template_snapshot" -> 'pageFormat',
-        'pages', jsonb_path_query_array("documents"."template_snapshot" -> 'pages', '$[0]'),
-        'editableFields', "documents"."template_snapshot" -> 'editableFields'
-      )`,
-      data: documents.data,
-      name: documents.name,
-      status: documents.status,
-      completionPercent: documents.completionPercent,
-      exportedAt: documents.exportedAt,
-      updatedAt: documents.updatedAt,
-      createdAt: documents.createdAt,
-    })
-    .from(documents)
-    .orderBy(desc(documents.updatedAt));
-  return c.json(result);
-});
+/** Première page du snapshot et champs : de quoi dessiner une miniature fidèle avec les données saisies */
+const preview = sql<PagePreview & { editableFields: EditableField[] }>`jsonb_build_object(
+  'theme', "documents"."template_snapshot" -> 'theme',
+  'pageFormat', "documents"."template_snapshot" -> 'pageFormat',
+  'pages', jsonb_path_query_array("documents"."template_snapshot" -> 'pages', '$[0]'),
+  'editableFields', "documents"."template_snapshot" -> 'editableFields'
+)`;
 
-router.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const [result] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!result) return c.json({ error: "Not found" }, 404);
-  return c.json(result);
-});
+const router = new Hono()
+  .get("/", async (c) => {
+    const result = await db
+      .select({
+        id: documents.id,
+        templateId: documents.templateId,
+        templateName: sql<string | null>`"documents"."template_snapshot" ->> 'name'`,
+        preview,
+        data: documents.data,
+        name: documents.name,
+        status: documents.status,
+        completionPercent: documents.completionPercent,
+        exportedAt: documents.exportedAt,
+        updatedAt: documents.updatedAt,
+        createdAt: documents.createdAt,
+      })
+      .from(documents)
+      .orderBy(desc(documents.updatedAt));
+    return c.json(result, 200);
+  })
 
-/** Crée un document à partir de la version publiée d'un template */
-router.post("/", async (c) => {
-  const body = await c.req.json<{ templateId: string; name?: string }>();
-  const [template] = await db.select().from(templates).where(eq(templates.id, body.templateId));
-  if (!template) return c.json({ error: "Template not found" }, 404);
-  if (!template.published) return c.json({ error: "Template not published" }, 409);
+  .get("/:id", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [result] = await db.select().from(documents).where(eq(documents.id, id));
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
+  })
 
-  const snapshot = buildDocumentSnapshot(template as unknown as Template);
-  const name = body.name?.trim() || `${snapshot.name} — ${new Date().toLocaleDateString("fr-FR")}`;
-  const [result] = await db
-    .insert(documents)
-    .values({
-      templateId: template.id,
-      name,
-      data: {},
-      templateSnapshot: snapshot,
-      status: "draft",
-      completionPercent: completionOf(snapshot, {}),
-    })
-    .returning();
-  return c.json(result, 201);
-});
+  /** Crée un document à partir de la version publiée d'un template */
+  .post("/", validate("json", documentCreate), async (c) => {
+    const body = c.req.valid("json");
+    const [template] = await db.select().from(templates).where(eq(templates.id, body.templateId));
+    if (!template) return c.json({ error: "Template introuvable" }, 404);
+    if (!template.published) return c.json({ error: "Ce template n'est pas publié" }, 409);
 
-/** Duplique un document (le cas courant : repartir du mois précédent) */
-router.post("/:id/duplicate", async (c) => {
-  const id = c.req.param("id");
-  const [source] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!source) return c.json({ error: "Not found" }, 404);
-  const [result] = await db
-    .insert(documents)
-    .values({
-      templateId: source.templateId,
-      name: `${source.name} (copie)`,
-      data: source.data,
-      templateSnapshot: source.templateSnapshot,
-      status: "draft",
-      completionPercent: source.completionPercent,
-    })
-    .returning();
-  return c.json(result, 201);
-});
+    const snapshot = buildDocumentSnapshot(template);
+    const name = body.name || `${snapshot.name} — ${new Date().toLocaleDateString("fr-FR")}`;
+    const [result] = await db
+      .insert(documents)
+      .values({
+        templateId: template.id,
+        name,
+        data: {},
+        templateSnapshot: snapshot,
+        status: "draft",
+        completionPercent: completionOf(snapshot, {}),
+      })
+      .returning();
+    return c.json(result!, 201);
+  })
 
-router.put("/:id", async (c) => {
-  const id = c.req.param("id");
-  const body = await c.req.json<{ name?: string }>();
-  if (!body.name?.trim()) return c.json({ error: "Name required" }, 400);
-  const [result] = await db
-    .update(documents)
-    .set({ name: body.name.trim(), updatedAt: new Date() })
-    .where(eq(documents.id, id))
-    .returning();
-  if (!result) return c.json({ error: "Not found" }, 404);
-  return c.json(result);
-});
+  /** Duplique un document (le cas courant : repartir du mois précédent) */
+  .post("/:id/duplicate", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [source] = await db.select().from(documents).where(eq(documents.id, id));
+    if (!source) return c.json(NOT_FOUND, 404);
+    const [result] = await db
+      .insert(documents)
+      .values({
+        templateId: source.templateId,
+        name: `${source.name} (copie)`,
+        data: source.data,
+        templateSnapshot: source.templateSnapshot,
+        status: "draft",
+        completionPercent: source.completionPercent,
+      })
+      .returning();
+    return c.json(result!, 201);
+  })
 
-/** Remplace les données saisies (le client envoie toujours l'état complet) */
-router.put("/:id/data", async (c) => {
-  const id = c.req.param("id");
-  const body = await c.req.json<{ data: Record<string, unknown> }>();
+  .put("/:id", validate("param", idParam), validate("json", documentRename), async (c) => {
+    const { id } = c.req.valid("param");
+    const [result] = await db
+      .update(documents)
+      .set({ name: c.req.valid("json").name, updatedAt: new Date() })
+      .where(eq(documents.id, id))
+      .returning();
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
+  })
 
-  const [existing] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!existing) return c.json({ error: "Not found" }, 404);
+  /** Remplace les données saisies (le client envoie toujours l'état complet) */
+  .put("/:id/data", validate("param", idParam), validate("json", documentData), async (c) => {
+    const { id } = c.req.valid("param");
+    const { data } = c.req.valid("json");
+    const [existing] = await db.select().from(documents).where(eq(documents.id, id));
+    if (!existing) return c.json(NOT_FOUND, 404);
 
-  const data = body.data ?? {};
-  const [result] = await db
-    .update(documents)
-    .set({ data, completionPercent: completionOf(existing.templateSnapshot, data), updatedAt: new Date() })
-    .where(eq(documents.id, id))
-    .returning();
-  return c.json(result);
-});
+    const [result] = await db
+      .update(documents)
+      .set({ data, completionPercent: completionOf(existing.templateSnapshot, data), updatedAt: new Date() })
+      .where(eq(documents.id, id))
+      .returning();
+    return c.json(result!, 200);
+  })
 
-/** Appelé après l'export PDF : le document est finalisé */
-router.put("/:id/export", async (c) => {
-  const id = c.req.param("id");
-  const now = new Date();
-  const [result] = await db
-    .update(documents)
-    .set({ status: "finalized", exportedAt: now, updatedAt: now })
-    .where(eq(documents.id, id))
-    .returning();
-  if (!result) return c.json({ error: "Not found" }, 404);
-  return c.json(result);
-});
+  /** Appelé après l'export PDF : le document est finalisé */
+  .put("/:id/export", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const now = new Date();
+    const [result] = await db
+      .update(documents)
+      .set({ status: "finalized", exportedAt: now, updatedAt: now })
+      .where(eq(documents.id, id))
+      .returning();
+    if (!result) return c.json(NOT_FOUND, 404);
+    return c.json(result, 200);
+  })
 
-router.delete("/:id", async (c) => {
-  const id = c.req.param("id");
-  await db.delete(documents).where(eq(documents.id, id));
-  return c.json({ ok: true });
-});
+  .delete("/:id", validate("param", idParam), async (c) => {
+    const { id } = c.req.valid("param");
+    const [deleted] = await db.delete(documents).where(eq(documents.id, id)).returning({ id: documents.id });
+    if (!deleted) return c.json(NOT_FOUND, 404);
+    return c.json({ ok: true }, 200);
+  });
 
 export default router;

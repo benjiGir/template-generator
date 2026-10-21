@@ -1,126 +1,69 @@
-import type {
-  Template,
-  EditableField,
-  Theme,
-  PageFormat,
-  TemplatePage,
-} from "@template-generator/shared/types/template";
-import type { ComponentPreset, Document } from "@template-generator/shared/types/document";
-
-export interface ThemeRecord {
-  id: string;
-  name: string;
-  theme: Theme;
-  isBuiltin: boolean;
-  createdAt: string;
-}
-
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    path: string,
-  ) {
-    super(`API ${status}: ${path}`);
-  }
-}
+import { hc, parseResponse, type InferRequestType } from "hono/client";
+import type { AppType } from "@template-generator/api";
 
 // Vide par défaut : URLs relatives, relayées vers l'API par Vite (dev) ou nginx (Docker)
-const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) ?? "";
+const BASE_URL = (import.meta.env["VITE_API_URL"] as string | undefined) || window.location.origin;
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
-  if (!res.ok) throw new ApiError(res.status, path);
-  return res.json() as Promise<T>;
-}
-
-/** Première page seulement : de quoi dessiner une miniature */
-export interface PagePreview {
-  theme: Theme;
-  pageFormat: PageFormat;
-  pages: TemplatePage[];
-}
-
-export interface TemplateSummary {
-  id: string;
-  name: string;
-  description: string | null;
-  published: boolean;
-  publishedAt: string | null;
-  editableFields?: EditableField[];
-  /** Version publiée pour le Studio, état de travail pour l'Atelier */
-  preview: PagePreview | null;
-  documentCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface DocumentSummary {
-  id: string;
-  templateId: string | null;
-  templateName: string | null;
-  name: string;
-  status: "draft" | "finalized";
-  completionPercent: number;
-  exportedAt: string | null;
-  preview: PagePreview & { editableFields: EditableField[] };
-  data: Record<string, unknown>;
-  updatedAt: string;
-  createdAt: string;
-}
-
-export type TemplateWritable = Pick<
-  Template,
-  "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "tags"
->;
+/**
+ * Client typé depuis les routes de l'API : paramètres, corps et réponses suivent le code du serveur,
+ * une divergence ne compile pas. `parseResponse` lève une `DetailedError` sur toute réponse en erreur.
+ */
+const client = hc<AppType>(BASE_URL).api;
 
 export const api = {
   templates: {
-    list: (filters?: { published?: boolean }) => {
-      const qs = filters?.published !== undefined ? `?published=${filters.published}` : "";
-      return request<TemplateSummary[]>(`/api/templates${qs}`);
-    },
-    get: (id: string) => request<Template>(`/api/templates/${id}`),
-    create: (data: TemplateWritable) =>
-      request<Template>("/api/templates", { method: "POST", body: JSON.stringify(data) }),
-    duplicate: (id: string) => request<Template>(`/api/templates/${id}/duplicate`, { method: "POST" }),
-    update: (id: string, data: Partial<TemplateWritable>) =>
-      request<Template>(`/api/templates/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-    publish: (id: string, data: { editableFields: EditableField[] }) =>
-      request<Template>(`/api/templates/${id}/publish`, { method: "PUT", body: JSON.stringify(data) }),
-    delete: (id: string) => request<{ ok: boolean }>(`/api/templates/${id}`, { method: "DELETE" }),
+    list: (filters?: { published?: boolean }) =>
+      parseResponse(
+        client.templates.$get({
+          query: filters?.published === undefined ? {} : { published: filters.published ? "true" : "false" },
+        }),
+      ),
+    get: (id: string) => parseResponse(client.templates[":id"].$get({ param: { id } })),
+    create: (json: TemplateWritable) => parseResponse(client.templates.$post({ json })),
+    duplicate: (id: string) => parseResponse(client.templates[":id"].duplicate.$post({ param: { id } })),
+    update: (id: string, json: Partial<TemplateWritable>) =>
+      parseResponse(client.templates[":id"].$put({ param: { id }, json })),
+    publish: (id: string, json: InferRequestType<(typeof client.templates)[":id"]["publish"]["$put"]>["json"]) =>
+      parseResponse(client.templates[":id"].publish.$put({ param: { id }, json })),
+    delete: (id: string) => parseResponse(client.templates[":id"].$delete({ param: { id } })),
   },
   presets: {
-    list: () => request<ComponentPreset[]>("/api/presets"),
-    get: (id: string) => request<ComponentPreset>(`/api/presets/${id}`),
-    duplicate: (id: string) => request<ComponentPreset>(`/api/presets/${id}/duplicate`, { method: "POST" }),
-    create: (data: Omit<ComponentPreset, "id" | "createdAt">) =>
-      request<ComponentPreset>("/api/presets", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: string, data: Partial<ComponentPreset>) =>
-      request<ComponentPreset>(`/api/presets/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-    delete: (id: string) => request<{ ok: boolean }>(`/api/presets/${id}`, { method: "DELETE" }),
+    list: () => parseResponse(client.presets.$get()),
+    get: (id: string) => parseResponse(client.presets[":id"].$get({ param: { id } })),
+    duplicate: (id: string) => parseResponse(client.presets[":id"].duplicate.$post({ param: { id } })),
+    create: (json: PresetWritable) => parseResponse(client.presets.$post({ json })),
+    update: (id: string, json: Partial<PresetWritable>) =>
+      parseResponse(client.presets[":id"].$put({ param: { id }, json })),
+    delete: (id: string) => parseResponse(client.presets[":id"].$delete({ param: { id } })),
   },
   documents: {
-    list: () => request<DocumentSummary[]>("/api/documents"),
-    get: (id: string) => request<Document>(`/api/documents/${id}`),
+    list: () => parseResponse(client.documents.$get()),
+    get: (id: string) => parseResponse(client.documents[":id"].$get({ param: { id } })),
     /** Le serveur fige la version publiée du template dans le document */
-    create: (data: { templateId: string; name?: string }) =>
-      request<Document>("/api/documents", { method: "POST", body: JSON.stringify(data) }),
-    duplicate: (id: string) => request<Document>(`/api/documents/${id}/duplicate`, { method: "POST" }),
+    create: (json: { templateId: string; name?: string }) => parseResponse(client.documents.$post({ json })),
+    duplicate: (id: string) => parseResponse(client.documents[":id"].duplicate.$post({ param: { id } })),
     rename: (id: string, name: string) =>
-      request<Document>(`/api/documents/${id}`, { method: "PUT", body: JSON.stringify({ name }) }),
+      parseResponse(client.documents[":id"].$put({ param: { id }, json: { name } })),
     updateData: (id: string, data: Record<string, unknown>) =>
-      request<Document>(`/api/documents/${id}/data`, { method: "PUT", body: JSON.stringify({ data }) }),
-    markExported: (id: string) =>
-      request<Document>(`/api/documents/${id}/export`, { method: "PUT", body: JSON.stringify({}) }),
-    delete: (id: string) => request<{ ok: boolean }>(`/api/documents/${id}`, { method: "DELETE" }),
+      parseResponse(client.documents[":id"].data.$put({ param: { id }, json: { data } })),
+    markExported: (id: string) => parseResponse(client.documents[":id"].export.$put({ param: { id } })),
+    delete: (id: string) => parseResponse(client.documents[":id"].$delete({ param: { id } })),
   },
   themes: {
-    list: () => request<ThemeRecord[]>("/api/themes"),
-    create: (data: { name: string; theme: Theme }) =>
-      request<ThemeRecord>("/api/themes", { method: "POST", body: JSON.stringify(data) }),
-    delete: (id: string) => request<{ success: boolean }>(`/api/themes/${id}`, { method: "DELETE" }),
+    list: () => parseResponse(client.themes.$get()),
+    create: (json: InferRequestType<typeof client.themes.$post>["json"]) =>
+      parseResponse(client.themes.$post({ json })),
+    delete: (id: string) => parseResponse(client.themes[":id"].$delete({ param: { id } })),
   },
 };
+
+/** Ce que l'Atelier envoie pour créer ou enregistrer un template */
+export type TemplateWritable = InferRequestType<typeof client.templates.$post>["json"];
+/** Ce que la Bibliothèque envoie pour créer ou modifier un preset */
+export type PresetWritable = InferRequestType<typeof client.presets.$post>["json"];
+
+/** Template dans les listes : version publiée pour le Studio, état de travail pour l'Atelier */
+export type TemplateSummary = Awaited<ReturnType<typeof api.templates.list>>[number];
+/** Document dans les listes, avec de quoi dessiner sa miniature */
+export type DocumentSummary = Awaited<ReturnType<typeof api.documents.list>>[number];
+export type ThemeRecord = Awaited<ReturnType<typeof api.themes.list>>[number];

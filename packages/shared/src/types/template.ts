@@ -113,22 +113,25 @@ export interface PublishedVersion {
   editableFields: EditableField[];
 }
 
-/** Le template complet */
+/** Le template complet, tel que l'API le renvoie */
 export interface Template {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
   theme: Theme;
   pageFormat: PageFormat;
   pages: TemplatePage[];
   published: boolean;
-  publishedAt?: string | null;
-  publishedVersion?: PublishedVersion | null;
+  publishedAt: string | null;
+  publishedVersion: PublishedVersion | null;
   editableFields: EditableField[];
   tags: string[];
   createdAt: string;
   updatedAt: string;
 }
+
+/** De quoi dessiner une miniature : le thème, le format et la première page seulement */
+export type PagePreview = Pick<Template, "theme" | "pageFormat" | "pages">;
 
 /** Statut affiché d'un template dans les listes */
 export type TemplateStatus = "draft" | "published" | "published-with-changes";

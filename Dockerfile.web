@@ -12,6 +12,8 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 # Package manifests only
 COPY packages/shared/package.json packages/shared/
 COPY packages/component-registry/package.json packages/component-registry/
+# Le front lit le type des routes de l'API (client typé) : ses sources servent à la vérification des types
+COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 
 RUN pnpm install --frozen-lockfile
@@ -19,6 +21,8 @@ RUN pnpm install --frozen-lockfile
 # Sources
 COPY packages/shared packages/shared
 COPY packages/component-registry packages/component-registry
+COPY apps/api/src apps/api/src
+COPY apps/api/tsconfig.json apps/api/
 COPY apps/web apps/web
 
 # VITE_API_URL vide = URLs relatives proxifiées par nginx

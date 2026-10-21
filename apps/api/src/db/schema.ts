@@ -1,4 +1,5 @@
-import { pgTable, uuid, text, jsonb, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, uuid, text, jsonb, timestamp, boolean, integer, check } from "drizzle-orm/pg-core";
 import type {
   Theme,
   PageFormat,
@@ -6,6 +7,11 @@ import type {
   EditableField,
   PublishedVersion,
 } from "@template-generator/shared/types/template";
+import type { ComponentCategory } from "@template-generator/shared/types/component";
+import type { DocumentSnapshot } from "@template-generator/shared/types/document";
+
+/** Statuts d'un document ; une contrainte en base refuse toute autre valeur */
+export const DOCUMENT_STATUSES = ["draft", "finalized"] as const;
 
 export const templates = pgTable("templates", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -28,8 +34,8 @@ export const componentPresets = pgTable("component_presets", {
   baseType: text("base_type").notNull(),
   label: text("label").notNull(),
   description: text("description"),
-  defaultProps: jsonb("default_props").notNull(),
-  category: text("category"),
+  defaultProps: jsonb("default_props").notNull().$type<Record<string, unknown>>(),
+  category: text("category").$type<ComponentCategory>(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
@@ -41,16 +47,20 @@ export const themes = pgTable("themes", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const documents = pgTable("documents", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // Le document embarque son snapshot : supprimer le template ne le casse pas
-  templateId: uuid("template_id").references(() => templates.id, { onDelete: "set null" }),
-  name: text("name").notNull(),
-  data: jsonb("data").notNull(),
-  templateSnapshot: jsonb("template_snapshot").notNull(),
-  status: text("status").default("draft").notNull(),
-  completionPercent: integer("completion_percent").default(0).notNull(),
-  exportedAt: timestamp("exported_at", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const documents = pgTable(
+  "documents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // Le document embarque son snapshot : supprimer le template ne le casse pas
+    templateId: uuid("template_id").references(() => templates.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    data: jsonb("data").notNull().$type<Record<string, unknown>>(),
+    templateSnapshot: jsonb("template_snapshot").notNull().$type<DocumentSnapshot>(),
+    status: text("status", { enum: DOCUMENT_STATUSES }).default("draft").notNull(),
+    completionPercent: integer("completion_percent").default(0).notNull(),
+    exportedAt: timestamp("exported_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [check("documents_status_check", sql`${t.status} in ('draft', 'finalized')`)],
+);

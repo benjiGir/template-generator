@@ -7,13 +7,14 @@ import { DocumentStatusBadge } from "@/components/ui/StatusBadge";
 import { TemplateRef } from "@/components/ui/ObjectIdentity";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { mergeDocumentData } from "@template-generator/shared/utils/fields";
-import type { Template } from "@template-generator/shared/types/template";
+import type { PagePreview } from "@template-generator/shared/types/template";
 
 /** Première page du document avec ses données : la miniature montre le vrai contenu */
-function previewOf(doc: DocumentSummary): Pick<Template, "theme" | "pageFormat" | "pages"> | null {
+export function documentPreview(doc: DocumentSummary): PagePreview | null {
   const p = doc.preview;
+  // Snapshots anciens ou incomplets : pas de miniature plutôt qu'une page cassée
   if (!p?.theme || !p.pageFormat || !p.pages?.length) return null;
-  return mergeDocumentData({ ...p, editableFields: p.editableFields ?? [] } as Template, doc.data ?? {});
+  return mergeDocumentData({ ...p, editableFields: p.editableFields ?? [] }, doc.data ?? {});
 }
 
 interface Props {
@@ -25,7 +26,7 @@ interface Props {
 
 export function DocumentCard({ doc, onDuplicate, onDelete, compact = false }: Props) {
   const navigate = useNavigate();
-  const preview = useMemo(() => previewOf(doc), [doc]);
+  const preview = useMemo(() => documentPreview(doc), [doc]);
   const thumbWidth = compact ? 260 : 300;
 
   return (

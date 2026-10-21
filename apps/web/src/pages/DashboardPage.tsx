@@ -8,18 +8,11 @@ import { GettingStarted } from "@/components/ui/GettingStarted";
 import { BlueprintGlyph, ObjectTag, TemplateRef } from "@/components/ui/ObjectIdentity";
 import { DocumentStatusBadge } from "@/components/ui/StatusBadge";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
-import { mergeDocumentData, templateStatus } from "@template-generator/shared/utils/fields";
-import type { Template } from "@template-generator/shared/types/template";
+import { documentPreview } from "@/components/document/DocumentCard";
+import { templateStatus } from "@template-generator/shared/utils/fields";
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }).toUpperCase();
-}
-
-/** Première page du document avec ses données */
-function previewOf(doc: DocumentSummary): Pick<Template, "theme" | "pageFormat" | "pages"> | null {
-  const p = doc.preview;
-  if (!p?.theme || !p.pageFormat || !p.pages?.length) return null;
-  return mergeDocumentData({ ...p, editableFields: p.editableFields ?? [] } as Template, doc.data ?? {});
 }
 
 export function DashboardPage() {
@@ -217,7 +210,7 @@ export function DashboardPage() {
 
 /** Une ligne de document : miniature (feuille à ombre orange), nom, template d'origine, puis le contenu propre à la liste */
 function DocumentRow({ doc, children }: { doc: DocumentSummary; children: React.ReactNode }) {
-  const preview = previewOf(doc);
+  const preview = documentPreview(doc);
   return (
     <li className="grid grid-cols-[48px_minmax(0,1fr)_170px_110px] items-center gap-4 border-t border-rule py-3">
       <Link

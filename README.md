@@ -148,8 +148,24 @@ POST   /api/presets/:id/duplicate     Duplique un preset
 PUT    /api/presets/:id               Met à jour un preset
 DELETE /api/presets/:id               Supprime un preset
 
+GET    /api/themes                    Liste les thèmes (fournis puis personnalisés)
+POST   /api/themes                    Enregistre un thème personnalisé
+PUT    /api/themes/:id                Modifie un thème personnalisé
+DELETE /api/themes/:id                Supprime un thème personnalisé
+
 GET    /api/health                    Health check
 ```
+
+### Contrat
+
+- **Entrées validées** : chaque route valide ses paramètres, sa query et son corps avec les schémas zod de
+  `apps/api/src/schemas.ts`. Les schémas qui décrivent un type partagé (`packages/shared/src/types`) le vérifient avec
+  `satisfies` : une divergence ne compile pas.
+- **Erreurs en JSON** : `{ "error": "…" }`, avec `issues` (champ et message) pour une requête invalide (400). Une
+  ressource absente répond 404, une erreur inattendue 500 (journalisée côté serveur).
+- **Client typé** : le front appelle l'API avec `hc<AppType>` (`apps/web/src/api/client.ts`) ; paramètres, corps et
+  réponses sont inférés depuis les routes. Changer une route casse la compilation du front là où elle est utilisée.
+- **Tests** : `apps/api/src/app.test.ts` couvre la validation et les erreurs sans base de données.
 
 ## Composants disponibles
 

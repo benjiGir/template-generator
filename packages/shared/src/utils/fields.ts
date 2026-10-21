@@ -1,5 +1,5 @@
 import type { EditableField, PublishedVersion, Template, TemplateStatus } from "../types/template";
-import type { Document, DocumentDisplayStatus } from "../types/document";
+import type { Document, DocumentDisplayStatus, DocumentSnapshot } from "../types/document";
 import { findNode } from "./tree";
 
 /** Clé d'un champ dans `Document.data` */
@@ -34,8 +34,11 @@ export function computeCompletion(fields: EditableField[], data: Record<string, 
   };
 }
 
-/** Applique les données saisies sur une copie du snapshot du template */
-export function mergeDocumentData(snapshot: Template, data: Record<string, unknown>): Template {
+/** Applique les données saisies sur une copie du snapshot du template (ou de son aperçu) */
+export function mergeDocumentData<T extends Pick<DocumentSnapshot, "pages" | "editableFields">>(
+  snapshot: T,
+  data: Record<string, unknown>,
+): T {
   const merged = structuredClone(snapshot);
   for (const field of merged.editableFields ?? []) {
     const key = fieldKey(field);
@@ -80,9 +83,13 @@ export function buildPublishedVersion(
 }
 
 /** Snapshot d'un template tel qu'utilisé par un document : la version publiée */
-export function buildDocumentSnapshot(template: Template): Template {
-  const version = template.publishedVersion ?? buildPublishedVersion(template);
-  return structuredClone({ ...template, ...version, publishedVersion: null });
+export function buildDocumentSnapshot(
+  template: Pick<
+    Template,
+    "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "publishedVersion"
+  >,
+): DocumentSnapshot {
+  return structuredClone(template.publishedVersion ?? buildPublishedVersion(template));
 }
 
 export function templateStatus(t: Pick<Template, "published" | "publishedAt" | "updatedAt">): TemplateStatus {

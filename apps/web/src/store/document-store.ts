@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { isFilled, mergeDocumentData, withNodeDefaults } from "@template-generator/shared/utils/fields";
-import type { Document } from "@template-generator/shared/types/document";
-import type { Template, EditableField } from "@template-generator/shared/types/template";
+import type { Document, DocumentSnapshot } from "@template-generator/shared/types/document";
+import type { EditableField } from "@template-generator/shared/types/template";
 
 interface DocumentState {
   document: Document | null;
-  templateSnapshot: Template | null;
+  templateSnapshot: DocumentSnapshot | null;
   editableFields: EditableField[];
   data: Record<string, unknown>;
   fillMode: "form" | "inline";
@@ -19,7 +19,8 @@ interface DocumentState {
   updateField: (fieldKey: string, value: unknown) => void;
   setFillMode: (mode: "form" | "inline") => void;
   markSaved: (revision: number) => void;
-  getMergedTemplate: () => Template | null;
+  /** Snapshot avec les données saisies : ce que montrent l'aperçu et l'export */
+  getMergedTemplate: () => DocumentSnapshot | null;
   reset: () => void;
 }
 

@@ -29,6 +29,13 @@
       "when": 1792413892722,
       "tag": "0003_mvp_foundations",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792565197262,
+      "tag": "0004_document_status_check",
+      "breakpoints": true
     }
   ]
 }

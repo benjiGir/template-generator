@@ -38,7 +38,8 @@ for (const theme of BUILTIN_THEMES) {
 
 console.log("\n── Templates ──");
 
-type TemplateInsert = Omit<Template, "id" | "createdAt" | "updatedAt">;
+/** Contenu d'un template de démonstration ; la publication est calculée à l'insertion */
+type TemplateInsert = Omit<Template, "id" | "createdAt" | "updatedAt" | "publishedAt" | "publishedVersion">;
 
 const TEMPLATES: TemplateInsert[] = [
   // 1 — Chantiers Techniques (KOMITY Blue)
@@ -1121,7 +1122,7 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Janvier 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Janvier 2025",
       "ib-1.content":
@@ -1140,7 +1141,7 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Février 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Février 2025",
       "ib-1.content":
@@ -1159,7 +1160,7 @@ const DOCUMENTS = [
     name: "Chantiers Techniques — Mars 2025",
     status: "draft" as const,
     completionPercent: 40,
-    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(chantiersSnapshot[0]!),
     data: {
       "tb-1.subtitle": "Bilan mensuel — Mars 2025",
       "kc-1.description": "En cours de saisie...",
@@ -1171,7 +1172,7 @@ const DOCUMENTS = [
     name: "Bilan RH — Janvier 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
     data: {
       "rh-tb-1.subtitle": "Janvier 2025",
       "rh-kc-1.description": "142 collaborateurs actifs.",
@@ -1191,7 +1192,7 @@ const DOCUMENTS = [
     name: "Bilan RH — Février 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
     data: {
       "rh-tb-1.subtitle": "Février 2025",
       "rh-kc-1.description": "145 collaborateurs actifs (+3).",
@@ -1211,7 +1212,7 @@ const DOCUMENTS = [
     name: "Bilan RH — Mars 2025",
     status: "draft" as const,
     completionPercent: 25,
-    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(rhSnapshot[0]!),
     data: {
       "rh-tb-1.subtitle": "Mars 2025",
     },
@@ -1222,7 +1223,7 @@ const DOCUMENTS = [
     name: "Rapport Financier — Q1 2025",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0]!),
     data: {
       "fi-tb-1.subtitle": "Q1 2025 — Janvier · Février · Mars",
       "fi-kc-1.description": "€ 1,24M — +12% vs Q1 2024.",
@@ -1239,7 +1240,7 @@ const DOCUMENTS = [
     name: "Rapport Financier — Q2 2025",
     status: "draft" as const,
     completionPercent: 15,
-    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(financeSnapshot[0]!),
     data: {
       "fi-tb-1.subtitle": "Q2 2025 — Avril · Mai · Juin",
     },
@@ -1250,7 +1251,7 @@ const DOCUMENTS = [
     name: "Post-Mortem — INC-2025-0042",
     status: "finalized" as const,
     completionPercent: 100,
-    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0]!),
     data: {
       "pm-tb-1.subtitle": "INC-2025-0042 — 8 février 2025",
       "pm-kc-1.description": "2h14 d'interruption partielle.",
@@ -1272,7 +1273,7 @@ const DOCUMENTS = [
     name: "Post-Mortem — INC-2025-0067",
     status: "draft" as const,
     completionPercent: 30,
-    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0] as unknown as Template),
+    templateSnapshot: buildDocumentSnapshot(pmSnapshot[0]!),
     data: {
       "pm-tb-1.subtitle": "INC-2025-0067 — 2 mars 2025",
       "pm-kc-1.description": "45 min de latence dégradée.",

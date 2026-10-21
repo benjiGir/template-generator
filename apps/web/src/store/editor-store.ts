@@ -31,7 +31,7 @@ interface EditorState {
   markSaved: (revision: number) => void;
   /** Applique un état venu du serveur (publication) sans toucher à l'historique */
   applyServerState: (template: Template) => void;
-  updateTemplateMeta: (name: string, description?: string) => void;
+  updateTemplateMeta: (name: string, description?: string | null) => void;
   updateTheme: (theme: Partial<Theme>) => void;
   updatePageFormat: (format: Partial<PageFormat>) => void;
 
@@ -329,7 +329,10 @@ export const useEditorStore = create<EditorState>()(
 );
 
 /** Contenu d'un template vierge (identifiant de page neuf à chaque appel) */
-export function newTemplateDraft(): Omit<Template, "id" | "createdAt" | "updatedAt" | "published"> {
+export function newTemplateDraft(): Pick<
+  Template,
+  "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "tags"
+> {
   return {
     name: "Nouveau template",
     description: "",

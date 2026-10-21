@@ -20,10 +20,13 @@ function template(overrides: Partial<Template> = {}): Template {
   return {
     id: "t1",
     name: "Brouillon",
+    description: null,
     theme: DEFAULT_THEME,
     pageFormat: DEFAULT_PAGE_FORMAT,
     pages: [{ id: "p1", children: [{ id: "n1", type: "title-block", props: { title: "Défaut" } }] }],
     published: false,
+    publishedAt: null,
+    publishedVersion: null,
     editableFields: [field("n1", "title")],
     tags: [],
     createdAt: "2026-01-01T00:00:00Z",
@@ -61,7 +64,7 @@ describe("computeCompletion", () => {
 
 describe("mergeDocumentData", () => {
   it("applique les données sans muter le snapshot", () => {
-    const snap = template();
+    const snap = buildDocumentSnapshot(template());
     const merged = mergeDocumentData(snap, { "n1.title": "Q3 2026" });
     expect(merged.pages[0]!.children[0]!.props["title"]).toBe("Q3 2026");
     expect(snap.pages[0]!.children[0]!.props["title"]).toBe("Défaut");
@@ -84,7 +87,8 @@ describe("buildDocumentSnapshot", () => {
     const snap = buildDocumentSnapshot(t);
     expect(snap.name).toBe("Publié");
     expect(snap.pages).toEqual([]);
-    expect(snap.publishedVersion).toBeNull();
+    // Le snapshot ne garde que la version publiée, pas l'état de travail du template
+    expect(snap).not.toHaveProperty("published");
   });
 });
 
@@ -99,7 +103,7 @@ describe("buildPublishedVersion", () => {
 
 describe("statuts", () => {
   it("détecte un template modifié après publication", () => {
-    expect(templateStatus({ published: false, updatedAt: "2026-01-02T00:00:00Z" })).toBe("draft");
+    expect(templateStatus({ published: false, publishedAt: null, updatedAt: "2026-01-02T00:00:00Z" })).toBe("draft");
     expect(
       templateStatus({ published: true, publishedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z" }),
     ).toBe("published");
@@ -108,7 +112,9 @@ describe("statuts", () => {
     ).toBe("published-with-changes");
   });
   it("détecte un document modifié après export", () => {
-    expect(documentDisplayStatus({ status: "draft", updatedAt: "2026-01-02T00:00:00Z" })).toBe("draft");
+    expect(documentDisplayStatus({ status: "draft", exportedAt: null, updatedAt: "2026-01-02T00:00:00Z" })).toBe(
+      "draft",
+    );
     expect(
       documentDisplayStatus({
         status: "finalized",

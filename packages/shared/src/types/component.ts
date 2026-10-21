@@ -1,22 +1,25 @@
-/** Catégories de composants dans la bibliothèque */
-export type ComponentCategory = "layout" | "content" | "data" | "decoration";
+/** Catégories de composants dans la bibliothèque (liste aussi utilisée pour valider les requêtes) */
+export const COMPONENT_CATEGORIES = ["layout", "content", "data", "decoration"] as const;
+export type ComponentCategory = (typeof COMPONENT_CATEGORIES)[number];
 
-/** Types de props supportés par l'éditeur */
-export type PropType =
-  | "text"
-  | "textarea"
-  | "richtext"
-  | "color"
-  | "select"
-  | "number"
-  | "boolean"
-  | "list"
-  | "emoji"
-  | "spacing"
-  | "font"
-  | "border"
-  | "image"
-  | "icon";
+/** Types de props supportés par l'éditeur (liste aussi utilisée pour valider les requêtes) */
+export const PROP_TYPES = [
+  "text",
+  "textarea",
+  "richtext",
+  "color",
+  "select",
+  "number",
+  "boolean",
+  "list",
+  "emoji",
+  "spacing",
+  "font",
+  "border",
+  "image",
+  "icon",
+] as const;
+export type PropType = (typeof PROP_TYPES)[number];
 
 export interface SpacingValue {
   top: number;
