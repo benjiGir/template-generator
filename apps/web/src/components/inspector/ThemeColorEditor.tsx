@@ -118,28 +118,28 @@ export function ColorTokenRow({ token }: { token: ColorToken }) {
           value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000"}
           onChange={(e) => set({ [token.key]: e.target.value })}
           aria-label={token.label}
-          className="h-6 w-6 shrink-0 cursor-pointer rounded border border-gray-200 p-0"
+          className="h-6 w-6 shrink-0 cursor-pointer rounded border border-rule p-0"
         />
-        <span className="w-32 shrink-0 text-xs font-medium text-gray-700">{token.label}</span>
+        <span className="w-32 shrink-0 text-xs font-medium text-ink-soft">{token.label}</span>
         <input
           type="text"
           value={value}
           onChange={(e) => set({ [token.key]: e.target.value })}
           aria-label={`${token.label} (code couleur)`}
-          className="min-w-0 flex-1 rounded border border-gray-200 px-1.5 py-0.5 font-mono text-xs focus:border-blue-400 focus:outline-none"
+          className="min-w-0 flex-1 rounded border border-rule px-1.5 py-0.5 font-mono text-xs focus:border-focus focus:outline-none"
         />
         {light && (
           <button
             type="button"
             onClick={() => set({ [light]: lighten(value) })}
             title="Recalculer la variante claire à partir de cette couleur"
-            className="shrink-0 rounded px-1 text-[10px] text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+            className="shrink-0 rounded px-1 text-[10px] text-ink-faint hover:bg-tpl-tint hover:text-tpl"
           >
             → clair
           </button>
         )}
       </div>
-      <p className="ml-8 mt-0.5 text-[10px] leading-snug text-gray-400">{token.usage}</p>
+      <p className="ml-8 mt-0.5 text-[10px] leading-snug text-ink-faint">{token.usage}</p>
     </div>
   );
 }

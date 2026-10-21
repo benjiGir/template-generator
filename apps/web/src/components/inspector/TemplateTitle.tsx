@@ -33,7 +33,7 @@ export function TemplateTitle() {
           }
         }}
         aria-label="Nom du template"
-        className="w-full rounded border border-blue-400 px-1.5 py-0.5 text-sm font-semibold text-gray-900 focus:outline-none"
+        className="w-full rounded border border-tpl px-1.5 py-0.5 text-sm font-semibold text-ink focus:outline-none"
       />
     );
   }
@@ -45,10 +45,10 @@ export function TemplateTitle() {
         setEditing(true);
       }}
       title="Renommer le template"
-      className="group flex max-w-full items-center gap-1.5 rounded text-left hover:text-blue-700"
+      className="group flex max-w-full items-center gap-1.5 rounded text-left hover:text-tpl-strong"
     >
       <span className="truncate">{name || "Sans nom"}</span>
-      <Pencil size={12} className="shrink-0 text-gray-300 group-hover:text-blue-600" />
+      <Pencil size={12} className="shrink-0 text-rule-strong group-hover:text-tpl" />
     </button>
   );
 }

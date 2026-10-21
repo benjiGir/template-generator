@@ -14,7 +14,7 @@ export function FormPreview({ fields }: { fields: EditableField[] }) {
 
   if (fields.length === 0) {
     return (
-      <p className="py-8 text-center text-xs text-gray-500">
+      <p className="py-8 text-center text-xs text-ink-subtle">
         Aucun champ retenu : le formulaire du Studio serait vide.
       </p>
     );
@@ -22,7 +22,7 @@ export function FormPreview({ fields }: { fields: EditableField[] }) {
 
   return (
     <div className="space-y-3">
-      <p className="rounded-md bg-blue-50 px-3 py-2 text-[11px] text-blue-800">
+      <p className="rounded-md bg-tpl-tint px-3 py-2 text-[11px] text-tpl-strong">
         Voici le formulaire du Studio. Vous pouvez l'essayer : rien n'est enregistré.
       </p>
       {groups.map((g) => (

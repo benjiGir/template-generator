@@ -14,7 +14,7 @@ export function BooleanPropField({ label, value, onChange }: Props) {
       aria-label={label}
       onClick={() => onChange(!value)}
       className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${
-        value ? "bg-blue-600" : "bg-gray-200"
+        value ? "bg-tpl" : "bg-rule"
       }`}
     >
       <span

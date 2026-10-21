@@ -17,12 +17,12 @@ export function ComponentCard({ definition }: Props) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="flex items-start gap-2 px-3 py-2.5 rounded cursor-grab active:cursor-grabbing hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
+      className="flex items-start gap-2 px-3 py-2.5 rounded cursor-grab active:cursor-grabbing hover:bg-tpl-tint border border-transparent hover:border-tpl-rule transition-all"
       style={{ opacity: isDragging ? 0.4 : 1, touchAction: "none" }}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-gray-800 leading-tight">{definition.label}</p>
-        <p className="text-xs text-gray-400 mt-0.5 leading-tight truncate">{definition.description}</p>
+        <p className="text-xs font-semibold text-ink leading-tight">{definition.label}</p>
+        <p className="text-xs text-ink-faint mt-0.5 leading-tight truncate">{definition.description}</p>
       </div>
     </div>
   );

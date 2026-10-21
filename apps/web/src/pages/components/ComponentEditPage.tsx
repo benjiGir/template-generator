@@ -8,6 +8,7 @@ import { useComponentDraftStore } from "@/store/component-draft-store";
 import { PRESET_WORKFLOW, PRESET_PATHS } from "@/workflow/definitions";
 import { NotFoundState } from "@/workflow/EntityState";
 import type { PropSchema, PropValue, PropValues } from "@template-generator/shared/types/component";
+import { Button } from "@/components/ui/Button";
 
 export function ComponentEditPage() {
   const { presetId } = useParams<{ presetId: string }>();
@@ -30,8 +31,8 @@ export function ComponentEditPage() {
   const def = get(baseType);
   if (!def) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-50">
-        <p className="text-sm text-red-500">Composant introuvable : {baseType}</p>
+      <div className="h-full flex items-center justify-center bg-paper">
+        <p className="text-sm text-danger">Composant introuvable : {baseType}</p>
       </div>
     );
   }
@@ -64,20 +65,20 @@ export function ComponentEditPage() {
     >
       <div className="h-full flex overflow-hidden">
         {/* Left: prop panel */}
-        <div className="w-[350px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="w-[350px] shrink-0 overflow-y-auto border-r border-rule bg-white">
+          <div className="px-4 py-3 border-b border-wash flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-gray-900">{def.label}</p>
-              <p className="text-xs text-gray-400">{def.description}</p>
+              <p className="text-sm font-semibold text-ink">{def.label}</p>
+              <p className="text-xs text-ink-faint">{def.description}</p>
             </div>
-            <button onClick={handleReset} className="text-xs text-gray-400 hover:text-gray-600 underline">
+            <Button variant="link" onClick={handleReset} className="text-xs">
               Réinitialiser
-            </button>
+            </Button>
           </div>
 
           <div className="p-4">
             {def.schema.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-6">Ce composant n'a pas de propriétés éditables.</p>
+              <p className="text-xs text-ink-faint text-center py-6">Ce composant n'a pas de propriétés éditables.</p>
             ) : groupMap.size === 1 && groupMap.has("Général") ? (
               <div className="space-y-4">
                 {(groupMap.get("Général") ?? []).map((s) => (
@@ -118,14 +119,14 @@ function GroupedProps({
       {Array.from(groupMap.entries()).map(([group, fields]) => {
         const isOpen = collapsed[group] !== true;
         return (
-          <div key={group} className="border border-gray-100 rounded overflow-hidden">
+          <div key={group} className="border border-wash rounded overflow-hidden">
             <button
               type="button"
               onClick={() => toggle(group)}
-              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-ink-muted bg-paper hover:bg-wash transition-colors"
             >
               <span>{group}</span>
-              <span className="text-gray-400 text-[10px]">{isOpen ? "▾" : "▸"}</span>
+              <span className="text-ink-faint text-[10px]">{isOpen ? "▾" : "▸"}</span>
             </button>
             {isOpen && (
               <div className="p-3 space-y-3 bg-white">

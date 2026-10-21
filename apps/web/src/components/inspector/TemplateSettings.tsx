@@ -1,4 +1,5 @@
 import { useEditorStore } from "@/store/editor-store";
+import { Button } from "@/components/ui/Button";
 
 const FORMAT_FIELDS = [
   { key: "width", label: "Largeur", hint: "ex. 210mm (A4)" },
@@ -19,10 +20,10 @@ export function TemplateSettings({ onOpenTheme }: { onOpenTheme?: () => void }) 
   return (
     <div className="space-y-4 p-4">
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Format de page</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-subtle">Format de page</p>
         {FORMAT_FIELDS.map(({ key, label, hint }) => (
           <div key={key} className="space-y-1">
-            <label htmlFor={`format-${key}`} className="text-xs text-gray-600">
+            <label htmlFor={`format-${key}`} className="text-xs text-ink-muted">
               {label}
             </label>
             <input
@@ -31,18 +32,18 @@ export function TemplateSettings({ onOpenTheme }: { onOpenTheme?: () => void }) 
               key={pageFormat[key]}
               defaultValue={pageFormat[key]}
               onBlur={(e) => e.target.value !== pageFormat[key] && updatePageFormat({ [key]: e.target.value })}
-              className="w-full rounded border border-gray-200 px-2.5 py-1.5 font-mono text-xs focus:border-blue-400 focus:outline-none"
+              className="w-full rounded border border-rule px-2.5 py-1.5 font-mono text-xs focus:border-focus focus:outline-none"
             />
-            <p className="text-[10px] text-gray-400">{hint}</p>
+            <p className="text-[10px] text-ink-faint">{hint}</p>
           </div>
         ))}
       </div>
       {onOpenTheme && (
-        <p className="text-[11px] text-gray-500">
+        <p className="text-[11px] text-ink-subtle">
           Couleurs, typographie et espacements :{" "}
-          <button onClick={onOpenTheme} className="text-blue-600 hover:underline">
+          <Button variant="link" tone="tpl" onClick={onOpenTheme}>
             onglet Thème
-          </button>
+          </Button>
         </p>
       )}
     </div>

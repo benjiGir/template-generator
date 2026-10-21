@@ -90,28 +90,28 @@ export function ColorPropField({ label, value, onChange }: Props) {
 
   return (
     <div ref={containerRef} className="relative">
-      <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-ink-muted mb-1.5">{label}</label>
 
       {/* Trigger */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 w-full px-2 py-1.5 border border-gray-200 rounded hover:border-gray-300 transition-colors text-left"
+        className="flex items-center gap-2 w-full px-2 py-1.5 border border-rule rounded hover:border-rule-strong transition-colors text-left"
       >
         <span
           style={{ backgroundColor: displayColor, border: "1px solid rgba(0,0,0,0.12)" }}
           className="w-5 h-5 rounded-sm shrink-0"
         />
-        <span className="text-xs font-mono text-gray-600 truncate flex-1">{isThemeRef ? value : displayColor}</span>
-        {isThemeRef && <span className="text-xs text-blue-500 shrink-0">lié</span>}
+        <span className="text-xs font-mono text-ink-muted truncate flex-1">{isThemeRef ? value : displayColor}</span>
+        {isThemeRef && <span className="text-xs text-tpl shrink-0">lié</span>}
       </button>
 
       {/* Popover */}
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 w-60 bg-white border border-gray-200 rounded-lg shadow-xl p-3 space-y-3">
+        <div className="absolute left-0 top-full mt-1 z-50 w-60 bg-white border border-rule rounded-lg shadow-xl p-3 space-y-3">
           {/* Palette thème */}
           <div>
-            <p className="text-xs text-gray-400 mb-1.5">Couleurs du thème</p>
+            <p className="text-xs text-ink-faint mb-1.5">Couleurs du thème</p>
             <div className="flex gap-1.5 flex-wrap">
               {THEME_REFS.map(({ key, label: l }) => {
                 const ref = `theme.${key}`;
@@ -139,7 +139,7 @@ export function ColorPropField({ label, value, onChange }: Props) {
 
           {/* Palette étendue */}
           <div>
-            <p className="text-xs text-gray-400 mb-1.5">Palette</p>
+            <p className="text-xs text-ink-faint mb-1.5">Palette</p>
             <div className="grid grid-cols-5 gap-1">
               {EXTENDED_PALETTE.map((color) => (
                 <button
@@ -177,7 +177,7 @@ export function ColorPropField({ label, value, onChange }: Props) {
             value={hexInput}
             onChange={(e) => handleHexInput(e.target.value)}
             placeholder="#000000"
-            className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 font-mono"
+            className="w-full px-2 py-1 text-xs border border-rule rounded focus:outline-none focus:border-focus font-mono"
           />
         </div>
       )}

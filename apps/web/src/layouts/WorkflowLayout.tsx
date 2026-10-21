@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, CircleHelp, Info, X } from "lucide-react"
 import type { WorkflowDef } from "@/workflow/definitions";
 import { useWorkflowSession } from "@/workflow/session";
 import { SaveIndicator } from "@/components/ui/SaveIndicator";
+import { Button } from "@/components/ui/Button";
 import { KIND_STYLES, ObjectTag } from "@/components/ui/ObjectIdentity";
 import { useHelp } from "@/help/context";
 import { stepHelp } from "@/help/stepHelp";
@@ -123,7 +124,7 @@ export function WorkflowLayout({
               className={`flex items-center gap-2 border-b-[3px] py-1 text-[13px] transition-colors ${
                 active
                   ? `${kindStyle.border} font-semibold text-ink`
-                  : `border-transparent ${done ? "text-gray-700" : "text-gray-500"} ${clickable ? "hover:text-ink hover:underline" : ""}`
+                  : `border-transparent ${done ? "text-ink-soft" : "text-ink-subtle"} ${clickable ? "hover:text-ink hover:underline" : ""}`
               } ${clickable ? "cursor-pointer" : "cursor-default"}`}
             >
               <span className="font-mono text-xs font-medium">{String(index + 1).padStart(2, "0")}</span>
@@ -137,51 +138,43 @@ export function WorkflowLayout({
   );
 
   const blockedReason = !guard.ok && guard.reason && (
-    <span className="flex items-center gap-1.5 text-xs text-amber-700">
+    <span className="flex items-center gap-1.5 text-xs text-warn-strong">
       <Info size={13} className="shrink-0" />
       {guard.reason}
     </span>
   );
 
   const previousButton = previous && (
-    <button
-      onClick={() => goTo(currentIndex - 1)}
-      disabled={pending}
-      className="flex min-h-9 items-center gap-1.5 rounded-sm border border-ink bg-transparent px-3 text-sm font-medium text-ink hover:bg-white disabled:opacity-50"
-    >
-      <ArrowLeft size={14} />
+    <Button icon={<ArrowLeft size={14} />} disabled={pending} onClick={() => goTo(currentIndex - 1)}>
       {previous.label}
-    </button>
+    </Button>
   );
 
   // Avancer est à l'encre ; l'action qui termine prend la couleur de l'objet produit
   const primaryButton =
     isLast && finalAction ? (
-      <button
-        onClick={() => run(finalAction.onClick)}
+      <Button
+        variant="primary"
+        tone={workflow.kind}
+        icon={finalAction.icon ?? <Check size={15} />}
         disabled={pending || finalAction.disabled}
-        className={`flex min-h-9 items-center gap-1.5 rounded-sm px-4 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 ${kindStyle.bg}`}
+        onClick={() => run(finalAction.onClick)}
       >
-        {finalAction.icon ?? <Check size={15} />}
         {finalAction.label}
-      </button>
+      </Button>
     ) : (
       !isLast && (
-        <button
-          onClick={handleNext}
-          disabled={pending || !guard.ok}
-          className="flex min-h-9 items-center gap-1.5 rounded-sm bg-ink px-4 text-sm font-medium text-paper hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
-        >
+        <Button variant="primary" disabled={pending || !guard.ok} onClick={handleNext}>
           {nextLabel === "Suivant" && next ? next.label : nextLabel}
           <ArrowRight size={14} />
-        </button>
+        </Button>
       )
     );
 
   const quit = (
     <Link
       to={workflow.listPath}
-      className="flex items-center gap-1 px-1 py-1 font-mono text-xs text-gray-700 hover:text-ink hover:underline"
+      className="flex items-center gap-1 px-1 py-1 font-mono text-xs text-ink-soft hover:text-ink hover:underline"
       title={`Quitter et revenir à la liste — ${workflow.listLabel}`}
     >
       <X size={13} />
@@ -192,14 +185,15 @@ export function WorkflowLayout({
   // Aide de l'étape en cours, dans un panneau : le travail reste à l'écran
   const helpTarget = stepHelp(workflow.kind, current);
   const helpButton = helpTarget && (
-    <button
+    <Button
+      variant="link"
       onClick={() => help.open(helpTarget.slug, helpTarget.sectionId)}
-      className="flex items-center gap-1 px-1 py-1 font-mono text-xs text-gray-700 hover:text-ink hover:underline"
       title="Aide sur cette étape"
+      className="px-1 py-1 font-mono text-xs"
     >
       <CircleHelp size={13} />
       Aide
-    </button>
+    </Button>
   );
 
   const heading = (

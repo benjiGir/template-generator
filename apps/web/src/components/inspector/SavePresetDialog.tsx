@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Field, Input } from "@/components/ui/Field";
 
 interface Props {
   onSave: (label: string) => void;
@@ -8,39 +11,30 @@ interface Props {
 export function SavePresetDialog({ onSave, onCancel }: Props) {
   const [label, setLabel] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!label.trim()) return;
     onSave(label.trim());
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-white rounded-lg shadow-xl p-5 w-72" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Sauvegarder comme preset</h3>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            autoFocus
-            type="text"
-            placeholder="Nom du preset"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
-          />
-          <div className="flex gap-2 justify-end">
-            <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700">
-              Annuler
-            </button>
-            <button
-              type="submit"
-              disabled={!label.trim()}
-              className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-40"
-            >
-              Sauvegarder
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Dialog labelledBy="save-preset-title" onClose={onCancel} className="max-w-xs p-5">
+      <h2 id="save-preset-title" className="mb-3 text-sm font-semibold text-ink">
+        Sauvegarder comme preset
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Field label="Nom du preset">
+          <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex. KPI Succès vert" />
+        </Field>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            Annuler
+          </Button>
+          <Button type="submit" variant="primary" tone="preset" size="sm" disabled={!label.trim()}>
+            Sauvegarder
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   );
 }

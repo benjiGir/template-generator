@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { create } from "zustand";
 import { AlertCircle, X } from "lucide-react";
+import { IconButton } from "./Button";
 
 interface Toast {
   id: number;
@@ -42,27 +43,39 @@ function ToastItem({ toast }: { toast: Toast }) {
   return (
     <div
       role="alert"
-      className="flex w-96 items-start gap-2.5 border border-rule border-l-[3px] border-l-red-600 bg-white px-3 py-2.5 text-sm text-ink shadow-lg"
+      className="flex w-96 items-start gap-2.5 border border-rule border-l-[3px] border-l-danger bg-white px-3 py-2.5 text-sm text-ink shadow-lg"
     >
-      <AlertCircle size={15} className="mt-0.5 shrink-0 text-red-600" />
+      <AlertCircle size={15} className="mt-0.5 shrink-0 text-danger" />
       <p className="flex-1">{toast.message}</p>
-      <button
-        onClick={() => dismiss(toast.id)}
-        className="rounded p-0.5 text-gray-500 hover:bg-gray-100 hover:text-ink"
-        aria-label="Fermer le message"
-      >
-        <X size={14} />
-      </button>
+      <IconButton label="Fermer le message" icon={<X size={14} />} size="sm" onClick={() => dismiss(toast.id)} />
     </div>
   );
 }
 
-/** Messages d'échec, empilés en bas à droite de l'écran */
+/**
+ * Messages d'échec, empilés en bas à droite de l'écran. La pile est un popover : comme les fenêtres
+ * (<dialog>), elle vit dans la couche supérieure du navigateur, et elle y est replacée en dernier
+ * à chaque nouveau message pour rester visible au-dessus d'une fenêtre ouverte.
+ */
 export function Toaster() {
   const toasts = useToastStore((s) => s.toasts);
-  if (toasts.length === 0) return null;
+  const ref = useRef<HTMLDivElement>(null);
+  const count = toasts.length;
+
+  useEffect(() => {
+    const stack = ref.current;
+    if (!stack) return;
+    if (stack.matches(":popover-open")) stack.hidePopover();
+    if (count > 0) stack.showPopover();
+  }, [count]);
+
   return (
-    <div className="fixed bottom-4 right-4 z-[1200] flex flex-col gap-2" aria-live="assertive">
+    <div
+      ref={ref}
+      popover="manual"
+      aria-live="assertive"
+      className="m-0 top-auto left-auto bottom-4 right-4 flex-col gap-2 overflow-visible border-0 bg-transparent p-0 open:flex"
+    >
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} />
       ))}

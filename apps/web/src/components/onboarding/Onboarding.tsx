@@ -11,7 +11,9 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
-import { KIND_STYLES, ObjectMark } from "@/components/ui/ObjectIdentity";
+import { ObjectMark } from "@/components/ui/ObjectIdentity";
+import { Button, IconButton } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
 import { TOUR_ENDINGS, TOUR_PROFILES, TOUR_STEPS, type TourProfile } from "./tourSteps";
 
 const STORAGE_KEY = "docforge-tour";
@@ -158,8 +160,8 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
   }, [profile, index]);
 
   useEffect(() => {
+    // Échap est géré par la fenêtre (Dialog) ; les flèches parcourent les étapes
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onSkip();
       if (!profile) return;
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") previous();
@@ -185,7 +187,7 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
   })();
 
   return (
-    <div className="fixed inset-0 z-[1100]" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+    <Dialog placement="cover" labelledBy="tour-title" dismissable={false} onClose={onSkip}>
       {/* Voile ; la découpe autour de l'élément est faite par l'ombre de la mise en lumière */}
       {rect ? (
         <div
@@ -200,66 +202,67 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
           }}
         />
       ) : (
-        <div aria-hidden className="absolute inset-0 bg-slate-900/55" />
+        <div aria-hidden className="absolute inset-0 bg-ink/55" />
       )}
 
       <div
         ref={cardRef}
-        className="absolute rounded-xl bg-white p-5 shadow-2xl transition-[top,left] duration-200"
+        className="absolute bg-white p-5 shadow-2xl transition-[top,left] duration-200"
         style={{ width: profile ? CARD_WIDTH : 460, ...cardStyle }}
       >
-        <button
-          onClick={onSkip}
-          className="absolute right-3 top-3 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-          aria-label="Passer le tutoriel"
+        <IconButton
+          label="Passer le tutoriel"
           title="Passer le tutoriel (Échap)"
-        >
-          <X size={16} />
-        </button>
+          icon={<X size={16} />}
+          size="sm"
+          onClick={onSkip}
+          className="absolute right-3 top-3"
+        />
 
         {!profile ? (
           <>
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
               Première visite
             </p>
-            <h2 id="tour-title" className="mt-1 text-lg font-semibold text-gray-900">
+            <h2 id="tour-title" className="mt-1 text-lg font-semibold text-ink">
               Bienvenue dans DocForge
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-ink-muted">
               DocForge sépare la forme du fond : un <strong>template</strong> fixe la mise en page une fois pour toutes,
               et chaque <strong>document</strong> n'en remplit que le contenu, jusqu'à l'export PDF.
             </p>
-            <p className="mt-4 text-sm font-medium text-gray-800">Que venez-vous faire ?</p>
+            <p className="mt-4 text-sm font-medium text-ink">Que venez-vous faire ?</p>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {TOUR_PROFILES.map((p, i) => (
                 <button
                   key={p.key}
+                  type="button"
                   ref={i === 0 ? primaryRef : undefined}
                   onClick={() => {
                     setProfile(p.key);
                     setIndex(0);
                   }}
-                  className="flex flex-col items-start gap-1.5 border border-rule p-3 text-left transition-colors hover:border-ink hover:bg-paper focus:outline-none focus:ring-2 focus:ring-ink"
+                  className="flex flex-col items-start gap-1.5 border border-rule p-3 text-left transition-colors hover:border-ink hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                 >
                   <ObjectMark kind={p.key === "contributor" ? "doc" : "tpl"} size={14} />
-                  <span className="text-sm font-semibold text-gray-900">{p.title}</span>
-                  <span className="text-xs text-gray-500">{p.hint}</span>
+                  <span className="text-sm font-semibold text-ink">{p.title}</span>
+                  <span className="text-xs text-ink-subtle">{p.hint}</span>
                 </button>
               ))}
             </div>
-            <button onClick={onSkip} className="mt-4 text-xs text-gray-500 hover:text-gray-800 hover:underline">
+            <Button variant="link" onClick={onSkip} className="mt-4 text-xs">
               Passer le tutoriel
-            </button>
+            </Button>
           </>
         ) : step ? (
           <>
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
               Étape {index + 1} sur {steps.length}
             </p>
-            <h2 id="tour-title" className="mt-1 pr-6 text-base font-semibold text-gray-900">
+            <h2 id="tour-title" className="mt-1 pr-6 text-base font-semibold text-ink">
               {step.title}
             </h2>
-            <p className="mt-1.5 text-sm text-gray-600">{step.body}</p>
+            <p className="mt-1.5 text-sm text-ink-muted">{step.body}</p>
 
             <div className="mt-4 flex items-center gap-1" aria-hidden>
               {steps.map((_, i) => (
@@ -273,56 +276,43 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
             {isLast ? (
               // Dernière étape : l'action proposée sur toute la largeur, quelle que soit la longueur de son libellé
               <div className="mt-4 space-y-2">
-                <button
+                <Button
                   ref={primaryRef}
+                  variant="primary"
+                  tone={profile === "contributor" ? "doc" : "tpl"}
+                  block
                   onClick={() => onFinish(TOUR_ENDINGS[profile].to)}
-                  className={`w-full rounded-sm px-3 py-2 text-sm font-semibold text-white hover:brightness-95 ${KIND_STYLES[profile === "contributor" ? "doc" : "tpl"].bg} focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-1`}
                 >
                   {TOUR_ENDINGS[profile].label}
-                </button>
+                </Button>
                 <div className="flex items-center justify-between">
-                  <button
-                    onClick={previous}
-                    className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
-                  >
-                    <ArrowLeft size={13} />
+                  <Button variant="ghost" size="sm" icon={<ArrowLeft size={13} />} onClick={previous}>
                     Précédent
-                  </button>
-                  <button
-                    onClick={() => onFinish()}
-                    className="rounded-md px-2 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
-                  >
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onFinish()}>
                     Terminer sans rien créer
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
               <div className="mt-4 flex items-center justify-between gap-2">
-                <button onClick={onSkip} className="text-xs text-gray-500 hover:text-gray-800 hover:underline">
+                <Button variant="link" onClick={onSkip} className="text-xs">
                   Passer
-                </button>
+                </Button>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={previous}
-                    className="flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    <ArrowLeft size={13} />
+                  <Button size="sm" icon={<ArrowLeft size={13} />} onClick={previous}>
                     Précédent
-                  </button>
-                  <button
-                    ref={primaryRef}
-                    onClick={next}
-                    className="flex items-center gap-1 rounded-sm bg-ink px-3 py-1.5 text-xs font-semibold text-paper hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-1"
-                  >
+                  </Button>
+                  <Button ref={primaryRef} variant="primary" size="sm" onClick={next}>
                     Suivant
                     <ArrowRight size={13} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
           </>
         ) : null}
       </div>
-    </div>
+    </Dialog>
   );
 }

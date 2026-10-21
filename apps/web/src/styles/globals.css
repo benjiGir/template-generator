@@ -3,93 +3,64 @@
 /*
  * Direction visuelle « bureau d'études » : papier, encre, filets plutôt qu'ombres,
  * et une couleur par type d'objet (document, template, preset).
- * Les gammes Tailwind sont redéfinies pour que l'interface entière suive ;
- * les documents eux-mêmes gardent les couleurs de leur template (styles en ligne du registre).
+ * Les documents eux-mêmes gardent les couleurs de leur template (styles en ligne du registre).
+ *
+ * Couleurs : uniquement des noms de rôle. Les gammes de Tailwind (gray, blue, red…) sont retirées :
+ * `bg-blue-50` ne produit aucun style, il faut choisir le rôle (`bg-tpl-tint`, `bg-focus`…).
+ * Composants de base : apps/web/src/components/ui/{Button,Dialog,Field}.tsx
  */
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Neutres chauds : papier → encre */
-  --color-gray-50: #f7f5f0;
-  --color-gray-100: #efece5;
-  --color-gray-200: #ddd8ce;
-  --color-gray-300: #c9c3b7;
-  --color-gray-400: #9a958b;
-  --color-gray-500: #6e6a62;
-  --color-gray-600: #57534b;
-  --color-gray-700: #48453f;
-  --color-gray-800: #2e2c28;
-  --color-gray-900: #16161a;
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
 
-  --color-slate-100: #efece5;
-  --color-slate-200: #e2ded5;
-  --color-slate-300: #c9c3b7;
-  --color-slate-400: #9a958b;
-  --color-slate-500: #6e6a62;
-  --color-slate-600: #57534b;
-  --color-slate-700: #48453f;
-  --color-slate-800: #2e2c28;
-  --color-slate-900: #16161a;
+  /* Surfaces et filets */
+  --color-paper: #f7f5f0; /* fond de l'application, zones en retrait */
+  --color-wash: #efece5; /* survol, puces, fonds discrets */
+  --color-table: #e2ded5; /* plan de travail sous les pages */
+  --color-rule: #ddd8ce; /* filets, bordures ordinaires */
+  --color-rule-strong: #c9c3b7; /* bordures appuyées, poignées au repos */
 
-  /* Bleu = cobalt, la couleur des templates (Atelier) */
-  --color-blue-50: #eef1fc;
-  --color-blue-100: #e4eafb;
-  --color-blue-200: #c9d3f6;
-  --color-blue-300: #a3b4ef;
-  --color-blue-400: #6f89e2;
-  --color-blue-500: #3f5fd6;
-  --color-blue-600: #2448c8;
-  --color-blue-700: #1d3ba6;
-  --color-blue-800: #192f82;
-  --color-blue-900: #142663;
+  /* Encre : du texte principal au plus effacé */
+  --color-ink: #16161a; /* texte principal, actions principales */
+  --color-ink-soft: #48453f; /* texte courant secondaire */
+  --color-ink-muted: #57534b; /* libellés */
+  --color-ink-subtle: #6e6a62; /* aides, métadonnées */
+  --color-ink-faint: #9a958b; /* indications, icônes au repos */
 
-  /* Ambre = ocre, « à compléter » */
-  --color-amber-50: #fbf4e6;
-  --color-amber-100: #f5e6c8;
-  --color-amber-200: #ebd09a;
-  --color-amber-300: #ddb566;
-  --color-amber-400: #c89a3a;
-  --color-amber-500: #a97a16;
-  --color-amber-600: #8a5a00;
-  --color-amber-700: #7a5000;
-  --color-amber-800: #6e4700;
-  --color-amber-900: #553700;
+  /* Champ ou contrôle qui a le focus */
+  --color-focus: #16161a;
 
-  /* Rouge = cramoisi, réservé au destructif */
-  --color-red-50: #fbedef;
-  --color-red-100: #f6d5da;
-  --color-red-200: #ebaab4;
-  --color-red-300: #dc7c8b;
-  --color-red-400: #c64b60;
-  --color-red-500: #b12a42;
-  --color-red-600: #9e1b32;
-  --color-red-700: #85162a;
-
-  /* Vert = preset (Bibliothèque) */
-  --color-emerald-50: #ebf7f2;
-  --color-emerald-100: #ddf2ea;
-  --color-emerald-200: #b5e1d0;
-  --color-emerald-300: #7fc8ad;
-  --color-emerald-500: #1e9970;
-  --color-emerald-600: #0f7a57;
-  --color-emerald-700: #0c6648;
-  --color-emerald-800: #0a523a;
-
-  /* Couleurs par type d'objet */
-  --color-paper: #f7f5f0;
-  --color-table: #e2ded5;
-  --color-rule: #ddd8ce;
-  --color-ink: #16161a;
+  /* Document (Studio) : orange */
   --color-doc: #c8441b;
   --color-doc-strong: #b03b17;
   --color-doc-tint: #fce9e0;
+
+  /* Template (Atelier) : cobalt ; aussi la sélection dans l'éditeur */
   --color-tpl: #2448c8;
-  --color-tpl-tint: #eef1fc;
+  --color-tpl-strong: #1d3ba6;
   --color-tpl-rule: #c9d3f6;
+  --color-tpl-tint: #eef1fc;
+
+  /* Preset (Bibliothèque) : vert */
   --color-preset: #0f7a57;
+  --color-preset-strong: #0c6648;
+  --color-preset-rule: #b5e1d0;
   --color-preset-tint: #ddf2ea;
-  --color-warn: #8a5a00;
+
+  /* États */
+  --color-danger: #9e1b32; /* destructif, erreur */
+  --color-danger-strong: #85162a;
+  --color-danger-rule: #ebaab4;
+  --color-danger-tint: #fbedef;
+  --color-warn: #8a5a00; /* à compléter, obligatoire */
+  --color-warn-strong: #6e4700;
+  --color-warn-rule: #ebd09a;
+  --color-warn-tint: #fbf4e6;
+  --color-success: #0c6648; /* confirmation d'une action */
 
   /* Angles presque droits, pas d'ombres portées sur les surfaces */
   --radius-sm: 2px;

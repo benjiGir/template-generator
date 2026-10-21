@@ -10,6 +10,7 @@ import { DocumentStatusBadge } from "@/components/ui/StatusBadge";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { documentPreview } from "@/components/document/DocumentCard";
 import { templateStatus } from "@template-generator/shared/utils/fields";
+import { Button } from "@/components/ui/Button";
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }).toUpperCase();
@@ -47,7 +48,7 @@ export function DashboardPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-5 border-b-2 border-ink pb-6">
           <div>
-            <div className="font-mono text-xs tracking-[0.06em] text-gray-500">{today}</div>
+            <div className="font-mono text-xs tracking-[0.06em] text-ink-subtle">{today}</div>
             <h1 className="mt-1.5 text-[32px] font-bold leading-tight tracking-tight">Reprendre le travail</h1>
           </div>
           <div className="flex flex-wrap gap-2.5">
@@ -96,7 +97,7 @@ export function DashboardPage() {
           <section aria-labelledby="dash-docs" className="flex min-w-0 flex-[999_1_560px] flex-col gap-8">
             <div className="flex items-center gap-3">
               <ObjectTag kind="doc">Documents</ObjectTag>
-              <h2 id="dash-docs" className="text-sm text-gray-700">
+              <h2 id="dash-docs" className="text-sm text-ink-soft">
                 Ce que vous remplissez et exportez en PDF
               </h2>
             </div>
@@ -105,7 +106,7 @@ export function DashboardPage() {
               <div className="mb-1.5 flex items-baseline justify-between gap-3">
                 <h3 className="text-base font-semibold">
                   En cours{" "}
-                  <span className="font-mono text-xs font-normal text-gray-500">
+                  <span className="font-mono text-xs font-normal text-ink-subtle">
                     {drafts.length} brouillon{drafts.length > 1 ? "s" : ""}
                   </span>
                 </h3>
@@ -114,14 +115,14 @@ export function DashboardPage() {
                 </Link>
               </div>
               {documentsLoaded && drafts.length === 0 ? (
-                <p className="border-t border-rule py-4 text-sm text-gray-600">Aucun brouillon en cours.</p>
+                <p className="border-t border-rule py-4 text-sm text-ink-muted">Aucun brouillon en cours.</p>
               ) : (
                 <ul>
                   {drafts.map((d) => (
                     <DocumentRow key={d.id} doc={d}>
                       <div>
                         <SegmentedProgress filled={d.completionPercent} total={100} />
-                        <div className="mt-1 font-mono text-[11px] text-gray-700">
+                        <div className="mt-1 font-mono text-[11px] text-ink-soft">
                           {d.completionPercent} % rempli · {shortDate(d.updatedAt)}
                         </div>
                       </div>
@@ -141,22 +142,24 @@ export function DashboardPage() {
               <div>
                 <div className="mb-1.5 flex items-baseline justify-between gap-3">
                   <h3 className="text-base font-semibold">Exportés récemment</h3>
-                  <span className="text-[13px] text-gray-500">Pour l'édition suivante, dupliquez le précédent.</span>
+                  <span className="text-[13px] text-ink-subtle">Pour l'édition suivante, dupliquez le précédent.</span>
                 </div>
                 <ul>
                   {exported.map((d) => (
                     <DocumentRow key={d.id} doc={d}>
                       <span className="flex items-center gap-2">
                         <DocumentStatusBadge document={d} />
-                        <span className="font-mono text-[11px] text-gray-500">{shortDate(d.updatedAt)}</span>
+                        <span className="font-mono text-[11px] text-ink-subtle">{shortDate(d.updatedAt)}</span>
                       </span>
-                      <button
-                        onClick={() => duplicate.mutate(d.id, { onSuccess: openDocument })}
+                      <Button
+                        variant="link"
+                        tone="doc"
                         disabled={duplicate.isPending}
-                        className="justify-self-end text-[13px] font-semibold text-doc-strong hover:underline disabled:opacity-50"
+                        onClick={() => duplicate.mutate(d.id, { onSuccess: openDocument })}
+                        className="justify-self-end text-[13px] font-semibold"
                       >
                         Dupliquer →
-                      </button>
+                      </Button>
                     </DocumentRow>
                   ))}
                 </ul>
@@ -169,12 +172,12 @@ export function DashboardPage() {
               <span className="self-start">
                 <ObjectTag kind="tpl">Templates</ObjectTag>
               </span>
-              <h2 id="dash-tpls" className="text-sm text-gray-800">
+              <h2 id="dash-tpls" className="text-sm text-ink">
                 Les modèles : mise en page fixe, champs à remplir. Chaque document part de l'un d'eux.
               </h2>
             </div>
             {templatesLoaded && templates.length === 0 ? (
-              <p className="border-t border-tpl-rule py-4 text-sm text-gray-700">Aucun template pour l'instant.</p>
+              <p className="border-t border-tpl-rule py-4 text-sm text-ink-soft">Aucun template pour l'instant.</p>
             ) : (
               <ul>
                 {templates.map((t) => (
@@ -205,7 +208,7 @@ function DocumentRow({ doc, children }: { doc: DocumentSummary; children: React.
       <Link
         to={`/documents/${doc.id}`}
         aria-label={`Ouvrir ${doc.name}`}
-        className="block h-[54px] w-10 overflow-hidden border border-gray-300 bg-white shadow-[3px_3px_0_var(--color-doc)]"
+        className="block h-[54px] w-10 overflow-hidden border border-rule-strong bg-white shadow-[3px_3px_0_var(--color-doc)]"
       >
         {preview && <DocumentThumbnail template={preview} width={38} cropHeight={52} />}
       </Link>
@@ -240,20 +243,16 @@ function TemplateRow({
           {template.name}
         </Link>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-          <span className="font-mono text-[11px] text-gray-700">
+          <span className="font-mono text-[11px] text-ink-soft">
             {published ? "PUBLIÉ" : "BROUILLON"} ·{" "}
             {template.documentCount === 0
               ? "AUCUN DOCUMENT"
               : `${template.documentCount} DOCUMENT${template.documentCount > 1 ? "S" : ""}`}
           </span>
           {published ? (
-            <button
-              onClick={onCreate}
-              disabled={creating}
-              className="text-xs font-semibold text-doc-strong hover:underline disabled:opacity-50"
-            >
+            <Button variant="link" tone="doc" disabled={creating} onClick={onCreate} className="text-xs font-semibold">
               Créer un document →
-            </button>
+            </Button>
           ) : (
             <Link to={`/templates/${template.id}/publish`} className="text-xs font-semibold text-tpl hover:underline">
               Finir et publier →

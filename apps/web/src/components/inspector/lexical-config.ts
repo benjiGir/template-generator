@@ -22,7 +22,7 @@ export const editorTheme = {
     bold: "font-bold",
     italic: "italic",
   },
-  link: "text-blue-400 underline cursor-pointer",
+  link: "text-tpl underline cursor-pointer",
   list: {
     ul: "list-disc ml-4",
     ol: "list-decimal ml-4",

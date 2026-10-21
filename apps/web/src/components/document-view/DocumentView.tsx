@@ -58,7 +58,7 @@ export function DocumentView({ template, renderNodes, zoom = 1, framed = false }
         if (!framed) return content;
         return (
           <div key={page.id}>
-            <div className="mb-2 flex justify-between px-3 font-mono text-[11px] uppercase tracking-[0.04em] text-gray-700">
+            <div className="mb-2 flex justify-between px-3 font-mono text-[11px] uppercase tracking-[0.04em] text-ink-soft">
               <span>
                 Page {index + 1}/{count} · {format.width} de large · exportée telle quelle
               </span>
@@ -73,7 +73,7 @@ export function DocumentView({ template, renderNodes, zoom = 1, framed = false }
 
 /** Traits de coupe aux quatre coins, comme sur une épreuve d'imprimerie */
 export function CropMarks({ children }: { children: ReactNode }) {
-  const mark = "pointer-events-none absolute h-2.5 w-2.5 border-gray-700";
+  const mark = "pointer-events-none absolute h-2.5 w-2.5 border-ink-soft";
   return (
     <div className="relative p-3">
       <span aria-hidden="true" className={`${mark} left-0 top-0 border-l border-t`} />

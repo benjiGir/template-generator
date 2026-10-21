@@ -7,6 +7,7 @@ import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { computeCompletion, fieldKey, isFilled } from "@template-generator/shared/utils/fields";
 import { FormField } from "./FormField";
 import type { EditableField } from "@template-generator/shared/types/template";
+import { Button, IconButton } from "@/components/ui/Button";
 
 /** Le composant le plus proche (vers le haut) sous l'élément cliqué ou survolé */
 function nodeIdFrom(target: EventTarget | null): string | null {
@@ -93,18 +94,12 @@ export function InlineFillMode() {
   const remaining = completion.total - completion.filled;
 
   const panel = selected && selectedFields.length > 0 && (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-xl">
-      <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2">
-        <span className="text-xs font-semibold text-gray-700">
+    <div className="rounded-lg border border-rule bg-white shadow-xl">
+      <div className="flex items-center justify-between border-b border-wash px-3 py-2">
+        <span className="text-xs font-semibold text-ink-soft">
           {selectedFields.length > 1 ? `Modifier ces ${selectedFields.length} contenus` : "Modifier ce contenu"}
         </span>
-        <button
-          onClick={() => setSelected(null)}
-          className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-          aria-label="Fermer (Échap)"
-        >
-          <X size={14} />
-        </button>
+        <IconButton label="Fermer (Échap)" icon={<X size={14} />} size="sm" onClick={() => setSelected(null)} />
       </div>
       <div className="max-h-[360px] space-y-2 overflow-y-auto px-3 py-2">
         {selectedFields.map((field) => (
@@ -121,19 +116,19 @@ export function InlineFillMode() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-5 py-2 text-xs">
+      <div className="flex shrink-0 items-center gap-3 border-b border-rule bg-white px-5 py-2 text-xs">
         <div className="flex w-56 items-center gap-2">
           <div className="flex-1">
             <SegmentedProgress filled={completion.filled} total={completion.total} />
           </div>
-          <span className="shrink-0 font-mono text-gray-700">
+          <span className="shrink-0 font-mono text-ink-soft">
             {completion.filled} / {completion.total}
           </span>
         </div>
-        <span className="text-gray-600">
+        <span className="text-ink-muted">
           {remaining === 0 ? "Tout est rempli" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""}`}
           {completion.missingRequired.length > 0 && (
-            <span className="text-amber-700">
+            <span className="text-warn-strong">
               {" "}
               · {completion.missingRequired.length} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide
               {completion.missingRequired.length > 1 ? "s" : ""}
@@ -141,18 +136,14 @@ export function InlineFillMode() {
           )}
         </span>
         {remaining > 0 && (
-          <button
-            onClick={goToNextEmpty}
-            className="flex items-center gap-1 rounded px-2 py-1 font-medium text-doc-strong hover:bg-doc-tint"
-          >
-            <SkipForward size={13} />
+          <Button variant="ghost" tone="doc" size="sm" icon={<SkipForward size={13} />} onClick={goToNextEmpty}>
             Champ vide suivant
-          </button>
+          </Button>
         )}
         <button
           onClick={() => setReveal((r) => !r)}
           aria-pressed={reveal}
-          className={`ml-auto flex items-center gap-1.5 rounded px-2 py-1 ${reveal ? "bg-white text-ink" : "text-gray-600 hover:bg-gray-100"}`}
+          className={`ml-auto flex items-center gap-1.5 rounded px-2 py-1 ${reveal ? "bg-white text-ink" : "text-ink-muted hover:bg-wash"}`}
         >
           {reveal ? <EyeOff size={13} /> : <Eye size={13} />}
           {reveal ? "Masquer les zones modifiables" : "Révéler les zones modifiables"}
@@ -177,7 +168,7 @@ export function InlineFillMode() {
         {lockedNotice && (
           <div
             role="status"
-            className="absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-xs text-white shadow-lg"
+            className="absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink-soft px-3 py-1.5 text-xs text-white shadow-lg"
             // Le message reste tant qu'on le survole, le temps de cliquer sur « Pourquoi ? »
             onMouseEnter={() => clearTimeout(noticeTimer.current)}
             onMouseLeave={() => {
@@ -198,7 +189,7 @@ export function InlineFillMode() {
           </div>
         )}
         {!selected && !reveal && hovered === null && (
-          <p className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-3 py-1 text-[11px] text-gray-500 shadow ring-1 ring-gray-200">
+          <p className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-3 py-1 text-[11px] text-ink-subtle shadow ring-1 ring-rule">
             Survolez le document : les zones modifiables s'encadrent. Cliquez pour les modifier.
           </p>
         )}

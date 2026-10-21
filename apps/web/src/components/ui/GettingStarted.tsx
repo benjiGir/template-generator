@@ -51,7 +51,7 @@ export function GettingStarted({ templates, documentCount }: Props) {
   return (
     <section className="border-2 border-ink bg-white p-6">
       <h2 className="text-lg font-bold">Bienvenue dans DocForge</h2>
-      <p className="mt-1 text-sm text-gray-700">
+      <p className="mt-1 text-sm text-ink-soft">
         La mise en page se conçoit une fois dans un <strong>template</strong> ; chaque <strong>document</strong> n'en
         remplit que le contenu. Voici les trois étapes.
       </p>
@@ -66,14 +66,14 @@ export function GettingStarted({ templates, documentCount }: Props) {
             }`}
           >
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-semibold text-gray-700">{String(i + 1).padStart(2, "0")}</span>
+              <span className="font-mono text-xs font-semibold text-ink-soft">{String(i + 1).padStart(2, "0")}</span>
               <ObjectMark kind={step.kind} size={9} />
-              <span className={`text-sm font-semibold ${step.done ? "text-gray-500 line-through" : "text-ink"}`}>
+              <span className={`text-sm font-semibold ${step.done ? "text-ink-subtle line-through" : "text-ink"}`}>
                 {step.title}
               </span>
               {step.done && <Check size={13} strokeWidth={3} aria-label="fait" />}
             </div>
-            <p className="mt-2 text-xs text-gray-700">{step.text}</p>
+            <p className="mt-2 text-xs text-ink-soft">{step.text}</p>
             {i === current && (
               <Link
                 to={step.action.to}

@@ -170,6 +170,20 @@ GET    /api/health                    Health check
   `useMutation` ailleurs). Les invalidations du cache sont écrites une fois dans `apps/web/src/api/cache.ts`, et toute
   mutation qui échoue affiche un message (texte dans `meta.errorMessage` du hook).
 
+## Interface : couleurs et composants de base
+
+- **Couleurs par rôle** (`apps/web/src/styles/globals.css`) : encre (`ink`, `ink-soft`, `ink-muted`, `ink-subtle`,
+  `ink-faint`), surfaces et filets (`paper`, `wash`, `table`, `rule`, `rule-strong`), `focus`, un jeu par type
+  d'objet (`doc`, `tpl`, `preset` avec `-strong`, `-rule`, `-tint`) et les états (`danger`, `warn`, `success`).
+  Les gammes de Tailwind (`gray`, `blue`…) sont retirées : `bg-blue-50` ne produit aucun style.
+- **`Button`** et **`IconButton`** (`components/ui/Button.tsx`) : `variant` (primary, secondary, ghost, dashed, link),
+  `tone` (neutral, danger, doc, tpl, preset), `size`, `pending`. `type="button"` par défaut. `buttonClasses()` donne
+  l'apparence d'un bouton à un `<Link>`.
+- **`Dialog`** (`components/ui/Dialog.tsx`) : fenêtre modale sur `<dialog>` natif (couche supérieure, focus gardé,
+  Échap, retour du focus), placée au centre, en grand (`fill`), en panneau (`side`) ou en calque (`cover`).
+- **`Field`** avec **`Input`**, **`Textarea`**, **`Select`** (`components/ui/Field.tsx`) : le libellé, la précision et
+  l'erreur sont reliés au contrôle sans identifiant à écrire.
+
 ## Composants disponibles
 
 ### Layout

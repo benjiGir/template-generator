@@ -14,6 +14,7 @@ import { FontPropField } from "./fields/FontPropField";
 import { BorderPropField } from "./fields/BorderPropField";
 import { ImagePropField } from "./fields/ImagePropField";
 import { IconPropField } from "./fields/IconPropField";
+import { Field } from "@/components/ui/Field";
 
 /** Ce dont un éditeur de prop a besoin : une prop du registre, ou un champ du formulaire du Studio */
 export interface PropFieldSpec {
@@ -33,15 +34,18 @@ interface Props {
   onChange: (value: PropValue) => void;
 }
 
-/** Types dont le composant de saisie n'affiche pas son propre libellé */
-const UNLABELLED = new Set(["text", "textarea", "number", "boolean", "select", "emoji"]);
+/** Types saisis dans un contrôle simple (Input, Textarea, Select), relié à son libellé par Field */
+const SIMPLE_CONTROLS = new Set(["text", "textarea", "number", "select"]);
+/** Types dont le composant de saisie n'affiche pas son propre libellé, sans contrôle unique à désigner */
+const UNLABELLED = new Set(["boolean", "emoji"]);
 
 export function PropField(props: Props) {
   const field = <PropInput {...props} />;
+  if (SIMPLE_CONTROLS.has(props.schema.type)) return <Field label={props.schema.label}>{field}</Field>;
   if (!UNLABELLED.has(props.schema.type)) return field;
   return (
     <div>
-      <label className="mb-1 block text-xs font-medium text-gray-600">{props.schema.label}</label>
+      <p className="mb-1 text-xs font-medium text-ink-muted">{props.schema.label}</p>
       {field}
     </div>
   );

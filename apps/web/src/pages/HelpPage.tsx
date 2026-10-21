@@ -37,7 +37,7 @@ export function HelpPage() {
       <aside className="w-64 shrink-0 overflow-y-auto border-r border-rule px-4 py-8" aria-label="Sommaire de l'aide">
         <Link
           to="/aide"
-          className="px-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600 hover:text-ink"
+          className="px-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted hover:text-ink"
         >
           Aide
         </Link>
@@ -63,7 +63,7 @@ export function HelpPage() {
                     <li key={s.id}>
                       <Link
                         to={helpPath(a.slug, s.id)}
-                        className={`block py-0.5 pl-3 text-[13px] ${hash === `#${s.id}` ? "font-semibold text-ink" : "text-gray-700 hover:text-ink"}`}
+                        className={`block py-0.5 pl-3 text-[13px] ${hash === `#${s.id}` ? "font-semibold text-ink" : "text-ink-soft hover:text-ink"}`}
                       >
                         {s.title}
                       </Link>
@@ -83,12 +83,12 @@ export function HelpPage() {
               {article.kind ? (
                 <ObjectTag kind={article.kind}>{article.space}</ObjectTag>
               ) : (
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
                   Aide
                 </span>
               )}
               <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight">{article.title}</h1>
-              <p className="text-sm text-gray-700">{article.summary}</p>
+              <p className="text-sm text-ink-soft">{article.summary}</p>
             </header>
             {article.sections.map((s) => (
               <section key={s.id} id={s.id} className="scroll-mt-6 border-b border-rule py-8 last:border-b-0">
@@ -109,11 +109,11 @@ function HelpIndex() {
   return (
     <div className="mx-auto max-w-[900px] px-10 pb-24 pt-8">
       <header className="border-b-2 border-ink pb-5">
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
           Documentation
         </span>
         <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight">Aide</h1>
-        <p className="text-sm text-gray-700">
+        <p className="text-sm text-ink-soft">
           Chaque étape expliquée, avec des extraits d'écrans annotés. Dans un parcours, le bouton <strong>Aide</strong>{" "}
           ouvre directement la section de l'étape en cours.
         </p>
@@ -132,13 +132,13 @@ function HelpIndex() {
               ) : (
                 <span className="h-2.5 w-2.5 border border-ink" aria-hidden />
               )}
-              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-gray-600">
+              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-muted">
                 {a.space ?? "Pour commencer"}
               </span>
             </span>
             <span className="mt-2 text-lg font-bold tracking-tight">{a.title}</span>
-            <span className="mt-1 text-sm text-gray-700">{a.summary}</span>
-            <span className="mt-4 flex items-center gap-1 font-mono text-xs text-gray-600 group-hover:text-ink">
+            <span className="mt-1 text-sm text-ink-soft">{a.summary}</span>
+            <span className="mt-4 flex items-center gap-1 font-mono text-xs text-ink-muted group-hover:text-ink">
               {a.sections.length} section{a.sections.length > 1 ? "s" : ""}
               <ArrowRight size={12} />
             </span>

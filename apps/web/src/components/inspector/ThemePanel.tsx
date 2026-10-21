@@ -7,6 +7,8 @@ import { ThemeTypographyEditor } from "./ThemeTypographyEditor";
 import { ThemeSpacingEditor } from "./ThemeSpacingEditor";
 import { ThemeBorderEditor } from "./ThemeBorderEditor";
 import { useCreateTheme } from "@/api/hooks/themes";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Field";
 
 /** Recherche insensible à la casse et aux accents */
 function normalize(text: string): string {
@@ -32,22 +34,22 @@ function Section({
   const [open, setOpen] = useState(defaultOpen);
   const isOpen = open || forceOpen;
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div className="border-b border-wash last:border-b-0">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={isOpen}
-        className="flex w-full items-center gap-1.5 px-4 py-2.5 text-left text-xs font-semibold text-gray-700 hover:bg-gray-50"
+        className="flex w-full items-center gap-1.5 px-4 py-2.5 text-left text-xs font-semibold text-ink-soft hover:bg-paper"
       >
         {isOpen ? (
-          <ChevronDown size={14} className="text-gray-400" />
+          <ChevronDown size={14} className="text-ink-faint" />
         ) : (
-          <ChevronRight size={14} className="text-gray-400" />
+          <ChevronRight size={14} className="text-ink-faint" />
         )}
         {title}
       </button>
       {isOpen && (
         <div className="pb-3">
-          {hint && <p className="px-4 pb-1 text-[11px] text-gray-500">{hint}</p>}
+          {hint && <p className="px-4 pb-1 text-[11px] text-ink-subtle">{hint}</p>}
           {children}
         </div>
       )}
@@ -122,9 +124,9 @@ export function ThemePanel() {
         </Section>
       )}
 
-      <div className="sticky top-0 z-10 border-b border-gray-100 bg-white px-4 py-2">
-        <label className="flex items-center gap-2 rounded-md border border-gray-200 px-2 py-1.5 focus-within:border-blue-400">
-          <Search size={13} className="text-gray-400" />
+      <div className="sticky top-0 z-10 border-b border-wash bg-white px-4 py-2">
+        <label className="flex items-center gap-2 rounded-md border border-rule px-2 py-1.5 focus-within:border-focus">
+          <Search size={13} className="text-ink-faint" />
           <input
             type="search"
             value={query}
@@ -136,7 +138,7 @@ export function ThemePanel() {
       </div>
 
       {nothing && (
-        <p className="px-4 py-6 text-center text-xs text-gray-500">Aucun réglage ne correspond à « {query} ».</p>
+        <p className="px-4 py-6 text-center text-xs text-ink-subtle">Aucun réglage ne correspond à « {query} ».</p>
       )}
 
       {colorGroups.map((g, i) => (
@@ -157,12 +159,11 @@ export function ThemePanel() {
 
       {!searching && (
         <div className="px-4 py-3">
-          {savedMessage && <p className="mb-2 text-[11px] text-emerald-700">{savedMessage}</p>}
+          {savedMessage && <p className="mb-2 text-[11px] text-success">{savedMessage}</p>}
           {showSaveForm ? (
             <div className="flex gap-2">
-              <input
+              <Input
                 autoFocus
-                type="text"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
                 onKeyDown={(e) => {
@@ -171,32 +172,35 @@ export function ThemePanel() {
                 }}
                 placeholder="Nom du thème…"
                 aria-label="Nom du nouveau thème"
-                className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-xs focus:border-blue-400 focus:outline-none"
+                className="flex-1"
               />
-              <button
+              <Button
+                variant="primary"
+                tone="tpl"
+                size="sm"
+                pending={saving}
+                disabled={!saveName.trim()}
                 onClick={() => void handleSave()}
-                disabled={saving || !saveName.trim()}
-                className="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
-                {saving ? "…" : "Enregistrer"}
-              </button>
-              <button
-                onClick={() => setShowSaveForm(false)}
-                className="rounded border border-gray-200 px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-50"
-              >
+                Enregistrer
+              </Button>
+              <Button size="sm" onClick={() => setShowSaveForm(false)}>
                 Annuler
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
+              variant="dashed"
+              tone="tpl"
+              size="sm"
+              block
               onClick={() => {
                 setShowSaveForm(true);
                 setSavedMessage(null);
               }}
-              className="w-full rounded border border-dashed border-blue-300 py-2 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
             >
               Enregistrer ces réglages comme thème réutilisable
-            </button>
+            </Button>
           )}
         </div>
       )}

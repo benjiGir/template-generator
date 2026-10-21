@@ -83,7 +83,7 @@ function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boole
             <span className={`block text-sm leading-5 ${isActive ? "font-semibold" : "font-medium"}`}>
               {item.label}
             </span>
-            {item.kind && <span className="block text-xs leading-4 text-gray-500">{item.intent}</span>}
+            {item.kind && <span className="block text-xs leading-4 text-ink-subtle">{item.intent}</span>}
           </span>
         </>
       )}
@@ -99,7 +99,7 @@ function HelpNavLink({ collapsed }: { collapsed: boolean }) {
       title="Aide — chaque étape expliquée"
       aria-label={collapsed ? "Aide" : undefined}
       className={({ isActive }) =>
-        `mt-auto flex items-center gap-2 transition-colors hover:text-ink ${isActive ? "font-semibold text-ink" : "text-gray-600"} ${
+        `mt-auto flex items-center gap-2 transition-colors hover:text-ink ${isActive ? "font-semibold text-ink" : "text-ink-muted"} ${
           collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 font-mono text-xs"
         }`
       }
@@ -119,7 +119,7 @@ function ReplayTourButton({ collapsed }: { collapsed: boolean }) {
       data-tour="tour-replay"
       title="Revoir le tutoriel"
       aria-label="Revoir le tutoriel"
-      className={`flex items-center gap-2 text-gray-600 transition-colors hover:text-ink ${
+      className={`flex items-center gap-2 text-ink-muted transition-colors hover:text-ink ${
         collapsed ? "h-10 w-10 justify-center" : "px-3 py-2 font-mono text-xs"
       }`}
     >
@@ -141,12 +141,12 @@ export function RootLayout() {
         <HelpProvider>
           <div className="flex h-screen bg-paper text-ink">
             <nav
-              className={`flex shrink-0 flex-col gap-0.5 border-r border-rule bg-gray-100 py-6 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
+              className={`flex shrink-0 flex-col gap-0.5 border-r border-rule bg-wash py-6 ${collapsed ? "w-16 items-center px-2" : "w-56 px-3"}`}
               aria-label="Navigation principale"
             >
               <div className={`mb-6 ${collapsed ? "text-center" : "px-3"}`}>
                 <div className="text-[17px] font-bold tracking-tight">{collapsed ? "DF" : "DocForge"}</div>
-                {!collapsed && <div className="font-mono text-[11px] text-gray-500">Documents techniques</div>}
+                {!collapsed && <div className="font-mono text-[11px] text-ink-subtle">Documents techniques</div>}
               </div>
 
               <NavEntry item={HOME} end collapsed={collapsed} />
@@ -155,7 +155,7 @@ export function RootLayout() {
               {collapsed ? (
                 <div className="my-3 h-px w-8 bg-rule" />
               ) : (
-                <div className="mt-5 px-3 pb-1 font-mono text-[11px] tracking-[0.06em] text-gray-500">CONCEPTION</div>
+                <div className="mt-5 px-3 pb-1 font-mono text-[11px] tracking-[0.06em] text-ink-subtle">CONCEPTION</div>
               )}
               {DESIGN.map((item) => (
                 <NavEntry key={item.to} item={item} collapsed={collapsed} />

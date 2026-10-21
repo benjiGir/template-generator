@@ -5,7 +5,8 @@ import { useDeleteTemplate, useDuplicateTemplate, useTemplates } from "@/api/hoo
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
-import { CreateButton, SpaceHeader } from "@/components/ui/SpaceHeader";
+import { SpaceHeader } from "@/components/ui/SpaceHeader";
+import { Button, IconButton } from "@/components/ui/Button";
 import { DocumentThumbnail } from "@/components/document-view/DocumentView";
 
 export function TemplatesListPage() {
@@ -48,28 +49,25 @@ export function TemplatesListPage() {
         title="Atelier"
         subtitle="Dessinez les templates que le Studio utilisera pour produire les documents."
         action={
-          <CreateButton kind="tpl" onClick={() => navigate("/templates/new")}>
+          <Button variant="primary" tone="tpl" size="lg" onClick={() => navigate("/templates/new")}>
             Nouveau template
-          </CreateButton>
+          </Button>
         }
       />
 
       <div className="px-8 py-8">
-        {isLoading && <p className="text-sm text-gray-400">Chargement...</p>}
-        {error && <p className="text-sm text-red-500">Impossible de charger les templates.</p>}
+        {isLoading && <p className="text-sm text-ink-faint">Chargement...</p>}
+        {error && <p className="text-sm text-danger">Impossible de charger les templates.</p>}
 
         {!isLoading && !error && templates.length === 0 && (
           <div className="py-20 text-center">
-            <p className="text-sm font-medium text-gray-700">Aucun template pour l'instant</p>
-            <p className="mb-4 mt-1 text-sm text-gray-500">
+            <p className="text-sm font-medium text-ink-soft">Aucun template pour l'instant</p>
+            <p className="mb-4 mt-1 text-sm text-ink-subtle">
               Un template définit la mise en page d'un type de document ; le Studio le remplit à chaque édition.
             </p>
-            <button
-              onClick={() => navigate("/templates/new")}
-              className="rounded bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-            >
+            <Button variant="primary" tone="tpl" size="lg" onClick={() => navigate("/templates/new")}>
               Créer mon premier template
-            </button>
+            </Button>
           </div>
         )}
 
@@ -96,31 +94,31 @@ export function TemplatesListPage() {
                     <div className="mt-0.5">
                       <TemplateStatusBadge template={t} />
                     </div>
-                    {t.description && <p className="mt-1 line-clamp-1 text-xs text-gray-500">{t.description}</p>}
+                    {t.description && <p className="mt-1 line-clamp-1 text-xs text-ink-subtle">{t.description}</p>}
                   </div>
                   <div className="ml-2 flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button
+                    <IconButton
+                      label={`Dupliquer ${t.name}`}
+                      title="Dupliquer"
+                      icon={<Copy size={14} />}
+                      tone="tpl"
+                      size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         duplicateMutation.mutate(t.id);
                       }}
-                      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-blue-600"
-                      title="Dupliquer"
-                      aria-label={`Dupliquer ${t.name}`}
-                    >
-                      <Copy size={14} />
-                    </button>
-                    <button
-                      onClick={(e) => handleDelete(e, t)}
-                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                    />
+                    <IconButton
+                      label={`Supprimer ${t.name}`}
                       title="Supprimer"
-                      aria-label={`Supprimer ${t.name}`}
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                      icon={<Trash2 size={14} />}
+                      tone="danger"
+                      size="sm"
+                      onClick={(e) => handleDelete(e, t)}
+                    />
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-xs text-ink-faint">
                   Modifié le{" "}
                   {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
                     day: "numeric",

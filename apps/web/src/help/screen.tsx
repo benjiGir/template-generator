@@ -63,7 +63,7 @@ export function Figure({
   return (
     <figure className="my-5">
       <div className="border border-ink bg-white">
-        <div className="flex items-center gap-2 border-b border-rule bg-paper px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-gray-600">
+        <div className="flex items-center gap-2 border-b border-rule bg-paper px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">
           <span className="h-1.5 w-1.5 bg-ink" aria-hidden />
           {where}
         </div>
@@ -79,7 +79,7 @@ export function Figure({
       <figcaption>
         <ol className="mt-3 space-y-1.5">
           {legend.map((item, i) => (
-            <li key={i} className="flex gap-2.5 text-sm text-gray-700">
+            <li key={i} className="flex gap-2.5 text-sm text-ink-soft">
               <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink font-mono text-[11px] font-semibold text-paper">
                 {i + 1}
               </span>
@@ -93,19 +93,21 @@ export function Figure({
 }
 
 /** Ligne de texte factice */
-export function Line({ w = "100%", tone = "bg-gray-300", h = 5 }: { w?: string; tone?: string; h?: number }) {
+export function Line({ w = "100%", tone = "bg-rule-strong", h = 5 }: { w?: string; tone?: string; h?: number }) {
   return <span className={`block ${tone}`} style={{ width: w, height: h }} />;
 }
 
 /** Petit libellé d'interface */
 export function Label({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <span className={`block text-[10px] leading-tight text-gray-700 ${className}`}>{children}</span>;
+  return <span className={`block text-[10px] leading-tight text-ink-soft ${className}`}>{children}</span>;
 }
 
 /** Libellé en chasse fixe, capitales (titres de groupes, étiquettes) */
 export function MonoLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`block font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-600 ${className}`}>
+    <span
+      className={`block font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-ink-muted ${className}`}
+    >
       {children}
     </span>
   );
@@ -123,7 +125,7 @@ export function Input({
 }) {
   return (
     <span
-      className={`block truncate border border-gray-300 bg-white px-1.5 py-1 text-[10px] ${value ? "text-ink" : "text-gray-400"} ${className}`}
+      className={`block truncate border border-rule-strong bg-white px-1.5 py-1 text-[10px] ${value ? "text-ink" : "text-ink-faint"} ${className}`}
     >
       {value ?? placeholder ?? " "}
     </span>
@@ -146,7 +148,7 @@ export function Btn({
     doc: "bg-doc text-white",
     tpl: "bg-tpl text-white",
     preset: "bg-preset text-white",
-    ghost: "text-gray-600",
+    ghost: "text-ink-muted",
   } as const;
   return (
     <span
@@ -164,7 +166,7 @@ export function MiniStepper({ steps, current, accent }: { steps: string[]; curre
       {steps.map((s, i) => (
         <span
           key={s}
-          className={`flex items-center gap-1 border-b-2 pb-0.5 text-[10px] ${i === current ? `${accent} font-semibold text-ink` : "border-transparent text-gray-500"}`}
+          className={`flex items-center gap-1 border-b-2 pb-0.5 text-[10px] ${i === current ? `${accent} font-semibold text-ink` : "border-transparent text-ink-subtle"}`}
         >
           <span className="font-mono text-[9px]">{String(i + 1).padStart(2, "0")}</span>
           {(i === current || steps.length <= 4) && <span className="whitespace-nowrap">{s}</span>}
@@ -186,7 +188,7 @@ const ZONE_STYLES: Record<ZoneLook, string> = {
   active: "outline outline-2 outline-doc outline-offset-1 bg-doc-tint/60",
   locked: "",
   pick: "outline outline-1 outline-dashed outline-tpl outline-offset-1",
-  warn: "outline outline-2 outline-amber-500 outline-offset-1 bg-amber-50",
+  warn: "outline outline-2 outline-warn outline-offset-1 bg-warn-tint",
 };
 
 const NO_ZONES = {};
@@ -211,40 +213,40 @@ export function MiniPage({
     >
       <div className="flex items-center justify-between">
         <span className="font-mono text-[7px] font-bold tracking-wide text-ink">KOMITY</span>
-        <Line w="30%" h={3} tone="bg-gray-200" />
+        <Line w="30%" h={3} tone="bg-rule" />
       </div>
       <div className={z("title")}>
         <span className="block text-[11px] font-bold leading-tight text-ink">Bilan mensuel</span>
-        <Line w="35%" h={3} tone="bg-gray-300" />
+        <Line w="35%" h={3} tone="bg-rule-strong" />
       </div>
-      <div className={`space-y-1 border-l-2 border-ink/70 bg-gray-50 px-2 py-1.5 ${z("intro")}`}>
+      <div className={`space-y-1 border-l-2 border-ink/70 bg-paper px-2 py-1.5 ${z("intro")}`}>
         <Line w="95%" h={3} />
         <Line w="70%" h={3} />
       </div>
       <div className={`grid grid-cols-4 gap-1 ${z("kpis")}`}>
-        {["bg-blue-100", "bg-emerald-100", "bg-amber-100", "bg-red-100"].map((t) => (
+        {["bg-tpl-tint", "bg-preset-tint", "bg-warn-tint", "bg-danger-tint"].map((t) => (
           <span key={t} className={`block space-y-1 p-1 ${t}`}>
-            <Line w="60%" h={3} tone="bg-gray-500" />
-            <Line w="85%" h={2} tone="bg-gray-300" />
+            <Line w="60%" h={3} tone="bg-ink-subtle" />
+            <Line w="85%" h={2} tone="bg-rule-strong" />
           </span>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-1.5">
-        <div className={`space-y-1 border border-gray-200 p-1.5 ${z("left")}`}>
-          <Line w="40%" h={3} tone="bg-emerald-600" />
+        <div className={`space-y-1 border border-rule p-1.5 ${z("left")}`}>
+          <Line w="40%" h={3} tone="bg-preset" />
           <Line w="90%" h={2.5} />
           <Line w="75%" h={2.5} />
           <Line w="82%" h={2.5} />
         </div>
-        <div className={`space-y-1 border border-gray-200 p-1.5 ${z("right")}`}>
-          <Line w="45%" h={3} tone="bg-amber-600" />
+        <div className={`space-y-1 border border-rule p-1.5 ${z("right")}`}>
+          <Line w="45%" h={3} tone="bg-warn" />
           <Line w="88%" h={2.5} />
           <Line w="64%" h={2.5} />
           <Line w="80%" h={2.5} />
         </div>
       </div>
-      <div className={`space-y-1 bg-gray-50 p-1.5 ${z("box")}`}>
-        <Line w="30%" h={3} tone="bg-gray-500" />
+      <div className={`space-y-1 bg-paper p-1.5 ${z("box")}`}>
+        <Line w="30%" h={3} tone="bg-ink-subtle" />
         <Line w="85%" h={2.5} />
         <Line w="60%" h={2.5} />
       </div>

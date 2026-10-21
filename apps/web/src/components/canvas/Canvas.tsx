@@ -3,6 +3,7 @@ import { Minus, Plus } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
 import { dimToPx } from "@/components/document-view/units";
 import { PageView } from "./PageView";
+import { IconButton } from "@/components/ui/Button";
 
 /** Marge intérieure horizontale du canvas (px-6 de chaque côté) */
 const PADDING = 48;
@@ -40,7 +41,7 @@ export function Canvas() {
     <div className="relative flex min-w-0 flex-1 flex-col">
       <div
         ref={scrollRef}
-        className="flex-1 overflow-auto bg-slate-200/70 px-6 py-8"
+        className="flex-1 overflow-auto bg-table/70 px-6 py-8"
         onClick={() => selectNode(null)}
         onMouseLeave={() => hoverNode(null)}
       >
@@ -57,30 +58,16 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="absolute bottom-3 right-4 flex items-center gap-0.5 rounded-lg bg-white/95 p-0.5 text-xs shadow-md ring-1 ring-gray-200">
-        <button
-          onClick={() => stepFrom(-1)}
-          className="rounded p-1.5 text-gray-600 hover:bg-gray-100"
-          title="Réduire"
-          aria-label="Réduire"
-        >
-          <Minus size={13} />
-        </button>
+      <div className="absolute bottom-3 right-4 flex items-center gap-0.5 rounded-lg bg-white/95 p-0.5 text-xs shadow-md ring-1 ring-rule">
+        <IconButton label="Réduire" icon={<Minus size={13} />} onClick={() => stepFrom(-1)} />
         <button
           onClick={() => setMode(mode === "fit" ? 1 : "fit")}
-          className="min-w-[64px] rounded px-1.5 py-1 font-medium text-gray-700 hover:bg-gray-100"
+          className="min-w-[64px] rounded px-1.5 py-1 font-medium text-ink-soft hover:bg-wash"
           title={mode === "fit" ? "Afficher à 100 %" : "Ajuster à la largeur"}
         >
           {mode === "fit" ? `Ajusté ${Math.round(zoom * 100)} %` : `${Math.round(zoom * 100)} %`}
         </button>
-        <button
-          onClick={() => stepFrom(1)}
-          className="rounded p-1.5 text-gray-600 hover:bg-gray-100"
-          title="Agrandir"
-          aria-label="Agrandir"
-        >
-          <Plus size={13} />
-        </button>
+        <IconButton label="Agrandir" icon={<Plus size={13} />} onClick={() => stepFrom(1)} />
       </div>
     </div>
   );

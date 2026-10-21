@@ -43,13 +43,13 @@ export function ExportPanel({
       )}
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-900">Options d'export</h2>
+        <h2 className="text-sm font-semibold text-ink">Options d'export</h2>
 
         <div className="space-y-1.5">
-          <label htmlFor="export-filename" className="text-xs font-medium text-gray-700">
+          <label htmlFor="export-filename" className="text-xs font-medium text-ink-soft">
             Nom du fichier
           </label>
-          <div className="flex items-center rounded-md border border-gray-300 focus-within:ring-2 focus-within:ring-ink">
+          <div className="flex items-center rounded-md border border-rule-strong focus-within:ring-2 focus-within:ring-ink">
             <input
               id="export-filename"
               type="text"
@@ -57,12 +57,12 @@ export function ExportPanel({
               onChange={(e) => onFilenameChange(e.target.value)}
               className="min-w-0 flex-1 rounded-md px-3 py-2 text-sm focus:outline-none"
             />
-            <span className="pr-3 text-sm text-gray-400">.pdf</span>
+            <span className="pr-3 text-sm text-ink-faint">.pdf</span>
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-xs font-medium text-gray-700">Format de page</span>
+          <span className="text-xs font-medium text-ink-soft">Format de page</span>
           <div className="grid grid-cols-2 gap-2">
             {(
               [
@@ -74,27 +74,27 @@ export function ExportPanel({
                 key={value}
                 onClick={() => onFormatChange(value)}
                 className={`rounded-md border px-3 py-2 text-left transition-colors ${
-                  format === value ? "border-doc bg-doc-tint" : "border-gray-200 hover:border-gray-300"
+                  format === value ? "border-doc bg-doc-tint" : "border-rule hover:border-rule-strong"
                 }`}
               >
-                <span className={`block text-xs font-medium ${format === value ? "text-doc-strong" : "text-gray-700"}`}>
+                <span className={`block text-xs font-medium ${format === value ? "text-doc-strong" : "text-ink-soft"}`}>
                   {label}
                 </span>
-                <span className="block text-[11px] text-gray-500">{hint}</span>
+                <span className="block text-[11px] text-ink-subtle">{hint}</span>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <h3 className="text-xs font-semibold text-gray-800">Ce qui va se passer</h3>
-        <p className="mt-1 text-xs text-gray-600">
+      <section className="rounded-lg border border-rule bg-paper p-4">
+        <h3 className="text-xs font-semibold text-ink">Ce qui va se passer</h3>
+        <p className="mt-1 text-xs text-ink-muted">
           La fenêtre d'impression de votre navigateur va s'ouvrir. Elle ne fait pas partie de DocForge ; réglez-la ainsi
           :
         </p>
         <PrintDialogIllustration />
-        <p className="mt-3 text-[11px] text-gray-500">
+        <p className="mt-3 text-[11px] text-ink-subtle">
           Puis cliquez sur <span className="font-semibold">Enregistrer</span>. Les couleurs de fond sont incluses
           automatiquement, et le document sera marqué comme finalisé.
         </p>
@@ -107,7 +107,7 @@ export function ExportPanel({
 function PrintDialogIllustration() {
   const row = (label: string, value: string, highlight: boolean, step?: number) => (
     <div className="flex items-center justify-between gap-3 py-1.5">
-      <span className="flex items-center gap-1.5 text-[11px] text-gray-500">
+      <span className="flex items-center gap-1.5 text-[11px] text-ink-subtle">
         {step && (
           <span className="flex h-4 w-4 items-center justify-center rounded-full bg-doc text-[9px] font-bold text-white">
             {step}
@@ -119,7 +119,7 @@ function PrintDialogIllustration() {
         className={`min-w-[150px] rounded border px-2 py-0.5 text-[11px] ${
           highlight
             ? "border-doc bg-doc-tint font-semibold text-doc-strong ring-2 ring-doc/30"
-            : "border-gray-200 bg-white text-gray-400"
+            : "border-rule bg-white text-ink-faint"
         }`}
       >
         {value}
@@ -128,13 +128,13 @@ function PrintDialogIllustration() {
   );
   return (
     <div
-      className="mt-3 rounded-md border border-gray-300 bg-white p-3 shadow-sm"
+      className="mt-3 rounded-md border border-rule-strong bg-white p-3 shadow-sm"
       aria-label="Réglages à choisir dans la fenêtre d'impression"
     >
-      <div className="mb-1 text-[11px] font-semibold text-gray-700">Imprimer</div>
+      <div className="mb-1 text-[11px] font-semibold text-ink-soft">Imprimer</div>
       {row("Destination", "Enregistrer au format PDF", true, 1)}
       {row("Pages", "Toutes", false)}
-      <div className="mt-1 border-t border-gray-100 pt-1 text-[10px] text-gray-400">Plus de paramètres ▾</div>
+      <div className="mt-1 border-t border-wash pt-1 text-[10px] text-ink-faint">Plus de paramètres ▾</div>
       {row("Marges", "Aucune", true, 2)}
       {row("Échelle", "Par défaut", false)}
     </div>

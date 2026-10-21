@@ -8,6 +8,7 @@ import { TemplateRef } from "@/components/ui/ObjectIdentity";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { mergeDocumentData } from "@template-generator/shared/utils/fields";
 import type { PagePreview } from "@template-generator/shared/types/template";
+import { Button, IconButton } from "@/components/ui/Button";
 
 /** Première page du document avec ses données : la miniature montre le vrai contenu */
 export function documentPreview(doc: DocumentSummary): PagePreview | null {
@@ -38,12 +39,12 @@ export function DocumentCard({ doc, onDuplicate, onDelete, compact = false }: Pr
       >
         <div className="flex justify-center overflow-hidden border-b border-rule bg-table px-5 pt-4">
           {preview ? (
-            <div className="overflow-hidden border border-b-0 border-gray-300 shadow-[3px_0_0_var(--color-doc)]">
+            <div className="overflow-hidden border border-b-0 border-rule-strong shadow-[3px_0_0_var(--color-doc)]">
               <DocumentThumbnail template={preview} width={thumbWidth - 40} cropHeight={compact ? 110 : 150} />
             </div>
           ) : (
             <div className="flex w-full items-center justify-center bg-white" style={{ height: compact ? 110 : 150 }}>
-              <FileText size={28} className="text-gray-200" />
+              <FileText size={28} className="text-rule" />
             </div>
           )}
         </div>
@@ -62,45 +63,45 @@ export function DocumentCard({ doc, onDuplicate, onDelete, compact = false }: Pr
               <div className="flex-1">
                 <SegmentedProgress filled={doc.completionPercent} total={100} height={6} />
               </div>
-              <span className="shrink-0 font-mono text-[11px] text-gray-700">{doc.completionPercent} %</span>
+              <span className="shrink-0 font-mono text-[11px] text-ink-soft">{doc.completionPercent} %</span>
             </div>
           ) : null}
         </div>
       </button>
 
       <div className="mt-auto flex items-center justify-between px-4 pb-3">
-        <span className="text-[11px] text-gray-400">
+        <span className="text-[11px] text-ink-faint">
           {new Date(doc.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
         </span>
         {!compact && (
           <div className="flex items-center gap-0.5">
             {onDuplicate && (
-              <button
-                onClick={() => onDuplicate(doc)}
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={<Copy size={13} />}
                 title="Dupliquer pour une nouvelle édition"
-                className="flex items-center gap-1 rounded px-1.5 py-1 text-xs text-gray-500 hover:bg-doc-tint hover:text-doc-strong"
+                onClick={() => onDuplicate(doc)}
               >
-                <Copy size={13} />
                 Dupliquer
-              </button>
+              </Button>
             )}
             <Link
               to={`/documents/${doc.id}/export`}
               title="Exporter en PDF"
               aria-label={`Exporter ${doc.name}`}
-              className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+              className="rounded p-1.5 text-ink-faint hover:bg-wash hover:text-ink-soft"
             >
               <FileDown size={14} />
             </Link>
             {onDelete && (
-              <button
-                onClick={() => onDelete(doc)}
+              <IconButton
+                label={`Supprimer ${doc.name}`}
                 title="Supprimer"
-                aria-label={`Supprimer ${doc.name}`}
-                className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
-              >
-                <Trash2 size={14} />
-              </button>
+                icon={<Trash2 size={14} />}
+                tone="danger"
+                onClick={() => onDelete(doc)}
+              />
             )}
           </div>
         )}

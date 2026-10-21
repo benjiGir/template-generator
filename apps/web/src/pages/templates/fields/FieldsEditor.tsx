@@ -25,6 +25,7 @@ import {
   type DetectedField,
 } from "@template-generator/shared/utils/field-detection";
 import type { EditableField } from "@template-generator/shared/types/template";
+import { Button, IconButton } from "@/components/ui/Button";
 
 export type RetainedField = EditableField & { location: string };
 
@@ -141,9 +142,9 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
   return (
     <div ref={listRef} className="space-y-4" onMouseLeave={() => onHoverNode(null)}>
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500">
-          <span className="font-semibold text-gray-800">{retained.length}</span> champ{retained.length > 1 ? "s" : ""}{" "}
-          retenu{retained.length > 1 ? "s" : ""}
+        <p className="text-xs text-ink-subtle">
+          <span className="font-semibold text-ink">{retained.length}</span> champ{retained.length > 1 ? "s" : ""} retenu
+          {retained.length > 1 ? "s" : ""}
           {requiredCount > 0 && (
             <>
               {" "}
@@ -151,17 +152,13 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
             </>
           )}
         </p>
-        <button
-          onClick={addGroup}
-          className="flex items-center gap-1 rounded px-1.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
-        >
-          <FolderPlus size={13} />
+        <Button variant="ghost" tone="tpl" size="sm" icon={<FolderPlus size={13} />} onClick={addGroup}>
           Ajouter un groupe
-        </button>
+        </Button>
       </div>
 
       {retained.length === 0 && extraGroups.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-500">
+        <p className="rounded-lg border border-dashed border-rule-strong p-4 text-center text-xs text-ink-subtle">
           Aucun champ retenu : le Studio n'aura rien à remplir. Cochez des contenus ci-dessous ou cliquez sur une zone
           du document.
         </p>
@@ -197,31 +194,33 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
         </DndContext>
       )}
 
-      <section className="rounded-lg border border-gray-200">
+      <section className="rounded-lg border border-rule">
         <button
           onClick={() => setExcludedOpen((o) => !o)}
           aria-expanded={excludedOpen}
-          className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+          className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-ink-muted hover:bg-paper"
         >
           <span className="flex items-center gap-1.5">
             {excludedOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             Contenus non retenus
           </span>
-          <span className="font-normal text-gray-400">{excluded.length}</span>
+          <span className="font-normal text-ink-faint">{excluded.length}</span>
         </button>
         {excludedOpen && (
-          <div className="border-t border-gray-100 px-2 pb-2 pt-1">
-            <p className="px-1 pb-2 text-[11px] text-gray-500">
+          <div className="border-t border-wash px-2 pb-2 pt-1">
+            <p className="px-1 pb-2 text-[11px] text-ink-subtle">
               Ces textes resteront fixes dans tous les documents. Ajoutez ceux qui doivent changer à chaque édition.
             </p>
-            {excluded.length === 0 && <p className="px-1 text-[11px] text-gray-400">Tous les contenus sont retenus.</p>}
+            {excluded.length === 0 && (
+              <p className="px-1 text-[11px] text-ink-faint">Tous les contenus sont retenus.</p>
+            )}
             {excluded.map((d) => (
               <div
                 key={fieldKey(d)}
                 data-row-node={d.nodeId}
                 onMouseEnter={() => onHoverNode(d.nodeId)}
                 onClick={() => onSelectNode(d.nodeId)}
-                className={`flex items-center gap-2 rounded-md px-2 py-1.5 ${d.nodeId === focusedNodeId ? "bg-blue-50 ring-1 ring-blue-200" : "hover:bg-gray-50"}`}
+                className={`flex items-center gap-2 rounded-md px-2 py-1.5 ${d.nodeId === focusedNodeId ? "bg-tpl-tint ring-1 ring-tpl-rule" : "hover:bg-paper"}`}
               >
                 <button
                   onClick={(e) => {
@@ -230,18 +229,16 @@ export function FieldsEditor({ retained, excluded, onChange, focusedNodeId, onHo
                   }}
                   title="Ajouter au formulaire"
                   aria-label={`Ajouter ${d.label} au formulaire`}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-gray-300 text-gray-400 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-rule-strong text-ink-faint hover:border-tpl hover:bg-tpl-tint hover:text-tpl"
                 >
                   <Plus size={12} />
                 </button>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs text-gray-700">{d.label}</p>
-                  <p className="truncate text-[10px] text-gray-400">{d.location}</p>
+                  <p className="truncate text-xs text-ink-soft">{d.label}</p>
+                  <p className="truncate text-[10px] text-ink-faint">{d.location}</p>
                 </div>
                 {!d.suggested && (
-                  <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
-                    structure
-                  </span>
+                  <span className="shrink-0 rounded bg-wash px-1.5 py-0.5 text-[10px] text-ink-subtle">structure</span>
                 )}
               </div>
             ))}
@@ -273,10 +270,10 @@ function GroupHeader({
     <div
       ref={setNodeRef}
       style={{ transform: DndCSS.Transform.toString(transform), transition }}
-      className="group/header flex items-center gap-2 border-b border-gray-200 pb-1 pt-3 first:pt-0"
+      className="group/header flex items-center gap-2 border-b border-rule pb-1 pt-3 first:pt-0"
     >
       {name === null ? (
-        <span className="flex-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Sans groupe</span>
+        <span className="flex-1 text-xs font-semibold uppercase tracking-wide text-ink-faint">Sans groupe</span>
       ) : (
         <input
           value={draft}
@@ -284,19 +281,19 @@ function GroupHeader({
           onBlur={() => (draft.trim() ? onRename(draft) : setDraft(name))}
           onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
           aria-label="Nom du groupe"
-          className="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-700 hover:border-gray-200 focus:border-blue-400 focus:bg-white focus:outline-none"
+          className="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 py-0.5 text-xs font-semibold uppercase tracking-wide text-ink-soft hover:border-rule focus:border-focus focus:bg-white focus:outline-none"
         />
       )}
-      <span className="text-[10px] text-gray-400">{count === 0 ? "vide — glissez des champs ici" : count}</span>
+      <span className="text-[10px] text-ink-faint">{count === 0 ? "vide — glissez des champs ici" : count}</span>
       {onDissolve && (
-        <button
-          onClick={onDissolve}
+        <IconButton
+          label={`Supprimer le groupe ${name}`}
           title="Supprimer le groupe (ses champs sont conservés)"
-          aria-label={`Supprimer le groupe ${name}`}
-          className="rounded p-0.5 text-gray-300 opacity-0 hover:text-gray-600 group-hover/header:opacity-100"
-        >
-          <X size={12} />
-        </button>
+          icon={<X size={12} />}
+          size="sm"
+          onClick={onDissolve}
+          className="opacity-0 focus-visible:opacity-100 group-hover/header:opacity-100"
+        />
       )}
     </div>
   );
@@ -334,7 +331,7 @@ function FieldRow({
       onMouseEnter={onHover}
       onClick={onSelect}
       className={`flex items-start gap-1.5 rounded-md border px-1.5 py-1.5 ${
-        focused ? "border-blue-300 bg-blue-50" : "border-transparent hover:border-gray-200 hover:bg-gray-50"
+        focused ? "border-tpl-rule bg-tpl-tint" : "border-transparent hover:border-rule hover:bg-paper"
       } ${isDragging ? "relative z-10 shadow-md" : ""}`}
     >
       <button
@@ -342,7 +339,7 @@ function FieldRow({
         {...listeners}
         title="Déplacer"
         aria-label={`Déplacer ${field.label}`}
-        className="mt-1 cursor-grab touch-none rounded p-0.5 text-gray-300 hover:text-gray-600 active:cursor-grabbing"
+        className="mt-1 cursor-grab touch-none rounded p-0.5 text-rule-strong hover:text-ink-muted active:cursor-grabbing"
       >
         <GripVertical size={14} />
       </button>
@@ -352,9 +349,9 @@ function FieldRow({
           onChange={(e) => onRename(e.target.value)}
           onClick={(e) => e.stopPropagation()}
           aria-label="Libellé du champ"
-          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-xs font-medium text-gray-900 hover:border-gray-200 focus:border-blue-400 focus:bg-white focus:outline-none"
+          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-xs font-medium text-ink hover:border-rule focus:border-focus focus:bg-white focus:outline-none"
         />
-        <p className="truncate px-1 text-[10px] text-gray-400">{field.location}</p>
+        <p className="truncate px-1 text-[10px] text-ink-faint">{field.location}</p>
       </div>
       <button
         onClick={(e) => {
@@ -365,23 +362,23 @@ function FieldRow({
         title={field.required ? "Obligatoire : la relecture signalera ce champ s'il est vide" : "Rendre obligatoire"}
         className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors ${
           field.required
-            ? "bg-amber-100 text-amber-800 ring-1 ring-amber-300"
-            : "text-gray-400 ring-1 ring-gray-200 hover:text-gray-700"
+            ? "bg-warn-tint text-warn-strong ring-1 ring-warn-rule"
+            : "text-ink-faint ring-1 ring-rule hover:text-ink-soft"
         }`}
       >
         Obligatoire
       </button>
-      <button
+      <IconButton
+        label={`Retirer ${field.label}`}
+        title="Retirer du formulaire (le texte restera fixe)"
+        icon={<X size={14} />}
+        size="sm"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        title="Retirer du formulaire (le texte restera fixe)"
-        aria-label={`Retirer ${field.label}`}
-        className="mt-0.5 shrink-0 rounded p-0.5 text-gray-300 hover:bg-gray-100 hover:text-gray-600"
-      >
-        <X size={14} />
-      </button>
+        className="mt-0.5"
+      />
     </div>
   );
 }

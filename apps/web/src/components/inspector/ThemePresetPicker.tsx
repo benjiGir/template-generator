@@ -30,7 +30,7 @@ export function ThemePresetPicker() {
 
   return (
     <div className="px-4 pb-2">
-      <p className="text-xs text-gray-500 mb-2">Un clic applique le thème ; vous pouvez ensuite l'ajuster.</p>
+      <p className="text-xs text-ink-subtle mb-2">Un clic applique le thème ; vous pouvez ensuite l'ajuster.</p>
       <div className="grid grid-cols-2 gap-2">
         {records.map((record) => {
           const isActive = currentThemeName === record.theme.name;
@@ -39,7 +39,7 @@ export function ThemePresetPicker() {
               <button
                 onClick={() => applyTheme(record.theme)}
                 className={`w-full text-left p-2 rounded border transition-colors ${
-                  isActive ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  isActive ? "border-tpl bg-tpl-tint" : "border-rule hover:border-rule-strong hover:bg-paper"
                 }`}
               >
                 <div className="flex gap-1 mb-1.5">
@@ -57,13 +57,13 @@ export function ThemePresetPicker() {
                     />
                   ))}
                 </div>
-                <p className="text-xs font-medium text-gray-700 truncate">{record.theme.name}</p>
+                <p className="text-xs font-medium text-ink-soft truncate">{record.theme.name}</p>
               </button>
 
               {!record.isBuiltin && (
                 <button
                   onClick={() => void handleDelete(record)}
-                  className="absolute top-1 right-1 hidden group-hover:flex w-4 h-4 items-center justify-center text-gray-400 hover:text-red-500 text-xs"
+                  className="absolute top-1 right-1 hidden group-hover:flex w-4 h-4 items-center justify-center text-ink-faint hover:text-danger text-xs"
                   title="Supprimer ce thème"
                   aria-label={`Supprimer le thème ${record.name}`}
                 >

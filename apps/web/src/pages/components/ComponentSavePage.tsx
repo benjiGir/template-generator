@@ -7,6 +7,7 @@ import { NotFoundState } from "@/workflow/EntityState";
 import { PresetPreviewPane } from "./PresetPreviewPane";
 import { COMPONENT_CATEGORIES, type ComponentCategory } from "@template-generator/shared/types/component";
 import { useSavePreset } from "@/api/hooks/presets";
+import { Field, Input, Select, Textarea } from "@/components/ui/Field";
 
 const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
   { value: "layout", label: "Mise en page" },
@@ -72,59 +73,61 @@ export function ComponentSavePage() {
         disabled: !label.trim(),
       }}
     >
-      <div className="h-full flex overflow-hidden bg-gray-50">
-        <div className="w-[400px] shrink-0 overflow-y-auto bg-white border-r border-gray-200 p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-5">
+      <div className="h-full flex overflow-hidden bg-paper">
+        <div className="w-[400px] shrink-0 overflow-y-auto bg-white border-r border-rule p-6">
+          <h2 className="text-base font-semibold text-ink mb-5">
             {editingId ? "Modifier le preset" : "Nommer et sauvegarder"}
           </h2>
 
           <div className="space-y-4">
-            <label className="block">
-              <span className="block text-xs font-medium text-gray-600 mb-1">
-                Nom du preset <span className="text-red-400">*</span>
-              </span>
-              <input
+            <Field
+              label={
+                <>
+                  Nom du preset <span className="text-danger">*</span>
+                </>
+              }
+            >
+              <Input
+                size="md"
                 autoFocus
-                type="text"
+                required
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="Ex: KPI Card Verte"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink"
               />
-            </label>
+            </Field>
 
-            <label className="block">
-              <span className="block text-xs font-medium text-gray-600 mb-1">Description</span>
-              <textarea
+            <Field label="Description">
+              <Textarea
+                size="md"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Description optionnelle…"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink resize-none"
+                className="resize-none"
               />
-            </label>
+            </Field>
 
-            <label className="block">
-              <span className="block text-xs font-medium text-gray-600 mb-1">Catégorie</span>
-              <select
+            <Field label="Catégorie">
+              <Select
+                size="md"
                 value={category}
                 onChange={(e) => {
                   const chosen = COMPONENT_CATEGORIES.find((c) => c === e.target.value);
                   if (chosen) setCategory(chosen);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink bg-white"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}
-              </select>
-            </label>
+              </Select>
+            </Field>
 
-            <div className="pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-400">
-                Composant de base : <span className="font-medium text-gray-600">{def.label}</span>
+            <div className="pt-2 border-t border-wash">
+              <p className="text-xs text-ink-faint">
+                Composant de base : <span className="font-medium text-ink-muted">{def.label}</span>
               </p>
             </div>
           </div>

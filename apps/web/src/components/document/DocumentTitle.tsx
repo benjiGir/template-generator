@@ -41,7 +41,7 @@ export function DocumentTitle() {
           }
         }}
         aria-label="Nom du document"
-        className="w-full rounded border border-ink px-1.5 py-0.5 text-sm font-semibold text-gray-900 focus:outline-none"
+        className="w-full rounded border border-ink px-1.5 py-0.5 text-sm font-semibold text-ink focus:outline-none"
       />
     );
   }
@@ -56,7 +56,7 @@ export function DocumentTitle() {
       className="group flex max-w-full items-center gap-1.5 rounded text-left hover:text-doc-strong"
     >
       <span className="truncate">{document.name}</span>
-      <Pencil size={12} className="shrink-0 text-gray-300 group-hover:text-doc-strong" />
+      <Pencil size={12} className="shrink-0 text-rule-strong group-hover:text-doc-strong" />
     </button>
   );
 }

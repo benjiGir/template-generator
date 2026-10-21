@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Textarea } from "@/components/ui/Field";
 
 interface Props {
   value: string;
@@ -21,13 +22,5 @@ export function TextareaPropField({ value, onChange, placeholder }: Props) {
     timerRef.current = setTimeout(() => onChange(next), 150);
   };
 
-  return (
-    <textarea
-      value={local}
-      onChange={handleChange}
-      placeholder={placeholder}
-      rows={3}
-      className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-white resize-y"
-    />
-  );
+  return <Textarea value={local} onChange={handleChange} placeholder={placeholder} rows={3} className="resize-y" />;
 }

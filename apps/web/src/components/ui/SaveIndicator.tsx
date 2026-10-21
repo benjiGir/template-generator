@@ -6,7 +6,7 @@ export function SaveIndicator({ autosave }: { autosave: Autosave }) {
   if (autosave.status === "error") {
     return (
       <span
-        className="flex items-center gap-1.5 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700"
+        className="flex items-center gap-1.5 rounded-md bg-danger-tint px-2 py-1 text-xs font-medium text-danger-strong"
         role="alert"
       >
         <AlertCircle size={13} />
@@ -19,7 +19,7 @@ export function SaveIndicator({ autosave }: { autosave: Autosave }) {
   }
   if (autosave.status === "saving") {
     return (
-      <span className="flex items-center gap-1.5 text-xs text-gray-400">
+      <span className="flex items-center gap-1.5 text-xs text-ink-faint">
         <Loader2 size={12} className="animate-spin" />
         Enregistrement…
       </span>

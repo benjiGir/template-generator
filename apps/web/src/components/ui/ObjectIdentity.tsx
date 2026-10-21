@@ -106,7 +106,7 @@ export function BlueprintGlyph() {
 /** Le template d'origine d'un document, en une ligne */
 export function TemplateRef({ name }: { name: string }) {
   return (
-    <span className="inline-flex min-w-0 items-center gap-1.5 text-xs text-gray-700">
+    <span className="inline-flex min-w-0 items-center gap-1.5 text-xs text-ink-soft">
       <ObjectMark kind="tpl" size={9} />
       <span className="truncate">Template : {name}</span>
     </span>

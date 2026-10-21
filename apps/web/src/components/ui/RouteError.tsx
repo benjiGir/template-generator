@@ -1,5 +1,6 @@
 import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
 import { AlertTriangle, RotateCw } from "lucide-react";
+import { Button, buttonClasses } from "./Button";
 
 /**
  * Écran affiché quand un écran plante au rendu : un message clair et deux issues,
@@ -16,32 +17,24 @@ export function RouteError() {
   return (
     <div className="flex h-full items-center justify-center bg-paper p-8">
       <div className="w-full max-w-lg border border-ink bg-white p-6">
-        <div className="flex items-center gap-2 text-red-700">
+        <div className="flex items-center gap-2 text-danger-strong">
           <AlertTriangle size={18} />
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em]">Erreur</p>
         </div>
         <h1 className="mt-2 text-xl font-bold tracking-tight">Cet écran n'a pas pu s'afficher</h1>
-        <p className="mt-2 text-sm text-gray-700">
+        <p className="mt-2 text-sm text-ink-soft">
           Votre travail déjà enregistré n'est pas perdu. Rechargez la page ; si le problème revient, repartez de
           l'accueil.
         </p>
         <div className="mt-5 flex items-center gap-2">
-          <button
-            onClick={() => window.location.reload()}
-            className="flex min-h-9 items-center gap-1.5 rounded-sm bg-ink px-4 text-sm font-medium text-paper hover:bg-gray-800"
-          >
-            <RotateCw size={14} />
+          <Button variant="primary" icon={<RotateCw size={14} />} onClick={() => window.location.reload()}>
             Recharger la page
-          </button>
-          <Link
-            to="/"
-            reloadDocument
-            className="flex min-h-9 items-center rounded-sm border border-ink px-4 text-sm font-medium text-ink hover:bg-paper"
-          >
+          </Button>
+          <Link to="/" reloadDocument className={buttonClasses()}>
             Retour à l'accueil
           </Link>
         </div>
-        <details className="mt-5 text-xs text-gray-600">
+        <details className="mt-5 text-xs text-ink-muted">
           <summary className="cursor-pointer select-none">Détail technique</summary>
           <pre className="mt-2 overflow-auto whitespace-pre-wrap bg-paper p-2 font-mono">{detail}</pre>
         </details>

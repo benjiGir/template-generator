@@ -53,7 +53,7 @@ export function FormFieldGroup({ group, fields, data, onUpdate, activeKey, onFoc
           {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
           {group}
         </span>
-        <span className="font-mono text-[11px] text-gray-700">
+        <span className="font-mono text-[11px] text-ink-soft">
           {filled}/{fields.length}
           {filled === fields.length ? " ✓" : ""}
         </span>

@@ -34,9 +34,9 @@ function InitPlugin({ value }: { value: string }) {
 
 function MiniToolbar() {
   const [editor] = useLexicalComposerContext();
-  const btn = "px-1.5 py-0.5 text-xs text-gray-600 hover:bg-gray-100 rounded";
+  const btn = "px-1.5 py-0.5 text-xs text-ink-muted hover:bg-wash rounded";
   return (
-    <div className="flex items-center gap-0.5 px-1 py-0.5 bg-white border border-gray-200 rounded shadow-md">
+    <div className="flex items-center gap-0.5 px-1 py-0.5 bg-white border border-rule rounded shadow-md">
       <button
         type="button"
         className={`${btn} font-bold`}
@@ -57,7 +57,7 @@ function MiniToolbar() {
       >
         I
       </button>
-      <span className="w-px h-3 bg-gray-200 mx-0.5" />
+      <span className="w-px h-3 bg-rule mx-0.5" />
       <button
         type="button"
         className={btn}

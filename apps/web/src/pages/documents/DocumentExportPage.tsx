@@ -46,7 +46,7 @@ export function DocumentExportPage() {
       }}
     >
       <div className="flex h-full overflow-hidden">
-        <aside className="w-[380px] shrink-0 overflow-hidden border-r border-gray-200 bg-white">
+        <aside className="w-[380px] shrink-0 overflow-hidden border-r border-rule bg-white">
           <ExportPanel
             filename={filename}
             onFilenameChange={setFilename}

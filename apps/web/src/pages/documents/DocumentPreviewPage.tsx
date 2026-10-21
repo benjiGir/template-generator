@@ -26,12 +26,12 @@ export function DocumentPreviewPage() {
       <div className="flex h-full flex-col overflow-hidden">
         <div
           className={`flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b px-5 py-2 text-xs ${
-            missingRequired.length > 0 ? "border-amber-200 bg-amber-50" : "border-rule bg-white"
+            missingRequired.length > 0 ? "border-warn-rule bg-warn-tint" : "border-rule bg-white"
           }`}
         >
           {missingRequired.length > 0 ? (
             <>
-              <span className="flex items-center gap-1.5 font-medium text-amber-800">
+              <span className="flex items-center gap-1.5 font-medium text-warn-strong">
                 <AlertTriangle size={13} />
                 {missingRequired.length} champ{missingRequired.length > 1 ? "s" : ""} obligatoire
                 {missingRequired.length > 1 ? "s" : ""} vide{missingRequired.length > 1 ? "s" : ""} :
@@ -44,12 +44,12 @@ export function DocumentPreviewPage() {
                   onMouseLeave={() => setHovered(null)}
                   onFocus={() => setHovered(f.nodeId)}
                   onBlur={() => setHovered(null)}
-                  className="rounded bg-white px-1.5 py-0.5 font-medium text-amber-900 ring-1 ring-amber-200 hover:ring-amber-400"
+                  className="rounded bg-white px-1.5 py-0.5 font-medium text-warn-strong ring-1 ring-warn-rule hover:ring-warn"
                 >
                   {f.label}
                 </Link>
               ))}
-              <span className="text-amber-700/80">Vous pouvez tout de même exporter.</span>
+              <span className="text-warn-strong/80">Vous pouvez tout de même exporter.</span>
             </>
           ) : (
             <span className="flex items-center gap-1.5 font-medium text-ink">

@@ -183,7 +183,7 @@ export function PreviewPane({
           aria-hidden
           className={`pointer-events-none absolute rounded-sm transition-all duration-150 ${
             highlightTone === "warning"
-              ? "bg-amber-400/10 ring-2 ring-amber-600 ring-offset-2"
+              ? "bg-warn/10 ring-2 ring-warn ring-offset-2"
               : highlightTone === "doc"
                 ? "bg-doc/5 ring-2 ring-doc ring-offset-2"
                 : "bg-tpl/5 ring-2 ring-tpl ring-offset-2"

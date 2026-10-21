@@ -54,11 +54,11 @@ function ToolbarPlugin() {
 
   const btn = (active: boolean) =>
     `px-1.5 py-0.5 text-xs rounded transition-colors ${
-      active ? "bg-slate-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-600"
+      active ? "bg-ink-subtle text-white" : "text-ink-faint hover:text-white hover:bg-ink-muted"
     }`;
 
   return (
-    <div className="flex items-center gap-0.5 px-2 py-1 border-b border-slate-600 flex-wrap">
+    <div className="flex items-center gap-0.5 px-2 py-1 border-b border-ink-muted flex-wrap">
       <button
         type="button"
         className={btn(isBold)}
@@ -75,7 +75,7 @@ function ToolbarPlugin() {
       >
         I
       </button>
-      <span className="w-px h-3 bg-slate-600 mx-0.5" />
+      <span className="w-px h-3 bg-ink-muted mx-0.5" />
       <button
         type="button"
         className={btn(false)}
@@ -92,7 +92,7 @@ function ToolbarPlugin() {
       >
         1—
       </button>
-      <span className="w-px h-3 bg-slate-600 mx-0.5" />
+      <span className="w-px h-3 bg-ink-muted mx-0.5" />
       <button type="button" className={btn(showLink)} onClick={() => setShowLink((s) => !s)} title="Lien">
         🔗
       </button>
@@ -112,7 +112,7 @@ function ToolbarPlugin() {
               if (e.key === "Escape") setShowLink(false);
             }}
             placeholder="https://..."
-            className="flex-1 px-1.5 py-0.5 text-xs bg-slate-700 border border-slate-500 rounded text-white font-mono focus:outline-none focus:border-blue-400"
+            className="flex-1 px-1.5 py-0.5 text-xs bg-ink-soft border border-ink-subtle rounded text-white font-mono focus:outline-none focus:border-tpl-rule"
           />
           <button
             type="button"
@@ -121,7 +121,7 @@ function ToolbarPlugin() {
               setShowLink(false);
               setLinkUrl("https://");
             }}
-            className="px-2 py-0.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-2 py-0.5 text-xs bg-tpl text-white rounded hover:bg-tpl-strong"
           >
             OK
           </button>
@@ -164,16 +164,16 @@ export function RichtextPropField({ label, value, onChange, placeholder }: Props
 
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
-      <div className="border border-gray-200 rounded overflow-hidden text-xs">
+      <label className="block text-xs font-medium text-ink-muted mb-1.5">{label}</label>
+      <div className="border border-rule rounded overflow-hidden text-xs">
         <LexicalComposer initialConfig={initialConfig}>
-          <div className="bg-slate-800 text-slate-100">
+          <div className="bg-ink-soft text-wash">
             <ToolbarPlugin />
             <div className="relative">
               <RichTextPlugin
                 contentEditable={<ContentEditable className="outline-none min-h-[60px] p-2 leading-relaxed" />}
                 placeholder={
-                  <div className="absolute top-2 left-2 text-slate-500 pointer-events-none select-none">
+                  <div className="absolute top-2 left-2 text-ink-subtle pointer-events-none select-none">
                     {placeholder ?? "Contenu…"}
                   </div>
                 }

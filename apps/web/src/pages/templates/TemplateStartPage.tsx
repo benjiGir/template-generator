@@ -10,6 +10,7 @@ import { TemplateStatusBadge } from "@/components/ui/StatusBadge";
 import { BlueprintFrame } from "@/components/ui/ObjectIdentity";
 import { TEMPLATE_WORKFLOW, TEMPLATE_PATHS } from "@/workflow/definitions";
 import { useCreateTemplate, useDuplicateTemplate, useTemplate, useTemplates } from "@/api/hooks/templates";
+import { Button } from "@/components/ui/Button";
 
 /**
  * Étape 1 de l'Atelier. Le cas courant est de repartir du template du trimestre précédent :
@@ -51,20 +52,20 @@ export function TemplateStartPage() {
       title="Nouveau template"
       guard={{ ok: false, reason: "Choisissez un point de départ" }}
     >
-      <div className="h-full overflow-y-auto bg-gray-50 px-8 py-6">
+      <div className="h-full overflow-y-auto bg-paper px-8 py-6">
         <div className="mx-auto max-w-5xl space-y-8">
           {(isLoading || templates.length > 0) && (
             <section>
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-bold text-ink">Repartir d'un template existant</h2>
-                  <p className="mt-0.5 text-sm text-gray-500">
+                  <p className="mt-0.5 text-sm text-ink-subtle">
                     La copie reprend le thème, la mise en page et les champs. Vous l'ajustez ensuite.
                   </p>
                 </div>
                 {templates.length > 6 && (
-                  <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-ink">
-                    <Search size={14} className="text-gray-400" />
+                  <label className="flex w-64 items-center gap-2 rounded-md border border-rule bg-white px-2.5 py-1.5 focus-within:border-ink">
+                    <Search size={14} className="text-ink-faint" />
                     <input
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
@@ -75,13 +76,13 @@ export function TemplateStartPage() {
                 )}
               </div>
 
-              {isLoading && <p className="text-sm text-gray-400">Chargement…</p>}
+              {isLoading && <p className="text-sm text-ink-faint">Chargement…</p>}
               {!isLoading && visible.length === 0 && (
-                <p className="py-6 text-center text-sm text-gray-500">
+                <p className="py-6 text-center text-sm text-ink-subtle">
                   Aucun template ne correspond à « {search} ».{" "}
-                  <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">
+                  <Button variant="link" tone="tpl" onClick={() => setSearch("")}>
                     Effacer la recherche
-                  </button>
+                  </Button>
                 </p>
               )}
 
@@ -106,16 +107,16 @@ export function TemplateStartPage() {
                           </div>
                         ) : (
                           <div className="flex h-[170px] w-[180px] items-center justify-center bg-white">
-                            <LayoutTemplate size={28} className="text-gray-200" />
+                            <LayoutTemplate size={28} className="text-rule" />
                           </div>
                         )}
                       </BlueprintFrame>
                       <div className="p-3">
                         <div className="flex items-center gap-1.5">
-                          <h3 className="min-w-0 flex-1 truncate text-xs font-semibold text-gray-900">{t.name}</h3>
+                          <h3 className="min-w-0 flex-1 truncate text-xs font-semibold text-ink">{t.name}</h3>
                           <TemplateStatusBadge template={t} />
                         </div>
-                        <p className="mt-1 text-[11px] text-gray-400">
+                        <p className="mt-1 text-[11px] text-ink-faint">
                           Modifié le{" "}
                           {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
                             day: "numeric",
@@ -127,13 +128,13 @@ export function TemplateStartPage() {
                     </button>
                     <button
                       onClick={() => setPreviewed(t)}
-                      className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-gray-700 opacity-0 shadow-sm ring-1 ring-gray-200 transition-opacity hover:text-blue-700 focus:opacity-100 group-hover:opacity-100"
+                      className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-ink-soft opacity-0 shadow-sm ring-1 ring-rule transition-opacity hover:text-tpl-strong focus:opacity-100 group-hover:opacity-100"
                     >
                       <Eye size={13} />
                       Aperçu
                     </button>
                     {creating === t.id && (
-                      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/70 text-xs font-medium text-blue-700">
+                      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-white/70 text-xs font-medium text-tpl-strong">
                         <Loader2 size={14} className="animate-spin" /> Copie en cours…
                       </div>
                     )}
@@ -144,21 +145,21 @@ export function TemplateStartPage() {
           )}
 
           <section>
-            <h2 className="mb-3 text-sm font-semibold text-gray-700">
+            <h2 className="mb-3 text-sm font-semibold text-ink-soft">
               {templates.length > 0 ? "Ou partir d'autre chose" : "Créer votre premier template"}
             </h2>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => start(null)}
                 disabled={creating !== null}
-                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 text-left transition-all hover:border-blue-400 hover:shadow-sm disabled:cursor-wait"
+                className="flex items-start gap-3 rounded-lg border border-rule bg-white p-4 text-left transition-all hover:border-tpl hover:shadow-sm disabled:cursor-wait"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-tpl-tint text-tpl">
                   {creating === "blank" ? <Loader2 size={18} className="animate-spin" /> : <FilePlus2 size={18} />}
                 </span>
                 <span>
-                  <span className="block text-sm font-semibold text-gray-900">Page blanche</span>
-                  <span className="mt-0.5 block text-xs text-gray-500">
+                  <span className="block text-sm font-semibold text-ink">Page blanche</span>
+                  <span className="mt-0.5 block text-xs text-ink-subtle">
                     Choisir un thème puis assembler les composants.
                   </span>
                 </span>
@@ -193,18 +194,18 @@ export function TemplateStartPage() {
 function SoonOption({ icon, label, hint }: { icon: React.ReactNode; label: string; hint: string }) {
   return (
     <div
-      className="flex items-start gap-3 rounded-lg border border-dashed border-gray-200 bg-white/60 p-4 text-left"
+      className="flex items-start gap-3 rounded-lg border border-dashed border-rule bg-white/60 p-4 text-left"
       aria-disabled="true"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-wash text-ink-faint">
         {icon}
       </span>
       <span>
-        <span className="flex items-center gap-1.5 text-sm font-semibold text-gray-500">
+        <span className="flex items-center gap-1.5 text-sm font-semibold text-ink-subtle">
           {label}
-          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">Bientôt</span>
+          <span className="rounded bg-wash px-1.5 py-0.5 text-[10px] font-medium text-ink-subtle">Bientôt</span>
         </span>
-        <span className="mt-0.5 block text-xs text-gray-400">{hint}</span>
+        <span className="mt-0.5 block text-xs text-ink-faint">{hint}</span>
       </span>
     </div>
   );

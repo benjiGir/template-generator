@@ -3,6 +3,7 @@ import { PropField } from "@/components/inspector/PropField";
 import { isFilled } from "@template-generator/shared/utils/fields";
 import type { EditableField } from "@template-generator/shared/types/template";
 import type { PropValue } from "@template-generator/shared/types/component";
+import { Button } from "@/components/ui/Button";
 
 interface Props {
   field: EditableField;
@@ -53,7 +54,7 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
     filled ? (
       <span className="text-[10px] font-medium text-ink">✓ obligatoire</span>
     ) : (
-      <span className="text-[10px] font-medium text-amber-700">obligatoire</span>
+      <span className="text-[10px] font-medium text-warn-strong">obligatoire</span>
     )
   ) : null;
 
@@ -74,12 +75,12 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
       <PropField key={resetKey} schema={schema} value={value} onChange={onChange} />
       {field.type === "list" && requiredBadge && <div className="mt-1">{requiredBadge}</div>}
       {usesPlaceholder && !filled && defaultText && (
-        <p className="mt-1 text-[11px] text-gray-400">
+        <p className="mt-1 text-[11px] text-ink-faint">
           Vide : le document garde le contenu du template.{" "}
           {(field.type === "textarea" || field.type === "richtext" || field.type === "list") && (
-            <button type="button" onClick={startFromDefault} className="text-doc-strong hover:underline">
+            <Button variant="link" tone="doc" onClick={startFromDefault}>
               Partir de ce contenu
-            </button>
+            </Button>
           )}
         </p>
       )}

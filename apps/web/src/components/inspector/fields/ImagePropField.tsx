@@ -1,5 +1,7 @@
 import { useRef, type ChangeEvent } from "react";
 import type { ImageValue } from "@template-generator/shared/types/component";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Field";
 
 interface Props {
   label: string;
@@ -26,16 +28,16 @@ export function ImagePropField({ label, value, onChange }: Props) {
 
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-ink-muted mb-1.5">{label}</label>
 
       {/* Preview */}
       {src && (
         <div className="mb-2 relative group">
-          <img src={src} alt="" className="w-full rounded border border-gray-200 object-contain max-h-32" />
+          <img src={src} alt="" className="w-full rounded border border-rule object-contain max-h-32" />
           <button
             type="button"
             onClick={() => onChange({ type: "url", value: "" })}
-            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded transition-opacity"
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 bg-danger text-white text-[10px] px-1.5 py-0.5 rounded transition-opacity"
           >
             Supprimer
           </button>
@@ -44,23 +46,19 @@ export function ImagePropField({ label, value, onChange }: Props) {
 
       {/* URL input */}
       <div className="flex gap-1.5 mb-1.5">
-        <input
-          type="text"
+        <Input
           value={val.type === "url" ? val.value : ""}
           onChange={(e) => onChange({ type: "url", value: e.target.value })}
           placeholder="https://…"
-          className="flex-1 px-2.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
+          aria-label={`${label} : adresse de l'image`}
+          className="flex-1"
         />
       </div>
 
       {/* File upload */}
-      <button
-        type="button"
-        onClick={() => fileRef.current?.click()}
-        className="w-full py-1 text-xs text-gray-500 border border-dashed border-gray-300 rounded hover:bg-gray-50 transition-colors"
-      >
+      <Button variant="dashed" size="sm" block onClick={() => fileRef.current?.click()}>
         Choisir un fichier…
-      </button>
+      </Button>
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
   );

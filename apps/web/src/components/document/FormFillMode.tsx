@@ -72,15 +72,15 @@ export function FormFillMode() {
 
   return (
     <div className="flex h-full overflow-hidden">
-      <aside className="flex w-[420px] shrink-0 flex-col border-r border-gray-200 bg-white">
-        <div className="shrink-0 border-b border-gray-100 px-5 py-3">
+      <aside className="flex w-[420px] shrink-0 flex-col border-r border-rule bg-white">
+        <div className="shrink-0 border-b border-wash px-5 py-3">
           <div className="mb-1.5 flex items-baseline justify-between text-xs">
-            <span className="font-medium text-gray-700">
+            <span className="font-medium text-ink-soft">
               {remaining === 0
                 ? "Tous les champs sont remplis"
                 : `Encore ${remaining} champ${remaining > 1 ? "s" : ""} à remplir`}
             </span>
-            <span className="font-mono text-xs text-gray-700">
+            <span className="font-mono text-xs text-ink-soft">
               {completion.filled} / {completion.total}
             </span>
           </div>
@@ -92,7 +92,7 @@ export function FormFillMode() {
                 const firstMissing = completion.missingRequired[0];
                 if (firstMissing) focusField(firstMissing);
               }}
-              className="mt-2 text-xs text-amber-700 hover:underline"
+              className="mt-2 text-xs text-warn-strong hover:underline"
             >
               {completion.missingRequired.length} champ{completion.missingRequired.length > 1 ? "s" : ""} obligatoire
               {completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""}{" "}
@@ -103,7 +103,7 @@ export function FormFillMode() {
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {editableFields.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-400">Ce template n'a aucun champ à remplir.</p>
+            <p className="py-8 text-center text-sm text-ink-faint">Ce template n'a aucun champ à remplir.</p>
           ) : (
             <div className="space-y-6">
               {Array.from(groups.entries()).map(([group, fields]) => (

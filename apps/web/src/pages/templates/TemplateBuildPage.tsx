@@ -5,6 +5,7 @@ import { WorkflowLayout } from "@/layouts/WorkflowLayout";
 import { TemplateTitle } from "@/components/inspector/TemplateTitle";
 import { usePrintDocument } from "@/components/document-view/usePrintDocument";
 import { TEMPLATE_WORKFLOW } from "@/workflow/definitions";
+import { Button } from "@/components/ui/Button";
 
 export function TemplateBuildPage() {
   const template = useLoadedTemplate();
@@ -21,15 +22,16 @@ export function TemplateBuildPage() {
       compact
       guard={hasComponents ? { ok: true } : { ok: false, reason: "Ajoutez au moins un composant" }}
       secondaryActions={
-        <button
-          onClick={() => print({ template, format: "auto", title: template.name })}
-          disabled={printing}
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<FileDown size={14} />}
+          pending={printing}
           title="Imprimer le template avec son contenu par défaut"
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+          onClick={() => print({ template, format: "auto", title: template.name })}
         >
-          <FileDown size={14} />
           Aperçu PDF
-        </button>
+        </Button>
       }
     >
       <EditorLayout />

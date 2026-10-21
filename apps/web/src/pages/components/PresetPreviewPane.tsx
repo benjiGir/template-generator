@@ -15,15 +15,15 @@ export function PresetPreviewPane({ type, props }: { type: string; props: PropVa
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 py-2 text-xs">
-        <label htmlFor="preview-theme" className="text-gray-500">
+      <div className="flex shrink-0 items-center gap-3 border-b border-rule bg-white px-4 py-2 text-xs">
+        <label htmlFor="preview-theme" className="text-ink-subtle">
           Aperçu avec le thème
         </label>
         <select
           id="preview-theme"
           value={theme.name}
           onChange={(e) => setPreviewTheme(e.target.value)}
-          className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:border-ink focus:outline-none"
+          className="rounded border border-rule bg-white px-2 py-1 text-xs focus:border-ink focus:outline-none"
         >
           {BUILTIN_THEMES.map((t) => (
             <option key={t.name} value={t.name}>
@@ -31,13 +31,13 @@ export function PresetPreviewPane({ type, props }: { type: string; props: PropVa
             </option>
           ))}
         </select>
-        <span className="ml-auto text-gray-400">Le preset prendra le thème du template où il sera utilisé.</span>
+        <span className="ml-auto text-ink-faint">Le preset prendra le thème du template où il sera utilisé.</span>
       </div>
       <div className="flex-1 overflow-y-auto bg-table p-8">
         <div className="mx-auto max-w-3xl shadow-[0_1px_3px_rgba(15,23,42,0.12),0_8px_24px_rgba(15,23,42,0.08)]">
           <ComponentPreview type={type} props={props} theme={theme} />
         </div>
-        <p className="mx-auto mt-3 max-w-3xl text-center text-[11px] text-gray-500">
+        <p className="mx-auto mt-3 max-w-3xl text-center text-[11px] text-ink-subtle">
           Le composant est montré dans une page, à l’échelle de la largeur disponible. Les éléments estompés ne font pas
           partie du preset : ils montrent le contexte dans lequel il s'affiche.
         </p>

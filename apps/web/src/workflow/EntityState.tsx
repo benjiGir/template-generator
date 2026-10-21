@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 export function LoadingState({ label = "Chargement…" }: { label?: string }) {
   return (
-    <div className="flex h-full items-center justify-center gap-2 bg-gray-50 text-sm text-gray-400">
+    <div className="flex h-full items-center justify-center gap-2 bg-paper text-sm text-ink-faint">
       <Loader2 size={16} className="animate-spin" />
       {label}
     </div>
@@ -12,8 +12,8 @@ export function LoadingState({ label = "Chargement…" }: { label?: string }) {
 
 export function NotFoundState({ message, backTo, backLabel }: { message: string; backTo: string; backLabel: string }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 bg-gray-50">
-      <p className="text-sm text-gray-600">{message}</p>
+    <div className="flex h-full flex-col items-center justify-center gap-3 bg-paper">
+      <p className="text-sm text-ink-muted">{message}</p>
       <Link to={backTo} className="text-sm font-medium text-ink underline underline-offset-2">
         ← {backLabel}
       </Link>

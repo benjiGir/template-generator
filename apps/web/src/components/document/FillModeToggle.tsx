@@ -20,12 +20,12 @@ export function FillModeToggle() {
           aria-checked={fillMode === key}
           onClick={() => setFillMode(key)}
           className={`flex items-center gap-1.5 border-b-2 py-1.5 text-[13px] transition-colors ${
-            fillMode === key ? "border-ink font-semibold text-ink" : "border-transparent text-gray-700 hover:text-ink"
+            fillMode === key ? "border-ink font-semibold text-ink" : "border-transparent text-ink-soft hover:text-ink"
           }`}
         >
           <Icon size={13} />
           {label}
-          <span className="hidden font-normal text-gray-500 xl:inline">— {hint}</span>
+          <span className="hidden font-normal text-ink-subtle xl:inline">— {hint}</span>
         </button>
       ))}
     </div>

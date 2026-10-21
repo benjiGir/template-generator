@@ -16,21 +16,21 @@ const CATEGORIES: { value: ComponentCategory; label: string }[] = [
 
 export function CategoryFilter({ activeCategory, onCategoryChange, search, onSearchChange }: Props) {
   return (
-    <div className="px-3 py-2 border-b border-gray-100 space-y-2">
+    <div className="px-3 py-2 border-b border-wash space-y-2">
       <input
         type="text"
         placeholder="Rechercher..."
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 bg-gray-50"
+        className="w-full px-2.5 py-1.5 text-xs border border-rule rounded focus:outline-none focus:border-focus bg-paper"
       />
       <div className="flex gap-1 flex-wrap">
         <button
           onClick={() => onCategoryChange(null)}
           className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
             activeCategory === null
-              ? "bg-blue-600 text-white border-blue-600"
-              : "border-gray-200 text-gray-500 hover:border-blue-300"
+              ? "bg-tpl text-white border-tpl"
+              : "border-rule text-ink-subtle hover:border-tpl-rule"
           }`}
         >
           Tous
@@ -41,8 +41,8 @@ export function CategoryFilter({ activeCategory, onCategoryChange, search, onSea
             onClick={() => onCategoryChange(activeCategory === cat.value ? null : cat.value)}
             className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
               activeCategory === cat.value
-                ? "bg-blue-600 text-white border-blue-600"
-                : "border-gray-200 text-gray-500 hover:border-blue-300"
+                ? "bg-tpl text-white border-tpl"
+                : "border-rule text-ink-subtle hover:border-tpl-rule"
             }`}
           >
             {cat.label}

@@ -13,10 +13,10 @@ export function TemplateThemePage() {
   return (
     <WorkflowLayout workflow={TEMPLATE_WORKFLOW} current="theme" entityId={template.id} title={<TemplateTitle />}>
       <div className="flex h-full overflow-hidden">
-        <aside className="w-[400px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
-          <div className="border-b border-gray-100 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gray-900">Identité visuelle</h2>
-            <p className="mt-0.5 text-xs text-gray-500">
+        <aside className="w-[400px] shrink-0 overflow-y-auto border-r border-rule bg-white">
+          <div className="border-b border-wash px-4 py-3">
+            <h2 className="text-sm font-semibold text-ink">Identité visuelle</h2>
+            <p className="mt-0.5 text-xs text-ink-subtle">
               Facultatif : le thème par défaut fonctionne. Chaque réglage s'applique à tout le document.
             </p>
           </div>
@@ -25,7 +25,7 @@ export function TemplateThemePage() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           {isEmpty && (
-            <p className="shrink-0 border-b border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-800">
+            <p className="shrink-0 border-b border-tpl-tint bg-tpl-tint px-4 py-2 text-xs text-tpl-strong">
               Le template est encore vide : le thème s'applique ici à une page d'exemple, qui ne fait pas partie du
               template.
             </p>

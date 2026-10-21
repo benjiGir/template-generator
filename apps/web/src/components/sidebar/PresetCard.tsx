@@ -28,8 +28,8 @@ export function PresetCard({ preset }: Props) {
       style={{ opacity: isDragging ? 0.4 : 1, touchAction: "none" }}
     >
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold leading-tight text-gray-800">{preset.label}</p>
-        <p className="mt-0.5 truncate text-xs leading-tight text-gray-400">
+        <p className="text-xs font-semibold leading-tight text-ink">{preset.label}</p>
+        <p className="mt-0.5 truncate text-xs leading-tight text-ink-faint">
           {get(preset.baseType)?.label ?? preset.baseType}
         </p>
       </div>

@@ -11,6 +11,7 @@ import { PageSettings } from "./PageSettings";
 import { SavePresetDialog } from "./SavePresetDialog";
 import { ThemePanel } from "./ThemePanel";
 import { useSavePreset } from "@/api/hooks/presets";
+import { Button } from "@/components/ui/Button";
 
 /** Types de props qui portent du contenu ; le reste règle l'apparence */
 const CONTENT_TYPES = new Set(["text", "textarea", "richtext", "list", "emoji", "image", "icon"]);
@@ -45,18 +46,18 @@ function StyleSections({
       {Array.from(groups.entries()).map(([group, fields]) => {
         const isOpen = open[group] ?? false;
         return (
-          <section key={group} className="rounded border border-gray-100">
+          <section key={group} className="rounded border border-wash">
             <button
               type="button"
               onClick={() => setOpen((o) => ({ ...o, [group]: !isOpen }))}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100"
+              className="flex w-full items-center justify-between bg-paper px-3 py-2 text-xs font-semibold text-ink-muted hover:bg-wash"
             >
               <span className="flex items-center gap-1.5">
                 {isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                 {group}
               </span>
-              <span className="font-normal text-gray-400">{fields.length}</span>
+              <span className="font-normal text-ink-faint">{fields.length}</span>
             </button>
             {isOpen && (
               <div className="space-y-3 p-3">
@@ -140,7 +141,7 @@ export function Inspector() {
     return (
       <>
         {content.length > 0 && style.length > 0 && (
-          <div className="mb-4 flex gap-1 rounded-lg bg-gray-100 p-0.5" role="tablist">
+          <div className="mb-4 flex gap-1 rounded-lg bg-wash p-0.5" role="tablist">
             {(
               [
                 ["content", "Contenu", content.length],
@@ -152,16 +153,16 @@ export function Inspector() {
                 role="tab"
                 aria-selected={tab === key}
                 onClick={() => setPropTab(key)}
-                className={`flex-1 rounded-md py-1 text-xs font-medium ${tab === key ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-800"}`}
+                className={`flex-1 rounded-md py-1 text-xs font-medium ${tab === key ? "bg-white text-ink shadow-sm" : "text-ink-subtle hover:text-ink"}`}
               >
-                {label} <span className="text-gray-400">{count}</span>
+                {label} <span className="text-ink-faint">{count}</span>
               </button>
             ))}
           </div>
         )}
         {tab === "content" ? (
           <div className="space-y-3">
-            <p className="rounded bg-blue-50 px-2 py-1.5 text-[11px] text-blue-800">
+            <p className="rounded bg-tpl-tint px-2 py-1.5 text-[11px] text-tpl-strong">
               Astuce : double-cliquez sur le texte dans le document pour l'éditer sur place.
             </p>
             {content.map((s) => {
@@ -169,10 +170,10 @@ export function Inspector() {
               return (
                 <div
                   key={s.key}
-                  className={editingInline ? "-mx-2 rounded-md bg-amber-50 px-2 py-1 ring-1 ring-amber-200" : ""}
+                  className={editingInline ? "-mx-2 rounded-md bg-warn-tint px-2 py-1 ring-1 ring-warn-rule" : ""}
                 >
                   {editingInline && (
-                    <p className="mb-1 text-[10px] font-medium text-amber-800">En cours d'édition dans le document</p>
+                    <p className="mb-1 text-[10px] font-medium text-warn-strong">En cours d'édition dans le document</p>
                   )}
                   <PropField schema={s} value={node.props[s.key]} onChange={(v) => onUpdate(s.key, v)} />
                 </div>
@@ -188,14 +189,12 @@ export function Inspector() {
 
   return (
     <>
-      <div className="h-full flex flex-col border-l border-gray-200 bg-white">
+      <div className="h-full flex flex-col border-l border-rule bg-white">
         {/* Header */}
-        <div className="px-4 py-3 border-b border-gray-200 shrink-0">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Inspecteur</h2>
-          {selectedNode && definition && (
-            <p className="text-sm font-semibold text-gray-900 mt-0.5">{definition.label}</p>
-          )}
-          {!selectedNode && <p className="text-xs text-gray-400 mt-0.5">{template?.name ?? "Aucun template"}</p>}
+        <div className="px-4 py-3 border-b border-rule shrink-0">
+          <h2 className="text-xs font-semibold text-ink-subtle uppercase tracking-wider">Inspecteur</h2>
+          {selectedNode && definition && <p className="text-sm font-semibold text-ink mt-0.5">{definition.label}</p>}
+          {!selectedNode && <p className="text-xs text-ink-faint mt-0.5">{template?.name ?? "Aucun template"}</p>}
 
           {/* Tabs — affichés quand aucun composant n'est sélectionné */}
           {showNoSelection && (
@@ -203,9 +202,7 @@ export function Inspector() {
               <button
                 onClick={() => setActiveTab("props")}
                 className={`flex-1 py-1 text-xs font-medium rounded transition-colors ${
-                  activeTab === "props"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-500 hover:text-gray-700 border border-gray-200"
+                  activeTab === "props" ? "bg-ink text-white" : "text-ink-subtle hover:text-ink-soft border border-rule"
                 }`}
               >
                 Page
@@ -213,9 +210,7 @@ export function Inspector() {
               <button
                 onClick={() => setActiveTab("theme")}
                 className={`flex-1 py-1 text-xs font-medium rounded transition-colors ${
-                  activeTab === "theme"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-500 hover:text-gray-700 border border-gray-200"
+                  activeTab === "theme" ? "bg-ink text-white" : "text-ink-subtle hover:text-ink-soft border border-rule"
                 }`}
               >
                 Thème
@@ -229,7 +224,7 @@ export function Inspector() {
           {selectedNode && definition ? (
             <div className="p-4">
               {definition.schema.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center">Ce composant n'a pas de propriétés éditables.</p>
+                <p className="text-xs text-ink-faint text-center">Ce composant n'a pas de propriétés éditables.</p>
               ) : (
                 renderSchema(definition.schema, selectedNode)
               )}
@@ -247,34 +242,25 @@ export function Inspector() {
 
           {!selectedNode && !template && (
             <div className="flex-1 flex items-center justify-center p-4">
-              <p className="text-xs text-gray-400 text-center">Cliquez sur un composant pour l'éditer</p>
+              <p className="text-xs text-ink-faint text-center">Cliquez sur un composant pour l'éditer</p>
             </div>
           )}
         </div>
 
         {/* Footer — actions sur le nœud sélectionné */}
         {selectedNode && (
-          <div className="shrink-0 border-t border-gray-100 p-3 space-y-2">
+          <div className="shrink-0 border-t border-wash p-3 space-y-2">
             <div className="flex gap-2">
-              <button
-                onClick={handleDuplicate}
-                className="flex-1 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
-              >
+              <Button size="sm" className="flex-1" onClick={handleDuplicate}>
                 Dupliquer
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded hover:bg-red-50 transition-colors"
-              >
+              </Button>
+              <Button tone="danger" size="sm" className="flex-1" onClick={handleDelete}>
                 Supprimer
-              </button>
+              </Button>
             </div>
-            <button
-              onClick={() => setShowPresetDialog(true)}
-              className="w-full py-1.5 text-xs font-medium text-blue-600 border border-dashed border-blue-300 rounded hover:bg-blue-50 transition-colors"
-            >
+            <Button variant="dashed" tone="preset" size="sm" block onClick={() => setShowPresetDialog(true)}>
               Sauvegarder comme preset
-            </button>
+            </Button>
           </div>
         )}
       </div>

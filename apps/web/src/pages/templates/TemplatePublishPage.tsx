@@ -14,6 +14,8 @@ import { detectFields, reconcileFields, suggestedFields } from "@template-genera
 import { FieldsEditor } from "./fields/FieldsEditor";
 import { FormPreview } from "./fields/FormPreview";
 import { usePublishTemplate } from "@/api/hooks/templates";
+import { Button } from "@/components/ui/Button";
+import { Field, Input, Textarea } from "@/components/ui/Field";
 
 type Tab = "fields" | "form" | "info";
 
@@ -121,8 +123,8 @@ export function TemplatePublishPage() {
       guard={nameMissing ? { ok: false, reason: "Donnez un nom au template" } : undefined}
     >
       <div className="flex h-full overflow-hidden">
-        <aside className="flex w-[460px] shrink-0 flex-col border-r border-gray-200 bg-white">
-          <div className="flex shrink-0 gap-1 border-b border-gray-200 px-3 pt-2" role="tablist">
+        <aside className="flex w-[460px] shrink-0 flex-col border-r border-rule bg-white">
+          <div className="flex shrink-0 gap-1 border-b border-rule px-3 pt-2" role="tablist">
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -130,15 +132,13 @@ export function TemplatePublishPage() {
                 aria-selected={tab === t.key}
                 onClick={() => setTab(t.key)}
                 className={`-mb-px flex items-center gap-1.5 border-b-2 px-2.5 py-2 text-xs font-medium ${
-                  tab === t.key
-                    ? "border-blue-600 text-blue-700"
-                    : "border-transparent text-gray-500 hover:text-gray-800"
+                  tab === t.key ? "border-tpl text-tpl-strong" : "border-transparent text-ink-subtle hover:text-ink"
                 }`}
               >
                 {t.label}
                 {t.badge && (
                   <span
-                    className={`rounded-full px-1.5 text-[10px] ${t.badge === "!" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"}`}
+                    className={`rounded-full px-1.5 text-[10px] ${t.badge === "!" ? "bg-warn-tint text-warn-strong" : "bg-wash text-ink-muted"}`}
                   >
                     {t.badge}
                   </span>
@@ -149,7 +149,7 @@ export function TemplatePublishPage() {
 
           <div className="flex-1 overflow-y-auto p-4">
             {status !== "draft" && tab === "fields" && (
-              <p className="mb-3 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-[11px] text-blue-800">
+              <p className="mb-3 rounded-md border border-tpl-tint bg-tpl-tint px-3 py-2 text-[11px] text-tpl-strong">
                 {status === "published-with-changes"
                   ? "Publié, mais vos modifications récentes ne sont pas encore visibles dans le Studio. Les documents existants ne changent pas."
                   : "Publié et à jour dans le Studio."}
@@ -166,13 +166,10 @@ export function TemplatePublishPage() {
                   onHoverNode={setHoverNode}
                   onSelectNode={setSelectedNode}
                 />
-                <button
-                  onClick={resetToSuggestion}
-                  className="mt-4 flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-gray-700"
-                >
+                <Button variant="link" onClick={resetToSuggestion} className="mt-4 text-[11px]">
                   <RotateCcw size={12} />
                   Revenir à la pré-sélection automatique
-                </button>
+                </Button>
               </>
             )}
 
@@ -180,52 +177,51 @@ export function TemplatePublishPage() {
 
             {tab === "info" && (
               <div className="space-y-3">
-                <div>
-                  <label htmlFor="tpl-name" className="mb-1 block text-xs font-medium text-gray-600">
-                    Nom <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    id="tpl-name"
-                    type="text"
+                <Field
+                  label={
+                    <>
+                      Nom <span className="text-danger">*</span>
+                    </>
+                  }
+                  hint="C'est ce nom que les contributeurs verront dans le Studio."
+                >
+                  <Input
+                    size="md"
+                    required
                     value={template.name}
                     onChange={(e) => updateTemplateMeta(e.target.value)}
-                    className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                   />
-                  <p className="mt-1 text-[11px] text-gray-400">
-                    C'est ce nom que les contributeurs verront dans le Studio.
-                  </p>
-                </div>
-                <div>
-                  <label htmlFor="tpl-desc" className="mb-1 block text-xs font-medium text-gray-600">
-                    Description
-                  </label>
-                  <textarea
-                    id="tpl-desc"
+                </Field>
+                <Field label="Description">
+                  <Textarea
+                    size="md"
                     value={template.description ?? ""}
                     onChange={(e) => updateTemplateMeta(template.name, e.target.value)}
                     rows={3}
-                    className="w-full resize-none rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
+                    className="resize-none"
                   />
-                </div>
+                </Field>
               </div>
             )}
           </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 py-2 text-xs">
-            <span className="flex items-center gap-1.5 text-gray-500">
+          <div className="flex shrink-0 items-center gap-3 border-b border-rule bg-white px-4 py-2 text-xs">
+            <span className="flex items-center gap-1.5 text-ink-subtle">
               <MousePointerClick size={13} />
               {pickMessage ?? "Cliquez sur une zone du document pour retrouver ses champs."}
             </span>
-            <button
-              onClick={() => setShowZones((v) => !v)}
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={showZones ? <EyeOff size={13} /> : <Eye size={13} />}
               aria-pressed={showZones}
-              className="ml-auto flex items-center gap-1.5 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
+              onClick={() => setShowZones((v) => !v)}
+              className="ml-auto"
             >
-              {showZones ? <EyeOff size={13} /> : <Eye size={13} />}
               {showZones ? "Masquer les zones retenues" : "Montrer les zones retenues"}
-            </button>
+            </Button>
           </div>
           <div className="min-h-0 flex-1">
             <PreviewPane

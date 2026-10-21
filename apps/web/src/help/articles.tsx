@@ -38,7 +38,7 @@ export interface HelpArticle {
 
 /** Paragraphe */
 function P({ children }: { children: ReactNode }) {
-  return <p className="mt-3 text-[15px] leading-relaxed text-gray-800">{children}</p>;
+  return <p className="mt-3 text-[15px] leading-relaxed text-ink">{children}</p>;
 }
 
 /** Étapes à suivre, numérotées */
@@ -46,8 +46,8 @@ function Steps({ items }: { items: ReactNode[] }) {
   return (
     <ol className="mt-3 space-y-1.5 border-l-2 border-rule pl-4">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-gray-800">
-          <span className="mt-[3px] font-mono text-xs font-semibold text-gray-500">
+        <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-ink">
+          <span className="mt-[3px] font-mono text-xs font-semibold text-ink-subtle">
             {String(i + 1).padStart(2, "0")}
           </span>
           <span>{item}</span>
@@ -61,8 +61,8 @@ function Steps({ items }: { items: ReactNode[] }) {
 function Tip({ title = "Bon à savoir", children }: { title?: string; children: ReactNode }) {
   return (
     <div className="mt-4 border-l-[3px] border-ink bg-white px-4 py-3">
-      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">{title}</p>
-      <div className="mt-1 text-sm leading-relaxed text-gray-800">{children}</div>
+      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{title}</p>
+      <div className="mt-1 text-sm leading-relaxed text-ink">{children}</div>
     </div>
   );
 }

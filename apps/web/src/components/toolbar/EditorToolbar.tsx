@@ -1,5 +1,6 @@
 import { Redo2, Undo2 } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
+import { IconButton } from "@/components/ui/Button";
 
 export function EditorToolbar() {
   const historyIndex = useEditorStore((s) => s.historyIndex);
@@ -11,24 +12,10 @@ export function EditorToolbar() {
   const canRedo = historyIndex < historyLength - 1;
 
   return (
-    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-gray-200 bg-white px-3">
-      <button
-        onClick={undo}
-        disabled={!canUndo}
-        title="Annuler (Ctrl+Z)"
-        className="rounded p-1.5 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-      >
-        <Undo2 size={15} />
-      </button>
-      <button
-        onClick={redo}
-        disabled={!canRedo}
-        title="Rétablir (Ctrl+Shift+Z)"
-        className="rounded p-1.5 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-      >
-        <Redo2 size={15} />
-      </button>
-      <span className="ml-3 text-[11px] text-gray-400">
+    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-rule bg-white px-3">
+      <IconButton label="Annuler (Ctrl+Z)" icon={<Undo2 size={15} />} disabled={!canUndo} onClick={undo} />
+      <IconButton label="Rétablir (Ctrl+Shift+Z)" icon={<Redo2 size={15} />} disabled={!canRedo} onClick={redo} />
+      <span className="ml-3 text-[11px] text-ink-faint">
         Les pages blanches sont le document exporté en PDF. Panneaux, poignées et contours n'apparaissent pas à
         l'export.
       </span>

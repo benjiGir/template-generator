@@ -14,6 +14,7 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { BUILTIN_THEMES } from "@template-generator/shared/themes/presets";
 import { BlueprintFrame, ObjectMark, ObjectTag } from "@/components/ui/ObjectIdentity";
 import { SegmentedProgress } from "@/components/ui/SegmentedProgress";
 import { Btn, Figure, Input, Label, Line, Mark, MiniPage, MiniStepper, MonoLabel, Table } from "./screen";
@@ -59,7 +60,7 @@ function WorkflowHeader({
   const accent = kind === "doc" ? "border-doc" : kind === "tpl" ? "border-tpl" : "border-preset";
   return (
     <div className="flex h-9 items-center gap-3 border-b-2 border-ink bg-paper px-3">
-      <span className="flex items-center gap-0.5 font-mono text-[9px] text-gray-700">
+      <span className="flex items-center gap-0.5 font-mono text-[9px] text-ink-soft">
         <X size={9} /> Quitter
       </span>
       <span className="origin-left scale-90">
@@ -116,12 +117,12 @@ export function ConceptFigure() {
         <div className="flex flex-col items-center gap-2">
           <div className="flex h-24 w-28 flex-col justify-center gap-1.5 rounded-[10px] border border-preset/40 bg-preset-tint p-3">
             <Line w="50%" h={4} tone="bg-preset" />
-            <Line w="90%" h={3} tone="bg-gray-400" />
-            <Line w="70%" h={3} tone="bg-gray-400" />
+            <Line w="90%" h={3} tone="bg-ink-faint" />
+            <Line w="70%" h={3} tone="bg-ink-faint" />
           </div>
           {caption("preset", 1, "Preset")}
         </div>
-        <ArrowRight size={16} className="text-gray-500" />
+        <ArrowRight size={16} className="text-ink-subtle" />
         <div className="flex flex-col items-center gap-2">
           <BlueprintFrame className="p-2.5">
             <div className="flex h-[120px] w-24 flex-col gap-1.5 border border-white/80 p-2">
@@ -136,7 +137,7 @@ export function ConceptFigure() {
           </BlueprintFrame>
           {caption("tpl", 2, "Template")}
         </div>
-        <ArrowRight size={16} className="text-gray-500" />
+        <ArrowRight size={16} className="text-ink-subtle" />
         <div className="flex flex-col items-center gap-2">
           <div className="relative h-[136px] w-[118px]">
             <MiniPage dense className="absolute left-4 top-0 h-[120px] w-[100px] overflow-hidden opacity-50" />
@@ -180,7 +181,7 @@ export function LockedFigure() {
           className="h-fit w-64"
           zones={{ intro: "field", kpis: "field", left: "field", right: "field", box: "field" }}
         />
-        <div className="absolute left-1/2 top-[30px] flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-slate-800 py-1 pl-1 pr-2.5 text-[9px] text-white shadow-lg">
+        <div className="absolute left-1/2 top-[30px] flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink-soft py-1 pl-1 pr-2.5 text-[9px] text-white shadow-lg">
           <Mark n={2} />
           <Lock size={9} /> Cette partie fait partie du template : elle ne se modifie pas ici.{" "}
           <span className="font-semibold underline">Pourquoi ?</span>
@@ -212,8 +213,8 @@ export function StudioSelectFigure() {
           { name: "Produit — Release Notes", effort: "Long", count: "26 champs à remplir" },
           { name: "Incident — Post-Mortem", effort: "Court", count: "7 champs, dont 7 obligatoires" },
         ].map((t, i) => (
-          <div key={t.name} className={`relative border bg-white ${t.hover ? "border-doc" : "border-gray-200"}`}>
-            <div className="flex justify-center bg-slate-100 px-4 pt-2">
+          <div key={t.name} className={`relative border bg-white ${t.hover ? "border-doc" : "border-rule"}`}>
+            <div className="flex justify-center bg-wash px-4 pt-2">
               <MiniPage className="h-[78px] w-full overflow-hidden" />
             </div>
             <div className="space-y-1 p-2">
@@ -221,8 +222,8 @@ export function StudioSelectFigure() {
                 {i === 0 && <Mark n={1} />}
                 <Label className="font-semibold">{t.name}</Label>
               </span>
-              <span className="flex items-center gap-1 text-[9px] text-gray-600">
-                <span className="bg-gray-100 px-1 font-medium text-ink">{t.effort}</span>
+              <span className="flex items-center gap-1 text-[9px] text-ink-muted">
+                <span className="bg-wash px-1 font-medium text-ink">{t.effort}</span>
                 {t.count}
                 {i === 1 && <Mark n={2} />}
               </span>
@@ -231,7 +232,7 @@ export function StudioSelectFigure() {
               <>
                 <span className="absolute right-1.5 top-1.5 flex items-center gap-1">
                   <Mark n={3} />
-                  <span className="flex items-center gap-0.5 bg-white/95 px-1 py-0.5 text-[9px] font-medium text-ink ring-1 ring-gray-300">
+                  <span className="flex items-center gap-0.5 bg-white/95 px-1 py-0.5 text-[9px] font-medium text-ink ring-1 ring-rule-strong">
                     <Eye size={9} /> Aperçu
                   </span>
                 </span>
@@ -265,7 +266,7 @@ export function FillFormFigure() {
               <span className="flex items-center gap-1 border-b-2 border-doc pb-1 font-semibold">
                 <List size={10} /> Formulaire
               </span>
-              <span className="flex items-center gap-1 pb-1 text-gray-500">
+              <span className="flex items-center gap-1 pb-1 text-ink-subtle">
                 <MousePointerClick size={10} /> Sur la page
               </span>
             </div>
@@ -274,7 +275,7 @@ export function FillFormFigure() {
             <div className="space-y-1">
               <div className="flex justify-between text-[10px]">
                 <span>Encore 2 champs à remplir</span>
-                <span className="font-mono text-gray-600">5 / 7</span>
+                <span className="font-mono text-ink-muted">5 / 7</span>
               </div>
               <SegmentedProgress filled={5} total={7} height={4} />
               <span className="block text-[9px] text-doc-strong underline">
@@ -288,7 +289,7 @@ export function FillFormFigure() {
                 <ChevronDown size={9} className="mr-0.5 inline" />
                 En-tête
               </MonoLabel>
-              <span className="font-mono text-[9px] text-gray-500">1/1</span>
+              <span className="font-mono text-[9px] text-ink-subtle">1/1</span>
             </div>
           </Row>
           <Row>
@@ -300,11 +301,11 @@ export function FillFormFigure() {
                   <ChevronDown size={9} className="mr-0.5 inline" />
                   Indicateurs
                 </MonoLabel>
-                <span className="font-mono text-[9px] text-gray-500">2/4</span>
+                <span className="font-mono text-[9px] text-ink-subtle">2/4</span>
               </div>
               <div className="flex justify-between">
                 <Label>KPI — Effectif total</Label>
-                <span className="text-[9px] text-amber-700">obligatoire</span>
+                <span className="text-[9px] text-warn-strong">obligatoire</span>
               </div>
               <Input value="128" className="border-doc ring-1 ring-doc" />
             </div>
@@ -370,15 +371,15 @@ export function ReviewFigure() {
       ]}
     >
       <WorkflowHeader kind="doc" title="Bilan mensuel — octobre" steps={STUDIO_STEPS} current={2} />
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px]">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-warn-rule bg-warn-tint px-3 py-1.5 text-[10px]">
         <Mark n={1} />
-        <span className="font-medium text-amber-800">2 champs obligatoires vides :</span>
-        <span className="bg-white px-1 py-0.5 font-medium text-amber-900 ring-1 ring-amber-400">Effectif total</span>
-        <span className="bg-white px-1 py-0.5 font-medium text-amber-900 ring-1 ring-amber-200">
+        <span className="font-medium text-warn-strong">2 champs obligatoires vides :</span>
+        <span className="bg-white px-1 py-0.5 font-medium text-warn-strong ring-1 ring-warn">Effectif total</span>
+        <span className="bg-white px-1 py-0.5 font-medium text-warn-strong ring-1 ring-warn-rule">
           Actions prioritaires
         </span>
         <Mark n={2} />
-        <span className="text-amber-700/80">Vous pouvez tout de même exporter.</span>
+        <span className="text-warn-strong/80">Vous pouvez tout de même exporter.</span>
       </div>
       <Table className="relative flex justify-center pt-3">
         <MiniPage className="h-fit w-64" zones={{ kpis: "warn" }} />
@@ -413,17 +414,17 @@ export function ExportFigure() {
               <Label className="font-semibold">Nom du fichier</Label>
               <span className="flex items-center gap-1">
                 <Input value="Bilan mensuel — octobre" className="flex-1" />
-                <span className="text-[9px] text-gray-500">.pdf</span>
+                <span className="text-[9px] text-ink-subtle">.pdf</span>
               </span>
               <Label className="pt-1 font-semibold">Format de page</Label>
               <div className="grid grid-cols-2 gap-1.5">
                 <span className="border border-ink bg-paper p-1.5">
                   <Label className="font-semibold">Adapté au contenu</Label>
-                  <span className="text-[8px] text-gray-500">une page, sans coupure</span>
+                  <span className="text-[8px] text-ink-subtle">une page, sans coupure</span>
                 </span>
-                <span className="border border-gray-200 p-1.5">
+                <span className="border border-rule p-1.5">
                   <Label className="font-semibold">A4 standard</Label>
-                  <span className="text-[8px] text-gray-500">pages découpées</span>
+                  <span className="text-[8px] text-ink-subtle">pages découpées</span>
                 </span>
               </div>
             </div>
@@ -435,17 +436,17 @@ export function ExportFigure() {
           </Row>
         </div>
         <Table className="flex items-start justify-center pt-4">
-          <div className="w-64 space-y-2 border border-gray-300 bg-white p-3 shadow-lg">
+          <div className="w-64 space-y-2 border border-rule-strong bg-white p-3 shadow-lg">
             <span className="flex items-center gap-1.5">
               <Mark n={3} />
               <Label className="text-[11px] font-semibold">Imprimer</Label>
             </span>
             <div className="grid grid-cols-[70px_1fr] items-center gap-y-1.5 text-[10px]">
-              <span className="text-gray-600">Destination</span>
+              <span className="text-ink-muted">Destination</span>
               <span className="border border-doc bg-doc-tint px-1.5 py-0.5 text-ink">Enregistrer au format PDF</span>
-              <span className="text-gray-600">Pages</span>
-              <span className="border border-gray-200 px-1.5 py-0.5 text-gray-500">Toutes</span>
-              <span className="text-gray-600">Marges</span>
+              <span className="text-ink-muted">Pages</span>
+              <span className="border border-rule px-1.5 py-0.5 text-ink-subtle">Toutes</span>
+              <span className="text-ink-muted">Marges</span>
               <span className="border border-doc bg-doc-tint px-1.5 py-0.5 text-ink">Aucune</span>
             </div>
             <span className="flex justify-end gap-1.5 pt-1">
@@ -479,8 +480,8 @@ export function DocumentCardFigure() {
           { name: "Bilan — octobre", status: <Status shape="hollow">Brouillon</Status>, filled: 5 },
           { name: "Bilan — août", status: <Status shape="diamond">Modifié depuis l'export</Status>, filled: 7 },
         ].map((d, i) => (
-          <div key={d.name} className="flex flex-col border border-gray-200 border-t-[3px] border-t-doc bg-white">
-            <div className="flex h-16 justify-center overflow-hidden bg-slate-100 px-5 pt-2">
+          <div key={d.name} className="flex flex-col border border-rule border-t-[3px] border-t-doc bg-white">
+            <div className="flex h-16 justify-center overflow-hidden bg-wash px-5 pt-2">
               <MiniPage className="w-full" />
             </div>
             <div className="space-y-1.5 p-2">
@@ -490,7 +491,7 @@ export function DocumentCardFigure() {
                 {i === 0 && <Mark n={1} />}
               </span>
               <SegmentedProgress filled={d.filled} total={7} height={3} />
-              <span className="flex items-center justify-end gap-2 text-[9px] text-gray-600">
+              <span className="flex items-center justify-end gap-2 text-[9px] text-ink-muted">
                 {i === 0 && <Mark n={2} />}
                 <span>Dupliquer</span>
                 <span>PDF</span>
@@ -528,7 +529,7 @@ export function TemplateStartFigure() {
           { name: "Chantiers techniques", status: <Status shape="dashed">Brouillon</Status> },
           { name: "Release Notes", status: <Status shape="diamond">Modifs non publiées</Status> },
         ].map((t, i) => (
-          <div key={t.name} className="border border-gray-200 bg-white">
+          <div key={t.name} className="border border-rule bg-white">
             <BlueprintFrame className="flex h-20 justify-center overflow-hidden px-4 pt-2">
               <MiniPage className="w-full" />
             </BlueprintFrame>
@@ -546,12 +547,12 @@ export function TemplateStartFigure() {
         ))}
         <div className="flex flex-col gap-1.5">
           <MonoLabel>Ou partir d'autre chose</MonoLabel>
-          <span className="space-y-0.5 border border-gray-200 bg-white p-2">
+          <span className="space-y-0.5 border border-rule bg-white p-2">
             <span className="flex items-center gap-1">
               <Mark n={3} />
               <Label className="font-semibold">Page blanche</Label>
             </span>
-            <span className="block text-[8px] text-gray-500">Choisir un thème puis assembler</span>
+            <span className="block text-[8px] text-ink-subtle">Choisir un thème puis assembler</span>
           </span>
         </div>
       </div>
@@ -578,28 +579,22 @@ export function ThemeFigure() {
           <Row n={1}>
             <MonoLabel>Thèmes prédéfinis</MonoLabel>
             <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-              {[
-                { name: "KOMITY Blue", colors: ["bg-blue-700", "bg-blue-400", "bg-emerald-500", "bg-amber-400"] },
-                {
-                  name: "Minimal Light",
-                  colors: ["bg-ink", "bg-gray-400", "bg-blue-500", "bg-gray-200"],
-                  active: true,
-                },
-                { name: "Minimal Dark", colors: ["bg-slate-900", "bg-slate-600", "bg-blue-400", "bg-slate-300"] },
-                { name: "Corporate Gray", colors: ["bg-gray-700", "bg-blue-600", "bg-gray-400", "bg-gray-200"] },
-              ].map(({ name, colors, active }) => (
-                <span
-                  key={name}
-                  className={`space-y-1 border p-1.5 ${active ? "border-ink bg-paper" : "border-gray-200"}`}
-                >
-                  <span className="flex gap-0.5">
-                    {colors.map((c) => (
-                      <span key={c} className={`h-2.5 w-2.5 ${c}`} />
-                    ))}
+              {BUILTIN_THEMES.slice(0, 4).map(({ name, colors }) => {
+                const active = name === "Minimal Light";
+                return (
+                  <span
+                    key={name}
+                    className={`space-y-1 border p-1.5 ${active ? "border-ink bg-paper" : "border-rule"}`}
+                  >
+                    <span className="flex gap-0.5">
+                      {[colors.primary, colors.accent, colors.success, colors.warning].map((color, i) => (
+                        <span key={i} className="h-2.5 w-2.5" style={{ backgroundColor: color }} />
+                      ))}
+                    </span>
+                    <Label className={active ? "font-semibold" : ""}>{name}</Label>
                   </span>
-                  <Label className={active ? "font-semibold" : ""}>{name}</Label>
-                </span>
-              ))}
+                );
+              })}
             </div>
           </Row>
           <Row n={2}>
@@ -608,10 +603,10 @@ export function ThemeFigure() {
               <span className="h-4 w-4 bg-ink" />
               <Input value="#1a1a1a" className="w-20" />
             </span>
-            <span className="mt-1.5 flex items-center gap-1 text-[10px] text-gray-600">
+            <span className="mt-1.5 flex items-center gap-1 text-[10px] text-ink-muted">
               <ChevronDown size={10} className="-rotate-90" /> Indicateurs et blocs colorés
             </span>
-            <span className="flex items-center gap-1 text-[10px] text-gray-600">
+            <span className="flex items-center gap-1 text-[10px] text-ink-muted">
               <ChevronDown size={10} className="-rotate-90" /> Textes
             </span>
           </Row>
@@ -660,7 +655,7 @@ export function BuildFigure() {
             <Mark n={1} />
             <MonoLabel>Bibliothèque</MonoLabel>
           </span>
-          <span className="flex items-center gap-1 border border-gray-300 px-1.5 py-0.5 text-[9px] text-gray-400">
+          <span className="flex items-center gap-1 border border-rule-strong px-1.5 py-0.5 text-[9px] text-ink-faint">
             <Search size={9} /> Rechercher…
           </span>
           <span className="flex items-center gap-1 font-mono text-[9px] font-semibold text-preset">
@@ -672,7 +667,7 @@ export function BuildFigure() {
               className={`block rounded-[6px] px-2 py-1 ${i === 0 ? "bg-preset-tint ring-1 ring-preset/40" : ""}`}
             >
               <Label className="font-semibold">{p}</Label>
-              <span className="text-[8px] text-gray-400">Carte KPI</span>
+              <span className="text-[8px] text-ink-faint">Carte KPI</span>
             </span>
           ))}
           <MonoLabel className="pt-1">Mise en page</MonoLabel>
@@ -697,7 +692,7 @@ export function BuildFigure() {
           <Input value="Sorties & mobilité" />
           <Label>Couleur d'accent</Label>
           <span className="flex items-center gap-1">
-            <span className="h-3 w-3 bg-amber-600" />
+            <span className="h-3 w-3 bg-warn" />
             <Input value="#D97706" className="flex-1" />
           </span>
         </div>
@@ -709,14 +704,14 @@ export function BuildFigure() {
 export function FieldsFigure() {
   const field = (label: string, required = false, n?: number) => (
     <span className="flex items-center gap-1.5 py-0.5">
-      <GripVertical size={9} className="text-gray-400" />
+      <GripVertical size={9} className="text-ink-faint" />
       <Input value={label} className="flex-1" />
       <span
-        className={`px-1 py-0.5 text-[8px] ${required ? "bg-amber-100 text-amber-800 ring-1 ring-amber-300" : "text-gray-400 ring-1 ring-gray-200"}`}
+        className={`px-1 py-0.5 text-[8px] ${required ? "bg-warn-tint text-warn-strong ring-1 ring-warn-rule" : "text-ink-faint ring-1 ring-rule"}`}
       >
         Obligatoire
       </span>
-      <X size={9} className="text-gray-400" />
+      <X size={9} className="text-ink-faint" />
       {n !== undefined && <Mark n={n} />}
     </span>
   );
@@ -748,8 +743,8 @@ export function FieldsFigure() {
               <span className="border-b-2 border-tpl pb-0.5 font-semibold">
                 Champs <span className="font-mono text-[9px]">12</span>
               </span>
-              <span className="text-gray-500">Formulaire du Studio</span>
-              <span className="text-gray-500">Nom et description</span>
+              <span className="text-ink-subtle">Formulaire du Studio</span>
+              <span className="text-ink-subtle">Nom et description</span>
             </div>
           </Row>
           <Row>
@@ -760,14 +755,14 @@ export function FieldsFigure() {
             {field("KPI — Recrutements")}
           </Row>
           <Row n={3}>
-            <span className="flex items-center justify-between border-t border-rule pt-1.5 text-[10px] font-semibold text-gray-600">
+            <span className="flex items-center justify-between border-t border-rule pt-1.5 text-[10px] font-semibold text-ink-muted">
               <span className="flex items-center gap-1">
                 <ChevronDown size={10} /> Contenus non retenus
               </span>
-              <span className="font-normal text-gray-400">6</span>
+              <span className="font-normal text-ink-faint">6</span>
             </span>
-            <span className="mt-1 flex items-center gap-1.5 text-[10px] text-gray-700">
-              <span className="flex h-3.5 w-3.5 items-center justify-center border border-gray-300">
+            <span className="mt-1 flex items-center gap-1.5 text-[10px] text-ink-soft">
+              <span className="flex h-3.5 w-3.5 items-center justify-center border border-rule-strong">
                 <Plus size={8} />
               </span>
               Titre de section « Mouvements du mois »
@@ -790,11 +785,11 @@ export function FieldsFigure() {
 export function VersionsFigure() {
   const doc = (name: string, version: string, faded = false) => (
     <span
-      className={`flex items-center gap-1.5 border border-gray-200 border-l-[3px] border-l-doc bg-white px-2 py-1 ${faded ? "opacity-70" : ""}`}
+      className={`flex items-center gap-1.5 border border-rule border-l-[3px] border-l-doc bg-white px-2 py-1 ${faded ? "opacity-70" : ""}`}
     >
       <ObjectMark kind="doc" size={7} />
       <span className="text-[10px] font-semibold">{name}</span>
-      <span className="ml-auto font-mono text-[9px] text-gray-500">{version}</span>
+      <span className="ml-auto font-mono text-[9px] text-ink-subtle">{version}</span>
     </span>
   );
   const tpl = (version: string, status: ReactNode) => (
@@ -837,7 +832,7 @@ export function VersionsFigure() {
           {title(2, "Modification")}
           {tpl("v1 + modifs", <Status shape="diamond">Non publiées</Status>)}
           {doc("Bilan — octobre", "v1")}
-          <span className="block text-[9px] text-gray-600">Le Studio utilise encore la v1.</span>
+          <span className="block text-[9px] text-ink-muted">Le Studio utilise encore la v1.</span>
         </div>
         <div className="space-y-2">
           {title(3, "Republication")}
@@ -874,7 +869,7 @@ export function PresetFigure() {
           {["Carte KPI", "Encadré d'introduction", "Bloc de détails"].map((c, i) => (
             <span
               key={c}
-              className={`flex items-center gap-1 px-1.5 py-1 text-[10px] ${i === 0 ? "bg-preset-tint font-semibold ring-1 ring-preset/40" : "text-gray-700"}`}
+              className={`flex items-center gap-1 px-1.5 py-1 text-[10px] ${i === 0 ? "bg-preset-tint font-semibold ring-1 ring-preset/40" : "text-ink-soft"}`}
             >
               {i === 0 && <Check size={9} className="text-preset" />}
               {c}
@@ -888,13 +883,13 @@ export function PresetFigure() {
           <Input value="Effectif total" />
           <Label>Couleur</Label>
           <span className="flex gap-1">
-            <span className="h-3 w-3 bg-emerald-500 ring-1 ring-ink ring-offset-1" />
-            <span className="h-3 w-3 bg-blue-500" />
-            <span className="h-3 w-3 bg-amber-500" />
+            <span className="h-3 w-3 bg-preset ring-1 ring-ink ring-offset-1" />
+            <span className="h-3 w-3 bg-tpl" />
+            <span className="h-3 w-3 bg-warn" />
           </span>
         </div>
         <Table className="flex items-center justify-center">
-          <span className="w-32 space-y-1 border-t-[3px] border-emerald-500 bg-emerald-50 p-2 shadow-sm">
+          <span className="w-32 space-y-1 border-t-[3px] border-preset bg-preset-tint p-2 shadow-sm">
             <span className="block text-[10px] font-semibold">Effectif total</span>
             <span className="block text-[14px] font-bold">128</span>
             <Line w="70%" h={3} />

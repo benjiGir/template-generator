@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { BorderValue } from "@template-generator/shared/types/component";
+import { Field, Input } from "@/components/ui/Field";
 
 interface Props {
   label: string;
@@ -30,7 +31,7 @@ export function BorderPropField({ label, value, onChange }: Props) {
 
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 mb-2">{label}</label>
+      <label className="block text-xs font-medium text-ink-muted mb-2">{label}</label>
 
       <div className="space-y-2">
         {/* Style */}
@@ -42,8 +43,8 @@ export function BorderPropField({ label, value, onChange }: Props) {
               onClick={() => update("style", s.value)}
               className={`flex-1 py-1 text-[10px] rounded border transition-colors ${
                 val.style === s.value
-                  ? "bg-blue-50 border-blue-400 text-blue-700 font-medium"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
+                  ? "bg-tpl-tint border-tpl text-tpl-strong font-medium"
+                  : "border-rule text-ink-subtle hover:border-rule-strong"
               }`}
             >
               {s.label}
@@ -55,26 +56,24 @@ export function BorderPropField({ label, value, onChange }: Props) {
           <>
             {/* Width + Color */}
             <div className="flex gap-2">
-              <label className="block flex-1">
-                <span className="text-[10px] text-gray-400 block mb-0.5">Épaisseur (px)</span>
-                <input
+              <Field label="Épaisseur (px)" className="flex-1">
+                <Input
                   type="number"
                   min={1}
                   max={20}
                   value={val.width}
                   onChange={(e) => update("width", Number(e.target.value))}
-                  className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
                 />
-              </label>
+              </Field>
               <div>
-                <span className="text-[10px] text-gray-400 block mb-0.5">Couleur</span>
+                <span className="text-[10px] text-ink-faint block mb-0.5">Couleur</span>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="color"
                     aria-label="Couleur de la bordure"
                     value={val.color}
                     onChange={(e) => update("color", e.target.value)}
-                    className="w-8 h-7 cursor-pointer rounded border border-gray-200 p-0.5"
+                    className="w-8 h-7 cursor-pointer rounded border border-rule p-0.5"
                   />
                   <input
                     type="text"
@@ -84,7 +83,7 @@ export function BorderPropField({ label, value, onChange }: Props) {
                       const v = e.target.value;
                       if (/^#[0-9A-Fa-f]{0,6}$/.test(v)) update("color", v);
                     }}
-                    className="w-20 px-1.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400 font-mono"
+                    className="w-20 px-1.5 py-1 text-xs border border-rule rounded focus:outline-none focus:border-focus font-mono"
                   />
                 </div>
               </div>
@@ -93,16 +92,9 @@ export function BorderPropField({ label, value, onChange }: Props) {
         )}
 
         {/* Radius */}
-        <label className="block">
-          <span className="text-[10px] text-gray-400 block mb-0.5">Rayon (px)</span>
-          <input
-            type="number"
-            min={0}
-            value={val.radius}
-            onChange={(e) => update("radius", Number(e.target.value))}
-            className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
-          />
-        </label>
+        <Field label="Rayon (px)">
+          <Input type="number" min={0} value={val.radius} onChange={(e) => update("radius", Number(e.target.value))} />
+        </Field>
 
         {/* Preview */}
         <div style={previewStyle} />
