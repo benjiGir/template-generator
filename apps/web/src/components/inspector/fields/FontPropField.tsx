@@ -1,14 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const SYSTEM_FONTS = [
-  "Arial",
-  "Georgia",
-  "Times New Roman",
-  "Courier New",
-  "Verdana",
-  "Trebuchet MS",
-  "Impact",
-];
+const SYSTEM_FONTS = ["Arial", "Georgia", "Times New Roman", "Courier New", "Verdana", "Trebuchet MS", "Impact"];
 
 const GOOGLE_FONTS = [
   "DM Sans",
@@ -64,9 +56,7 @@ export function FontPropField({ label, value, onChange }: Props) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const filtered = query
-    ? ALL_FONTS.filter((f) => f.toLowerCase().includes(query.toLowerCase()))
-    : ALL_FONTS;
+  const filtered = query ? ALL_FONTS.filter((f) => f.toLowerCase().includes(query.toLowerCase())) : ALL_FONTS;
 
   const select = (font: string) => {
     injectGoogleFont(font);
@@ -84,9 +74,7 @@ export function FontPropField({ label, value, onChange }: Props) {
         className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs border border-gray-200 rounded hover:border-gray-300 bg-white"
         style={{ fontFamily: current || undefined }}
       >
-        <span className={current ? "text-gray-900" : "text-gray-400"}>
-          {current || "Sélectionner une police…"}
-        </span>
+        <span className={current ? "text-gray-900" : "text-gray-400"}>{current || "Sélectionner une police…"}</span>
         <span className="text-gray-400 ml-1">▾</span>
       </button>
 
@@ -117,15 +105,11 @@ export function FontPropField({ label, value, onChange }: Props) {
                   style={{ fontFamily: font }}
                 >
                   {font}
-                  {GOOGLE_FONT_SET.has(font) && (
-                    <span className="ml-1 text-[10px] text-gray-400">G</span>
-                  )}
+                  {GOOGLE_FONT_SET.has(font) && <span className="ml-1 text-[10px] text-gray-400">G</span>}
                 </button>
               </li>
             ))}
-            {filtered.length === 0 && (
-              <li className="px-2.5 py-2 text-xs text-gray-400 text-center">Aucun résultat</li>
-            )}
+            {filtered.length === 0 && <li className="px-2.5 py-2 text-xs text-gray-400 text-center">Aucun résultat</li>}
           </ul>
         </div>
       )}

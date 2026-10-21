@@ -2,7 +2,7 @@ import { List, MousePointerClick } from "lucide-react";
 import { useDocumentStore } from "@/store/document-store";
 
 const MODES = [
-  { key: "form",   icon: List,              label: "Formulaire",  hint: "remplir champ par champ" },
+  { key: "form", icon: List, label: "Formulaire", hint: "remplir champ par champ" },
   { key: "inline", icon: MousePointerClick, label: "Sur la page", hint: "relire et corriger en contexte" },
 ] as const;
 

@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { Template, ComponentNode, TemplatePage, Theme, PageFormat, EditableField } from "@template-generator/shared/types/template";
+import type {
+  Template,
+  ComponentNode,
+  TemplatePage,
+  Theme,
+  PageFormat,
+  EditableField,
+} from "@template-generator/shared/types/template";
 import { DEFAULT_THEME, DEFAULT_PAGE_FORMAT } from "@template-generator/shared/types/template";
 import {
   findNode,
@@ -37,7 +44,13 @@ interface EditorState {
 
   addNode: (pageIndex: number, parentId: string | null, index: number, node: ComponentNode) => void;
   removeNode: (pageIndex: number, nodeId: string) => void;
-  moveNode: (fromPageIndex: number, toPageIndex: number, nodeId: string, newParentId: string | null, newIndex: number) => void;
+  moveNode: (
+    fromPageIndex: number,
+    toPageIndex: number,
+    nodeId: string,
+    newParentId: string | null,
+    newIndex: number,
+  ) => void;
   updateNodeProps: (nodeId: string, props: Record<string, unknown>) => void;
   duplicateNode: (pageIndex: number, nodeId: string) => void;
 
@@ -88,10 +101,10 @@ export const useEditorStore = create<EditorState>()(
         normalized.theme = {
           ...DEFAULT_THEME,
           ...normalized.theme,
-          colors:     { ...DEFAULT_THEME.colors,     ...normalized.theme.colors },
+          colors: { ...DEFAULT_THEME.colors, ...normalized.theme.colors },
           typography: { ...DEFAULT_THEME.typography, ...normalized.theme.typography },
-          spacing:    { ...DEFAULT_THEME.spacing,    ...normalized.theme.spacing },
-          borders:    { ...DEFAULT_THEME.borders,    ...normalized.theme.borders },
+          spacing: { ...DEFAULT_THEME.spacing, ...normalized.theme.spacing },
+          borders: { ...DEFAULT_THEME.borders, ...normalized.theme.borders },
         };
         s.template = normalized;
         s.selectedNodeId = null;
@@ -132,10 +145,10 @@ export const useEditorStore = create<EditorState>()(
         s.template.theme = {
           ...s.template.theme,
           ...theme,
-          colors:     { ...s.template.theme.colors,     ...(theme.colors     ?? {}) },
+          colors: { ...s.template.theme.colors, ...(theme.colors ?? {}) },
           typography: { ...s.template.theme.typography, ...(theme.typography ?? {}) },
-          spacing:    { ...s.template.theme.spacing,    ...(theme.spacing    ?? {}) },
-          borders:    { ...s.template.theme.borders,    ...(theme.borders    ?? {}) },
+          spacing: { ...s.template.theme.spacing, ...(theme.spacing ?? {}) },
+          borders: { ...s.template.theme.borders, ...(theme.borders ?? {}) },
         };
         s.revision++;
       }),
@@ -228,7 +241,12 @@ export const useEditorStore = create<EditorState>()(
         if (!node) return;
         fromPage.children = treeRemoveNode(fromPage.children as ComponentNode[], nodeId) as typeof fromPage.children;
         const toPage = s.template.pages[toPageIndex] ?? fromPage;
-        toPage.children = insertNode(toPage.children as ComponentNode[], newParentId, newIndex, node) as typeof toPage.children;
+        toPage.children = insertNode(
+          toPage.children as ComponentNode[],
+          newParentId,
+          newIndex,
+          node,
+        ) as typeof toPage.children;
         s.revision++;
       }),
 
@@ -308,7 +326,7 @@ export const useEditorStore = create<EditorState>()(
           s.revision++;
         }
       }),
-  }))
+  })),
 );
 
 /** Contenu d'un template vierge (identifiant de page neuf à chaque appel) */

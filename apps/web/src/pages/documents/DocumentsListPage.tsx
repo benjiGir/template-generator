@@ -13,9 +13,9 @@ import type { DocumentDisplayStatus } from "@template-generator/shared/types/doc
 type StatusFilter = "all" | DocumentDisplayStatus;
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: "all",                   label: "Tous" },
-  { value: "draft",                 label: "Brouillons" },
-  { value: "finalized",             label: "Finalisés" },
+  { value: "all", label: "Tous" },
+  { value: "draft", label: "Brouillons" },
+  { value: "finalized", label: "Finalisés" },
   { value: "modified-after-export", label: "Modifiés depuis l'export" },
 ];
 
@@ -27,7 +27,11 @@ export function DocumentsListPage() {
   const [status, setStatus] = useState<StatusFilter>("all");
   const [template, setTemplate] = useState<string>("all");
 
-  const { data: documents = [], isLoading, error } = useQuery({
+  const {
+    data: documents = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: queryKeys.documents.list(),
     queryFn: () => api.documents.list(),
   });
@@ -48,17 +52,16 @@ export function DocumentsListPage() {
   const handleDelete = async (doc: DocumentSummary) => {
     const ok = await confirm({
       title: `Supprimer « ${doc.name} » ?`,
-      consequences: [
-        "Le contenu saisi sera définitivement perdu.",
-        "Les PDF déjà exportés ne sont pas concernés.",
-      ],
+      consequences: ["Le contenu saisi sera définitivement perdu.", "Les PDF déjà exportés ne sont pas concernés."],
       confirmLabel: "Supprimer le document",
       tone: "danger",
     });
     if (ok) deleteMutation.mutate(doc.id);
   };
 
-  const templateNames = Array.from(new Set(documents.map((d) => d.templateName).filter((n): n is string => !!n))).sort();
+  const templateNames = Array.from(
+    new Set(documents.map((d) => d.templateName).filter((n): n is string => !!n)),
+  ).sort();
   const counts = new Map<StatusFilter, number>([["all", documents.length]]);
   for (const d of documents) {
     const s = documentDisplayStatus(d);
@@ -70,7 +73,7 @@ export function DocumentsListPage() {
     (d) =>
       (status === "all" || documentDisplayStatus(d) === status) &&
       (template === "all" || d.templateName === template) &&
-      (!query || `${d.name} ${d.templateName ?? ""}`.toLowerCase().includes(query))
+      (!query || `${d.name} ${d.templateName ?? ""}`.toLowerCase().includes(query)),
   );
   const filtersActive = status !== "all" || template !== "all" || query !== "";
 
@@ -81,7 +84,11 @@ export function DocumentsListPage() {
         tag="Documents"
         title="Studio"
         subtitle="Remplissez un template et exportez votre document en PDF."
-        action={<CreateButton kind="doc" onClick={() => navigate("/documents/new")}>Nouveau document</CreateButton>}
+        action={
+          <CreateButton kind="doc" onClick={() => navigate("/documents/new")}>
+            Nouveau document
+          </CreateButton>
+        }
       />
 
       {documents.length > 0 && (
@@ -93,10 +100,13 @@ export function DocumentsListPage() {
                 onClick={() => setStatus(f.value)}
                 aria-pressed={status === f.value}
                 className={`border-b-2 py-1 text-[13px] transition-colors ${
-                  status === f.value ? "border-ink font-semibold text-ink" : "border-transparent text-gray-700 hover:text-ink"
+                  status === f.value
+                    ? "border-ink font-semibold text-ink"
+                    : "border-transparent text-gray-700 hover:text-ink"
                 }`}
               >
-                {f.label} <span className="font-mono text-[11px] font-normal text-gray-700">{counts.get(f.value) ?? 0}</span>
+                {f.label}{" "}
+                <span className="font-mono text-[11px] font-normal text-gray-700">{counts.get(f.value) ?? 0}</span>
               </button>
             ))}
           </div>
@@ -108,7 +118,11 @@ export function DocumentsListPage() {
               className="rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 focus:border-ink focus:outline-none"
             >
               <option value="all">Tous les templates</option>
-              {templateNames.map((n) => <option key={n} value={n}>{n}</option>)}
+              {templateNames.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
             </select>
           )}
           <label className="ml-auto flex w-64 items-center gap-2 rounded-md border border-gray-200 px-2.5 py-1.5 focus-within:border-ink">
@@ -130,7 +144,9 @@ export function DocumentsListPage() {
         {!isLoading && !error && documents.length === 0 && (
           <div className="py-20 text-center">
             <p className="text-sm font-medium text-gray-700">Aucun document pour l'instant</p>
-            <p className="mb-4 mt-1 text-sm text-gray-500">Choisissez un template, remplissez-le, puis exportez-le en PDF.</p>
+            <p className="mb-4 mt-1 text-sm text-gray-500">
+              Choisissez un template, remplissez-le, puis exportez-le en PDF.
+            </p>
             <button
               onClick={() => navigate("/documents/new")}
               className="rounded bg-doc px-5 py-2.5 text-sm font-medium text-white transition-colors hover:brightness-95"
@@ -144,7 +160,11 @@ export function DocumentsListPage() {
           <p className="py-16 text-center text-sm text-gray-500">
             Aucun document ne correspond à ces filtres.{" "}
             <button
-              onClick={() => { setSearch(""); setStatus("all"); setTemplate("all"); }}
+              onClick={() => {
+                setSearch("");
+                setStatus("all");
+                setTemplate("all");
+              }}
               className="text-doc-strong hover:underline"
             >
               Réinitialiser les filtres
@@ -154,7 +174,12 @@ export function DocumentsListPage() {
 
         <div className="grid max-w-6xl grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
           {filtered.map((doc) => (
-            <DocumentCard key={doc.id} doc={doc} onDuplicate={(d) => duplicateMutation.mutate(d.id)} onDelete={handleDelete} />
+            <DocumentCard
+              key={doc.id}
+              doc={doc}
+              onDuplicate={(d) => duplicateMutation.mutate(d.id)}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </div>

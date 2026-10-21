@@ -27,7 +27,10 @@ export function TemplateTitle() {
         onBlur={commit}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.currentTarget.blur();
-          if (e.key === "Escape") { setDraft(name); setEditing(false); }
+          if (e.key === "Escape") {
+            setDraft(name);
+            setEditing(false);
+          }
         }}
         aria-label="Nom du template"
         className="w-full rounded border border-blue-400 px-1.5 py-0.5 text-sm font-semibold text-gray-900 focus:outline-none"
@@ -37,7 +40,10 @@ export function TemplateTitle() {
 
   return (
     <button
-      onClick={() => { setDraft(name); setEditing(true); }}
+      onClick={() => {
+        setDraft(name);
+        setEditing(true);
+      }}
       title="Renommer le template"
       className="group flex max-w-full items-center gap-1.5 rounded text-left hover:text-blue-700"
     >

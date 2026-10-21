@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { KIND_STYLES, ObjectMark } from "@/components/ui/ObjectIdentity";
@@ -206,8 +215,12 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
 
         {!profile ? (
           <>
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">Première visite</p>
-            <h2 id="tour-title" className="mt-1 text-lg font-semibold text-gray-900">Bienvenue dans DocForge</h2>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">
+              Première visite
+            </p>
+            <h2 id="tour-title" className="mt-1 text-lg font-semibold text-gray-900">
+              Bienvenue dans DocForge
+            </h2>
             <p className="mt-2 text-sm text-gray-600">
               DocForge sépare la forme du fond : un <strong>template</strong> fixe la mise en page une fois pour toutes,
               et chaque <strong>document</strong> n'en remplit que le contenu, jusqu'à l'export PDF.
@@ -218,7 +231,10 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
                 <button
                   key={p.key}
                   ref={i === 0 ? primaryRef : undefined}
-                  onClick={() => { setProfile(p.key); setIndex(0); }}
+                  onClick={() => {
+                    setProfile(p.key);
+                    setIndex(0);
+                  }}
                   className="flex flex-col items-start gap-1.5 border border-rule p-3 text-left transition-colors hover:border-ink hover:bg-paper focus:outline-none focus:ring-2 focus:ring-ink"
                 >
                   <ObjectMark kind={p.key === "contributor" ? "doc" : "tpl"} size={14} />
@@ -236,12 +252,17 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-700">
               Étape {index + 1} sur {steps.length}
             </p>
-            <h2 id="tour-title" className="mt-1 pr-6 text-base font-semibold text-gray-900">{step.title}</h2>
+            <h2 id="tour-title" className="mt-1 pr-6 text-base font-semibold text-gray-900">
+              {step.title}
+            </h2>
             <p className="mt-1.5 text-sm text-gray-600">{step.body}</p>
 
             <div className="mt-4 flex items-center gap-1" aria-hidden>
               {steps.map((_, i) => (
-                <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-ink" : "w-1.5 bg-rule"}`} />
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-ink" : "w-1.5 bg-rule"}`}
+                />
               ))}
             </div>
 
@@ -263,7 +284,10 @@ function Tour({ onSkip, onFinish }: { onSkip: () => void; onFinish: (to?: string
                     <ArrowLeft size={13} />
                     Précédent
                   </button>
-                  <button onClick={() => onFinish()} className="rounded-md px-2 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100">
+                  <button
+                    onClick={() => onFinish()}
+                    className="rounded-md px-2 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
+                  >
                     Terminer sans rien créer
                   </button>
                 </div>

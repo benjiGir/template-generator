@@ -32,30 +32,30 @@ const router = createBrowserRouter([
       { path: "/", element: <DashboardPage /> },
 
       // Studio de Publication
-      { path: "/documents",     element: <DocumentsListPage /> },
+      { path: "/documents", element: <DocumentsListPage /> },
       { path: "/documents/new", element: <DocumentSelectPage /> },
       {
         path: "/documents/:id",
         element: <DocumentWorkflowRoute />,
         children: [
-          { index: true,       element: <DocumentEntryRedirect /> },
-          { path: "fill",      element: <DocumentFillPage /> },
-          { path: "preview",   element: <DocumentPreviewPage /> },
-          { path: "export",    element: <DocumentExportPage /> },
+          { index: true, element: <DocumentEntryRedirect /> },
+          { path: "fill", element: <DocumentFillPage /> },
+          { path: "preview", element: <DocumentPreviewPage /> },
+          { path: "export", element: <DocumentExportPage /> },
         ],
       },
 
       // Atelier Templates
-      { path: "/templates",          element: <TemplatesListPage /> },
-      { path: "/templates/new",      element: <TemplateStartPage /> },
+      { path: "/templates", element: <TemplatesListPage /> },
+      { path: "/templates/new", element: <TemplateStartPage /> },
       { path: "/templates/:id/edit", element: <LegacyTemplateEdit /> },
       {
         path: "/templates/:id",
         element: <TemplateWorkflowRoute />,
         children: [
-          { index: true,     element: <Navigate to="build" replace /> },
-          { path: "theme",   element: <TemplateThemePage /> },
-          { path: "build",   element: <TemplateBuildPage /> },
+          { index: true, element: <Navigate to="build" replace /> },
+          { path: "theme", element: <TemplateThemePage /> },
+          { path: "build", element: <TemplateBuildPage /> },
           { path: "publish", element: <TemplatePublishPage /> },
         ],
       },
@@ -66,13 +66,13 @@ const router = createBrowserRouter([
         path: "/components/:presetId",
         element: <PresetWorkflowRoute />,
         children: [
-          { index: true,       element: <PresetEntry /> },
+          { index: true, element: <PresetEntry /> },
           { path: "configure", element: <ComponentEditPage /> },
-          { path: "save",      element: <ComponentSavePage /> },
+          { path: "save", element: <ComponentSavePage /> },
         ],
       },
 
-      { path: "/aide",       element: <HelpPage /> },
+      { path: "/aide", element: <HelpPage /> },
       { path: "/aide/:slug", element: <HelpPage /> },
 
       { path: "*", element: <Navigate to="/" replace /> },

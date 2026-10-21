@@ -11,7 +11,9 @@ export function PageSettings() {
   const page = template?.pages[selectedPageIndex];
 
   const [label, setLabel] = useState(page?.label ?? "");
-  useEffect(() => { setLabel(page?.label ?? ""); }, [page?.label]);
+  useEffect(() => {
+    setLabel(page?.label ?? "");
+  }, [page?.label]);
 
   if (!template || !page) return null;
 

@@ -51,11 +51,7 @@ export function EditorLayout() {
 
       if (e.key === "Delete") {
         const target = e.target as HTMLElement;
-        if (
-          target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable
-        ) {
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
           return;
         }
         if (!selectedNodeId || !template) return;

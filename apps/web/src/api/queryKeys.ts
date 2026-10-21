@@ -1,7 +1,6 @@
 export const queryKeys = {
   templates: {
-    list: (filters?: { published?: boolean }) =>
-      ["templates", "list", filters ?? {}] as const,
+    list: (filters?: { published?: boolean }) => ["templates", "list", filters ?? {}] as const,
     detail: (id: string) => ["templates", "detail", id] as const,
   },
   documents: {

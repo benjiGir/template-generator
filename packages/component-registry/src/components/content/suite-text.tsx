@@ -30,9 +30,7 @@ register({
   icon: "ArrowRight",
   category: "content",
   description: "Texte de suite ou de prochaine étape",
-  schema: [
-    { key: "text", label: "Texte", type: "textarea", defaultValue: "Pour la suite..." },
-  ],
+  schema: [{ key: "text", label: "Texte", type: "textarea", defaultValue: "Pour la suite..." }],
   acceptsChildren: false,
   defaultProps: { text: "Pour la suite..." },
   render: SuiteText as RegisteredComponent["render"],

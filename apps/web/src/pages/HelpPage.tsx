@@ -35,7 +35,10 @@ export function HelpPage() {
   return (
     <div className="flex h-full">
       <aside className="w-64 shrink-0 overflow-y-auto border-r border-rule px-4 py-8" aria-label="Sommaire de l'aide">
-        <Link to="/aide" className="px-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600 hover:text-ink">
+        <Link
+          to="/aide"
+          className="px-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600 hover:text-ink"
+        >
           Aide
         </Link>
         <ul className="mt-3 space-y-4">
@@ -47,7 +50,11 @@ export function HelpPage() {
                   `flex items-center gap-2 border-l-[3px] px-2 py-1 text-sm ${isActive ? "border-ink bg-white font-semibold" : "border-transparent font-medium hover:bg-white/60"}`
                 }
               >
-                {a.kind ? <ObjectMark kind={a.kind} size={9} /> : <span className="h-[9px] w-[9px] border border-ink" aria-hidden />}
+                {a.kind ? (
+                  <ObjectMark kind={a.kind} size={9} />
+                ) : (
+                  <span className="h-[9px] w-[9px] border border-ink" aria-hidden />
+                )}
                 {a.title}
               </NavLink>
               {a.slug === slug && (
@@ -73,7 +80,13 @@ export function HelpPage() {
         {article ? (
           <article className="mx-auto max-w-[760px] px-10 pb-24 pt-8">
             <header className="border-b-2 border-ink pb-5">
-              {article.kind ? <ObjectTag kind={article.kind}>{article.space}</ObjectTag> : <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">Aide</span>}
+              {article.kind ? (
+                <ObjectTag kind={article.kind}>{article.space}</ObjectTag>
+              ) : (
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+                  Aide
+                </span>
+              )}
               <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight">{article.title}</h1>
               <p className="text-sm text-gray-700">{article.summary}</p>
             </header>
@@ -96,20 +109,32 @@ function HelpIndex() {
   return (
     <div className="mx-auto max-w-[900px] px-10 pb-24 pt-8">
       <header className="border-b-2 border-ink pb-5">
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">Documentation</span>
+        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+          Documentation
+        </span>
         <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight">Aide</h1>
         <p className="text-sm text-gray-700">
-          Chaque étape expliquée, avec des extraits d'écrans annotés. Dans un parcours, le bouton <strong>Aide</strong> ouvre
-          directement la section de l'étape en cours.
+          Chaque étape expliquée, avec des extraits d'écrans annotés. Dans un parcours, le bouton <strong>Aide</strong>{" "}
+          ouvre directement la section de l'étape en cours.
         </p>
       </header>
 
       <div className="mt-8 grid grid-cols-2 gap-4">
         {HELP_ARTICLES.map((a) => (
-          <Link key={a.slug} to={helpPath(a.slug)} className="group flex flex-col border border-rule bg-white p-5 transition-colors hover:border-ink">
+          <Link
+            key={a.slug}
+            to={helpPath(a.slug)}
+            className="group flex flex-col border border-rule bg-white p-5 transition-colors hover:border-ink"
+          >
             <span className="flex items-center gap-2">
-              {a.kind ? <ObjectMark kind={a.kind} size={10} /> : <span className="h-2.5 w-2.5 border border-ink" aria-hidden />}
-              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-gray-600">{a.space ?? "Pour commencer"}</span>
+              {a.kind ? (
+                <ObjectMark kind={a.kind} size={10} />
+              ) : (
+                <span className="h-2.5 w-2.5 border border-ink" aria-hidden />
+              )}
+              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-gray-600">
+                {a.space ?? "Pour commencer"}
+              </span>
             </span>
             <span className="mt-2 text-lg font-bold tracking-tight">{a.title}</span>
             <span className="mt-1 text-sm text-gray-700">{a.summary}</span>
@@ -127,7 +152,9 @@ function HelpIndex() {
           {QUESTIONS.map(({ q, to }) => (
             <li key={q} className="flex items-center justify-between gap-4 py-3 text-[15px]">
               <span>{q}</span>
-              <span className="shrink-0 text-sm"><HelpLink to={to}>Voir la réponse</HelpLink></span>
+              <span className="shrink-0 text-sm">
+                <HelpLink to={to}>Voir la réponse</HelpLink>
+              </span>
             </li>
           ))}
         </ul>

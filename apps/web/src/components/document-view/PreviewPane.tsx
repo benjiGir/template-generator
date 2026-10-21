@@ -41,17 +41,38 @@ interface Props {
 /** Union des boîtes rendues par un composant (son repère est en display: contents) */
 function measureNode(el: HTMLElement, nodeId: string): Rect | null {
   const marker = el.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
-  const boxes = marker ? Array.from(marker.children).map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0 || r.height > 0) : [];
+  const boxes = marker
+    ? Array.from(marker.children)
+        .map((c) => c.getBoundingClientRect())
+        .filter((r) => r.width > 0 || r.height > 0)
+    : [];
   if (boxes.length === 0) return null;
   const container = el.getBoundingClientRect();
   const top = Math.min(...boxes.map((b) => b.top));
   const left = Math.min(...boxes.map((b) => b.left));
   const bottom = Math.max(...boxes.map((b) => b.bottom));
   const right = Math.max(...boxes.map((b) => b.right));
-  return { top: top - container.top + el.scrollTop, left: left - container.left + el.scrollLeft, width: right - left, height: bottom - top };
+  return {
+    top: top - container.top + el.scrollTop,
+    left: left - container.left + el.scrollLeft,
+    width: right - left,
+    height: bottom - top,
+  };
 }
 
-export function PreviewPane({ template, highlightNodeId, highlightTone = "focus", outlineNodeIds, outlineTone = "tpl", framed = false, pickable = false, renderNodes, onBackgroundClick, header, anchoredPanel }: Props) {
+export function PreviewPane({
+  template,
+  highlightNodeId,
+  highlightTone = "focus",
+  outlineNodeIds,
+  outlineTone = "tpl",
+  framed = false,
+  pickable = false,
+  renderNodes,
+  onBackgroundClick,
+  header,
+  anchoredPanel,
+}: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -78,7 +99,14 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
     if (!el) return;
     const measure = () => {
       setRect(highlightNodeId ? measureNode(el, highlightNodeId) : null);
-      setOutlines(outlineKey ? outlineKey.split("|").map((id) => measureNode(el, id)).filter((r): r is Rect => r !== null) : []);
+      setOutlines(
+        outlineKey
+          ? outlineKey
+              .split("|")
+              .map((id) => measureNode(el, id))
+              .filter((r): r is Rect => r !== null)
+          : [],
+      );
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -95,7 +123,10 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
     scrolledFor.current = highlightNodeId;
     const visible = rect.top >= el.scrollTop && rect.top + rect.height <= el.scrollTop + el.clientHeight;
     if (!visible) {
-      el.scrollTo({ top: Math.max(0, rect.top - el.clientHeight / 2 + Math.min(rect.height, el.clientHeight) / 2), behavior: "smooth" });
+      el.scrollTo({
+        top: Math.max(0, rect.top - el.clientHeight / 2 + Math.min(rect.height, el.clientHeight) / 2),
+        behavior: "smooth",
+      });
     }
   }, [rect, highlightNodeId]);
 
@@ -154,8 +185,8 @@ export function PreviewPane({ template, highlightNodeId, highlightTone = "focus"
             highlightTone === "warning"
               ? "bg-amber-400/10 ring-2 ring-amber-600 ring-offset-2"
               : highlightTone === "doc"
-              ? "bg-doc/5 ring-2 ring-doc ring-offset-2"
-              : "bg-tpl/5 ring-2 ring-tpl ring-offset-2"
+                ? "bg-doc/5 ring-2 ring-doc ring-offset-2"
+                : "bg-tpl/5 ring-2 ring-tpl ring-offset-2"
           }`}
           style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
         />

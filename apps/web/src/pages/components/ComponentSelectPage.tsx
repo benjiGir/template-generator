@@ -9,9 +9,9 @@ import { PRESET_WORKFLOW } from "@/workflow/definitions";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 
 const CATEGORY_LABELS: Record<ComponentCategory, string> = {
-  layout:     "Mise en page",
-  content:    "Contenu",
-  data:       "Données",
+  layout: "Mise en page",
+  content: "Contenu",
+  data: "Données",
   decoration: "Décoration",
 };
 
@@ -27,9 +27,8 @@ export function ComponentSelectPage() {
 
   const allComponents = getAll();
 
-  const filtered = categoryFilter === "all"
-    ? allComponents
-    : allComponents.filter((c) => c.category === categoryFilter);
+  const filtered =
+    categoryFilter === "all" ? allComponents : allComponents.filter((c) => c.category === categoryFilter);
 
   const grouped = CATEGORY_ORDER.reduce<Record<string, typeof allComponents>>((acc, cat) => {
     const items = filtered.filter((c) => c.category === cat);
@@ -54,7 +53,9 @@ export function ComponentSelectPage() {
       firstNavigableStep={0}
       title="Nouveau preset"
       guard={selected ? { ok: true } : { ok: false, reason: "Cliquez sur un composant pour le configurer" }}
-      onNext={() => { if (selected) choose(selected); }}
+      onNext={() => {
+        if (selected) choose(selected);
+      }}
     >
       <div className="h-full flex flex-col overflow-hidden bg-gray-50">
         {/* Category filter */}
@@ -65,9 +66,7 @@ export function ComponentSelectPage() {
               key={cat}
               onClick={() => setCategoryFilter(cat)}
               className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                categoryFilter === cat
-                  ? "bg-preset text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                categoryFilter === cat ? "bg-preset text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {cat === "all" ? "Tous" : CATEGORY_LABELS[cat]}
@@ -95,7 +94,13 @@ export function ComponentSelectPage() {
                   >
                     <div className="h-[110px] overflow-hidden border-b border-gray-100 bg-table p-2">
                       <div className="overflow-hidden rounded-sm bg-white shadow-sm">
-                        <ComponentPreview type={def.type} props={def.defaultProps} theme={DEFAULT_THEME} maxHeight={94} compact />
+                        <ComponentPreview
+                          type={def.type}
+                          props={def.defaultProps}
+                          theme={DEFAULT_THEME}
+                          maxHeight={94}
+                          compact
+                        />
                       </div>
                     </div>
                     <div className="p-3">

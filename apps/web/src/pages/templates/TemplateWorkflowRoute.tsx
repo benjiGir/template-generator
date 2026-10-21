@@ -46,7 +46,15 @@ export function TemplateWorkflowRoute() {
     getSnapshot: () => {
       const t = useEditorStore.getState().template;
       if (!t || t.id !== id) return null;
-      return { id: t.id, name: t.name, description: t.description, theme: t.theme, pageFormat: t.pageFormat, pages: t.pages, editableFields: t.editableFields };
+      return {
+        id: t.id,
+        name: t.name,
+        description: t.description,
+        theme: t.theme,
+        pageFormat: t.pageFormat,
+        pages: t.pages,
+        editableFields: t.editableFields,
+      };
     },
     save: ({ id: templateId, ...body }) => api.templates.update(templateId, body),
     onSaved: (rev, result) => {
@@ -63,7 +71,13 @@ export function TemplateWorkflowRoute() {
   const session = { flush: autosave.flush, autosave };
 
   if (query.isError) {
-    return <NotFoundState message="Ce template n'existe pas ou a été supprimé." backTo="/templates" backLabel="Retour aux templates" />;
+    return (
+      <NotFoundState
+        message="Ce template n'existe pas ou a été supprimé."
+        backTo="/templates"
+        backLabel="Retour aux templates"
+      />
+    );
   }
   if (loadedId !== id || loadedForMount.current !== id) return <LoadingState label="Chargement du template…" />;
 

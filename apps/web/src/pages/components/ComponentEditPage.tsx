@@ -18,7 +18,13 @@ export function ComponentEditPage() {
   const editingLabel = useComponentDraftStore((s) => s.label);
 
   if (!baseType) {
-    return <NotFoundState message="Aucun composant choisi." backTo={PRESET_WORKFLOW.steps[0]!.path("new")} backLabel="Choisir un composant" />;
+    return (
+      <NotFoundState
+        message="Aucun composant choisi."
+        backTo={PRESET_WORKFLOW.steps[0]!.path("new")}
+        backLabel="Choisir un composant"
+      />
+    );
   }
 
   const def = get(baseType);
@@ -63,28 +69,18 @@ export function ComponentEditPage() {
               <p className="text-sm font-semibold text-gray-900">{def.label}</p>
               <p className="text-xs text-gray-400">{def.description}</p>
             </div>
-            <button
-              onClick={handleReset}
-              className="text-xs text-gray-400 hover:text-gray-600 underline"
-            >
+            <button onClick={handleReset} className="text-xs text-gray-400 hover:text-gray-600 underline">
               Réinitialiser
             </button>
           </div>
 
           <div className="p-4">
             {def.schema.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-6">
-                Ce composant n'a pas de propriétés éditables.
-              </p>
+              <p className="text-xs text-gray-400 text-center py-6">Ce composant n'a pas de propriétés éditables.</p>
             ) : groupMap.size === 1 && groupMap.has("Général") ? (
               <div className="space-y-4">
                 {(groupMap.get("Général") ?? []).map((s) => (
-                  <PropField
-                    key={s.key}
-                    schema={s}
-                    value={props[s.key]}
-                    onChange={(v) => updateProp(s.key, v)}
-                  />
+                  <PropField key={s.key} schema={s} value={props[s.key]} onChange={(v) => updateProp(s.key, v)} />
                 ))}
               </div>
             ) : (
@@ -133,12 +129,7 @@ function GroupedProps({
             {isOpen && (
               <div className="p-3 space-y-3 bg-white">
                 {fields.map((s) => (
-                  <PropField
-                    key={s.key}
-                    schema={s}
-                    value={props[s.key]}
-                    onChange={(v) => onUpdate(s.key, v)}
-                  />
+                  <PropField key={s.key} schema={s} value={props[s.key]} onChange={(v) => onUpdate(s.key, v)} />
                 ))}
               </div>
             )}

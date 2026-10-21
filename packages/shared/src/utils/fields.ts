@@ -66,13 +66,15 @@ export function withNodeDefaults(fields: EditableField[], pages: Template["pages
 }
 
 /** Fige l'état courant d'un template pour publication */
-export function buildPublishedVersion(template: Pick<Template, "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields">): PublishedVersion {
+export function buildPublishedVersion(
+  template: Pick<Template, "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields">,
+): PublishedVersion {
   return structuredClone({
-    name:           template.name,
-    description:    template.description ?? undefined,
-    theme:          template.theme,
-    pageFormat:     template.pageFormat,
-    pages:          template.pages,
+    name: template.name,
+    description: template.description ?? undefined,
+    theme: template.theme,
+    pageFormat: template.pageFormat,
+    pages: template.pages,
     editableFields: withNodeDefaults(template.editableFields, template.pages),
   });
 }

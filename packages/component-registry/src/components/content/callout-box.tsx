@@ -15,10 +15,10 @@ interface Props {
 }
 
 const VARIANT_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  info:    { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8" },
+  info: { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8" },
   success: { bg: "#F0FDF4", border: "#22C55E", text: "#15803D" },
   warning: { bg: "#FFFBEB", border: "#F59E0B", text: "#B45309" },
-  danger:  { bg: "#FEF2F2", border: "#EF4444", text: "#B91C1C" },
+  danger: { bg: "#FEF2F2", border: "#EF4444", text: "#B91C1C" },
 };
 
 function CalloutBox({ theme, icon = "Info", title = "", content = "", color, variant = "info" }: Props) {
@@ -58,10 +58,7 @@ function CalloutBox({ theme, icon = "Info", title = "", content = "", color, var
               {title}
             </p>
           )}
-          <RichBlock
-            text={content}
-            style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: theme.colors.text }}
-          />
+          <RichBlock text={content} style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: theme.colors.text }} />
         </div>
       </div>
     </div>

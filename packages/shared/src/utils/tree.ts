@@ -17,7 +17,7 @@ export function findParent(
   nodes: ComponentNode[],
   id: string,
   parent: ComponentNode | null = null,
-  parentIndex = 0
+  parentIndex = 0,
 ): { parent: ComponentNode | null; index: number } | null {
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
@@ -46,7 +46,7 @@ export function insertNode(
   nodes: ComponentNode[],
   parentId: string | null,
   index: number,
-  node: ComponentNode
+  node: ComponentNode,
 ): ComponentNode[] {
   if (parentId === null) {
     const result = [...nodes];
@@ -71,7 +71,7 @@ export function moveNode(
   nodes: ComponentNode[],
   nodeId: string,
   newParentId: string | null,
-  newIndex: number
+  newIndex: number,
 ): ComponentNode[] {
   const node = findNode(nodes, nodeId);
   if (!node) return nodes;

@@ -15,9 +15,7 @@ register({
   icon: "ArrowUpDown",
   category: "layout",
   description: "Espace vertical entre les composants",
-  schema: [
-    { key: "height", label: "Hauteur (px)", type: "number", defaultValue: 24 },
-  ],
+  schema: [{ key: "height", label: "Hauteur (px)", type: "number", defaultValue: 24 }],
   acceptsChildren: false,
   defaultProps: { height: 24 },
   render: Spacer as RegisteredComponent["render"],

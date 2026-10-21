@@ -60,7 +60,13 @@ export function DocumentWorkflowRoute() {
   useAutosaveExitGuard(`/documents/${id}`, autosave);
 
   if (query.isError) {
-    return <NotFoundState message="Ce document n'existe pas ou a été supprimé." backTo="/documents" backLabel="Retour aux documents" />;
+    return (
+      <NotFoundState
+        message="Ce document n'existe pas ou a été supprimé."
+        backTo="/documents"
+        backLabel="Retour aux documents"
+      />
+    );
   }
   if (loadedId !== id || loadedForMount.current !== id) return <LoadingState label="Chargement du document…" />;
 

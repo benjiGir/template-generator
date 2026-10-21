@@ -37,9 +37,7 @@ register({
   icon: "LayoutGrid",
   category: "data",
   description: "Rangée de cartes KPI (max 4)",
-  schema: [
-    { key: "sectionTitle", label: "Titre de section", type: "text", defaultValue: "" },
-  ],
+  schema: [{ key: "sectionTitle", label: "Titre de section", type: "text", defaultValue: "" }],
   acceptsChildren: true,
   childrenLayout: "horizontal",
   allowedChildren: ["kpi-card"],

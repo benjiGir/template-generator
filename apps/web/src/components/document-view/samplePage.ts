@@ -10,15 +10,31 @@ export const SAMPLE_PAGE: TemplatePage = {
   children: [
     { id: "s-ph", type: "page-header", props: { brandName: "VOTRE MARQUE", brandSub: "Direction" } },
     { id: "s-tb", type: "title-block", props: { title: "Titre du document", subtitle: "Période — sous-titre" } },
-    { id: "s-ib", type: "intro-box", props: { content: "Un **encadré d'introduction** présente le document en quelques lignes." } },
+    {
+      id: "s-ib",
+      type: "intro-box",
+      props: { content: "Un **encadré d'introduction** présente le document en quelques lignes." },
+    },
     {
       id: "s-kr",
       type: "kpi-row",
       props: { sectionTitle: "Indicateurs clés" },
       children: [
-        { id: "s-k1", type: "kpi-card", props: { emoji: "📈", title: "Carte bleue", description: "Couleur de marque.", color: "blue" } },
-        { id: "s-k2", type: "kpi-card", props: { emoji: "✅", title: "Carte verte", description: "Couleur verte.", color: "green" } },
-        { id: "s-k3", type: "kpi-card", props: { emoji: "⚠️", title: "Carte ambre", description: "Couleur ambre.", color: "amber" } },
+        {
+          id: "s-k1",
+          type: "kpi-card",
+          props: { emoji: "📈", title: "Carte bleue", description: "Couleur de marque.", color: "blue" },
+        },
+        {
+          id: "s-k2",
+          type: "kpi-card",
+          props: { emoji: "✅", title: "Carte verte", description: "Couleur verte.", color: "green" },
+        },
+        {
+          id: "s-k3",
+          type: "kpi-card",
+          props: { emoji: "⚠️", title: "Carte ambre", description: "Couleur ambre.", color: "amber" },
+        },
       ],
     },
     { id: "s-sh", type: "section-header", props: { text: "Titre de section" } },

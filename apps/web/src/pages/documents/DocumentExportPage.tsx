@@ -42,7 +42,11 @@ export function DocumentExportPage() {
       current="export"
       entityId={document.id}
       title={<DocumentTitle />}
-      finalAction={{ label: exportedAt ? "Exporter à nouveau" : "Exporter en PDF", icon: <FileDown size={15} />, onClick: handleExport }}
+      finalAction={{
+        label: exportedAt ? "Exporter à nouveau" : "Exporter en PDF",
+        icon: <FileDown size={15} />,
+        onClick: handleExport,
+      }}
     >
       <div className="flex h-full overflow-hidden">
         <aside className="w-[380px] shrink-0 overflow-hidden border-r border-gray-200 bg-white">

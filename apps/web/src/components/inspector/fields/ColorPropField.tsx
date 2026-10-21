@@ -4,22 +4,46 @@ import { useEditorStore } from "@/store/editor-store";
 import type { ThemeColors } from "@template-generator/shared/types/template";
 
 const THEME_REFS: Array<{ key: keyof ThemeColors; label: string }> = [
-  { key: "primary",  label: "Primaire" },
-  { key: "accent",   label: "Accent" },
-  { key: "success",  label: "Succès" },
-  { key: "warning",  label: "Avert." },
-  { key: "danger",   label: "Danger" },
-  { key: "text",     label: "Texte" },
-  { key: "textLight",label: "Texte clair" },
+  { key: "primary", label: "Primaire" },
+  { key: "accent", label: "Accent" },
+  { key: "success", label: "Succès" },
+  { key: "warning", label: "Avert." },
+  { key: "danger", label: "Danger" },
+  { key: "text", label: "Texte" },
+  { key: "textLight", label: "Texte clair" },
 ];
 
 const EXTENDED_PALETTE = [
-  "#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#BFDBFE",
-  "#14532D", "#16A34A", "#22C55E", "#86EFAC", "#DCFCE7",
-  "#78350F", "#D97706", "#F59E0B", "#FCD34D", "#FEF3C7",
-  "#7F1D1D", "#DC2626", "#EF4444", "#FCA5A5", "#FEE2E2",
-  "#4C1D95", "#7C3AED", "#A855F7", "#D8B4FE", "#F3E8FF",
-  "#111827", "#374151", "#6B7280", "#D1D5DB", "#FFFFFF",
+  "#1E40AF",
+  "#2563EB",
+  "#3B82F6",
+  "#60A5FA",
+  "#BFDBFE",
+  "#14532D",
+  "#16A34A",
+  "#22C55E",
+  "#86EFAC",
+  "#DCFCE7",
+  "#78350F",
+  "#D97706",
+  "#F59E0B",
+  "#FCD34D",
+  "#FEF3C7",
+  "#7F1D1D",
+  "#DC2626",
+  "#EF4444",
+  "#FCA5A5",
+  "#FEE2E2",
+  "#4C1D95",
+  "#7C3AED",
+  "#A855F7",
+  "#D8B4FE",
+  "#F3E8FF",
+  "#111827",
+  "#374151",
+  "#6B7280",
+  "#D1D5DB",
+  "#FFFFFF",
 ];
 
 function resolveDisplayColor(value: string, colors: ThemeColors | undefined): string {
@@ -79,18 +103,13 @@ export function ColorPropField({ label, value, onChange }: Props) {
           style={{ backgroundColor: displayColor, border: "1px solid rgba(0,0,0,0.12)" }}
           className="w-5 h-5 rounded-sm shrink-0"
         />
-        <span className="text-xs font-mono text-gray-600 truncate flex-1">
-          {isThemeRef ? value : displayColor}
-        </span>
-        {isThemeRef && (
-          <span className="text-xs text-blue-500 shrink-0">lié</span>
-        )}
+        <span className="text-xs font-mono text-gray-600 truncate flex-1">{isThemeRef ? value : displayColor}</span>
+        {isThemeRef && <span className="text-xs text-blue-500 shrink-0">lié</span>}
       </button>
 
       {/* Popover */}
       {open && (
         <div className="absolute left-0 top-full mt-1 z-50 w-60 bg-white border border-gray-200 rounded-lg shadow-xl p-3 space-y-3">
-
           {/* Palette thème */}
           <div>
             <p className="text-xs text-gray-400 mb-1.5">Couleurs du thème</p>
@@ -102,7 +121,10 @@ export function ColorPropField({ label, value, onChange }: Props) {
                   <button
                     key={ref}
                     type="button"
-                    onClick={() => { onChange(ref); setOpen(false); }}
+                    onClick={() => {
+                      onChange(ref);
+                      setOpen(false);
+                    }}
                     title={l}
                     style={{
                       backgroundColor: hex,
@@ -123,7 +145,10 @@ export function ColorPropField({ label, value, onChange }: Props) {
                 <button
                   key={color}
                   type="button"
-                  onClick={() => { onChange(color); setOpen(false); }}
+                  onClick={() => {
+                    onChange(color);
+                    setOpen(false);
+                  }}
                   title={color}
                   style={{
                     backgroundColor: color,
@@ -138,7 +163,10 @@ export function ColorPropField({ label, value, onChange }: Props) {
           {/* Color picker */}
           <Colorful
             color={displayColor}
-            onChange={(color) => { onChange(color.hex); setHexInput(color.hex); }}
+            onChange={(color) => {
+              onChange(color.hex);
+              setHexInput(color.hex);
+            }}
             style={{ width: "100%" }}
           />
 

@@ -38,9 +38,7 @@ register({
   icon: "Heading2",
   category: "content",
   description: "Titre de section avec ligne de séparation",
-  schema: [
-    { key: "text", label: "Texte", type: "text", defaultValue: "Section" },
-  ],
+  schema: [{ key: "text", label: "Texte", type: "text", defaultValue: "Section" }],
   acceptsChildren: false,
   defaultProps: { text: "Section" },
   render: SectionHeader as RegisteredComponent["render"],

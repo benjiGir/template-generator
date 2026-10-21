@@ -33,19 +33,19 @@ router.get("/", async (c) => {
   const studio = publishedFilter === "true";
   let query = db
     .select({
-      id:             templates.id,
-      name:           templates.name,
-      description:    templates.description,
-      published:      templates.published,
-      publishedAt:    templates.publishedAt,
+      id: templates.id,
+      name: templates.name,
+      description: templates.description,
+      published: templates.published,
+      publishedAt: templates.publishedAt,
       // Le Studio voit les champs de la version publiée, l'Atelier ceux de l'état de travail
       editableFields: studio
         ? sql<unknown>`coalesce("templates"."published_version" -> 'editableFields', "templates"."editable_fields")`
         : templates.editableFields,
-      preview:        studio ? publishedPreview : workingPreview,
+      preview: studio ? publishedPreview : workingPreview,
       documentCount,
-      createdAt:      templates.createdAt,
-      updatedAt:      templates.updatedAt,
+      createdAt: templates.createdAt,
+      updatedAt: templates.updatedAt,
     })
     .from(templates)
     .$dynamic();
@@ -79,14 +79,14 @@ router.post("/:id/duplicate", async (c) => {
   const [result] = await db
     .insert(templates)
     .values({
-      name:           `${source.name} (copie)`,
-      description:    source.description,
-      theme:          source.theme,
-      pageFormat:     source.pageFormat,
-      pages:          source.pages,
+      name: `${source.name} (copie)`,
+      description: source.description,
+      theme: source.theme,
+      pageFormat: source.pageFormat,
+      pages: source.pages,
       editableFields: source.editableFields,
-      tags:           source.tags,
-      published:      false,
+      tags: source.tags,
+      published: false,
     })
     .returning();
   return c.json(result, 201);
@@ -116,11 +116,11 @@ router.put("/:id/publish", async (c) => {
   const [result] = await db
     .update(templates)
     .set({
-      published:        true,
+      published: true,
       editableFields,
       publishedVersion: buildPublishedVersion({ ...(existing as unknown as Template), editableFields }),
-      publishedAt:      now,
-      updatedAt:        now,
+      publishedAt: now,
+      updatedAt: now,
     })
     .where(eq(templates.id, id))
     .returning();

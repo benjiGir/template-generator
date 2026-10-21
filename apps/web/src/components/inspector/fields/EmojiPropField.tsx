@@ -1,8 +1,30 @@
 import { useState } from "react";
 
 const COMMON_EMOJIS = [
-  "✅","⚡","🚀","🐛","📊","📈","📉","🎯","💡","🔧","⚠️","❌",
-  "🟢","🟡","🔴","🔵","⭐","🏆","💪","🔥","📋","🗓️","👥","💬",
+  "✅",
+  "⚡",
+  "🚀",
+  "🐛",
+  "📊",
+  "📈",
+  "📉",
+  "🎯",
+  "💡",
+  "🔧",
+  "⚠️",
+  "❌",
+  "🟢",
+  "🟡",
+  "🔴",
+  "🔵",
+  "⭐",
+  "🏆",
+  "💪",
+  "🔥",
+  "📋",
+  "🗓️",
+  "👥",
+  "💬",
 ];
 
 interface Props {
@@ -37,7 +59,10 @@ export function EmojiPropField({ value, onChange }: Props) {
             <button
               key={emoji}
               type="button"
-              onClick={() => { onChange(emoji); setOpen(false); }}
+              onClick={() => {
+                onChange(emoji);
+                setOpen(false);
+              }}
               className="text-base w-7 h-7 flex items-center justify-center rounded hover:bg-blue-100 transition-colors"
             >
               {emoji}

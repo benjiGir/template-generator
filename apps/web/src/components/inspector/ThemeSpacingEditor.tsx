@@ -18,7 +18,9 @@ export function ThemeSpacingEditor() {
         <div>
           <label className="text-xs text-gray-500 block mb-1">Unité de base (px)</label>
           <input
-            type="number" min={1} max={16}
+            type="number"
+            min={1}
+            max={16}
             value={sp.unit}
             onChange={(e) => update("unit", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
@@ -27,7 +29,9 @@ export function ThemeSpacingEditor() {
         <div>
           <label className="text-xs text-gray-500 block mb-1">Écart sections</label>
           <input
-            type="number" min={0} max={16}
+            type="number"
+            min={0}
+            max={16}
             value={sp.sectionGap}
             onChange={(e) => update("sectionGap", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
@@ -39,7 +43,9 @@ export function ThemeSpacingEditor() {
         <div>
           <label className="text-xs text-gray-500 block mb-1">Écart composants</label>
           <input
-            type="number" min={0} max={16}
+            type="number"
+            min={0}
+            max={16}
             value={sp.componentGap}
             onChange={(e) => update("componentGap", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"

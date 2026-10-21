@@ -3,19 +3,86 @@ import * as LucideIcons from "lucide-react";
 
 // Curated list of common icons
 const ICON_NAMES = [
-  "AlertCircle", "AlertTriangle", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight",
-  "ArrowUp", "Award", "BarChart", "BarChart2", "BarChart3", "Bell", "BookOpen",
-  "Bookmark", "Briefcase", "Building", "Calendar", "CheckCircle", "CheckSquare",
-  "ChevronDown", "ChevronRight", "Circle", "Clipboard", "Clock", "Cloud",
-  "Code", "Cog", "Download", "Edit", "Eye", "File", "FileText", "Flag",
-  "Folder", "Globe", "Hash", "Heart", "Home", "Image", "Info",
-  "Layers", "Layout", "Link", "List", "Lock", "Mail",
-  "MapPin", "Menu", "MessageCircle", "Minus", "Monitor",
-  "Moon", "MoreHorizontal", "Package", "Pencil", "Phone", "Plus",
-  "Power", "Printer", "RefreshCw", "Search", "Send", "Settings",
-  "Share", "Shield", "ShoppingCart", "Star", "Sun", "Tag",
-  "Target", "Trash", "TrendingUp", "TrendingDown", "Upload", "User",
-  "Users", "Wifi", "X", "XCircle", "Zap",
+  "AlertCircle",
+  "AlertTriangle",
+  "Archive",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "Award",
+  "BarChart",
+  "BarChart2",
+  "BarChart3",
+  "Bell",
+  "BookOpen",
+  "Bookmark",
+  "Briefcase",
+  "Building",
+  "Calendar",
+  "CheckCircle",
+  "CheckSquare",
+  "ChevronDown",
+  "ChevronRight",
+  "Circle",
+  "Clipboard",
+  "Clock",
+  "Cloud",
+  "Code",
+  "Cog",
+  "Download",
+  "Edit",
+  "Eye",
+  "File",
+  "FileText",
+  "Flag",
+  "Folder",
+  "Globe",
+  "Hash",
+  "Heart",
+  "Home",
+  "Image",
+  "Info",
+  "Layers",
+  "Layout",
+  "Link",
+  "List",
+  "Lock",
+  "Mail",
+  "MapPin",
+  "Menu",
+  "MessageCircle",
+  "Minus",
+  "Monitor",
+  "Moon",
+  "MoreHorizontal",
+  "Package",
+  "Pencil",
+  "Phone",
+  "Plus",
+  "Power",
+  "Printer",
+  "RefreshCw",
+  "Search",
+  "Send",
+  "Settings",
+  "Share",
+  "Shield",
+  "ShoppingCart",
+  "Star",
+  "Sun",
+  "Tag",
+  "Target",
+  "Trash",
+  "TrendingUp",
+  "TrendingDown",
+  "Upload",
+  "User",
+  "Users",
+  "Wifi",
+  "X",
+  "XCircle",
+  "Zap",
 ];
 
 interface Props {
@@ -29,9 +96,7 @@ export function IconPropField({ label, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const current = (value as string | undefined) ?? "";
 
-  const filtered = query
-    ? ICON_NAMES.filter((n) => n.toLowerCase().includes(query.toLowerCase()))
-    : ICON_NAMES;
+  const filtered = query ? ICON_NAMES.filter((n) => n.toLowerCase().includes(query.toLowerCase())) : ICON_NAMES;
 
   const CurrentIcon = current ? (LucideIcons as unknown as Record<string, ElementType>)[current] : null;
 
@@ -83,9 +148,7 @@ export function IconPropField({ label, value, onChange }: Props) {
                       setQuery("");
                     }}
                     className={`flex flex-col items-center gap-0.5 p-1.5 rounded text-[10px] transition-colors ${
-                      name === current
-                        ? "bg-blue-50 text-blue-700"
-                        : "hover:bg-gray-100 text-gray-600"
+                      name === current ? "bg-blue-50 text-blue-700" : "hover:bg-gray-100 text-gray-600"
                     }`}
                   >
                     <Icon size={14} />
@@ -102,7 +165,10 @@ export function IconPropField({ label, value, onChange }: Props) {
             <div className="border-t border-gray-100 p-1.5">
               <button
                 type="button"
-                onClick={() => { onChange(""); setOpen(false); }}
+                onClick={() => {
+                  onChange("");
+                  setOpen(false);
+                }}
                 className="w-full py-1 text-xs text-gray-400 hover:text-red-500 transition-colors"
               >
                 Effacer

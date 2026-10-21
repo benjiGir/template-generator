@@ -42,31 +42,14 @@ function PropInput({ schema, value, onChange }: Props) {
 
   switch (schema.type) {
     case "text":
-      return (
-        <TextPropField
-          value={str}
-          placeholder={schema.placeholder}
-          onChange={onChange}
-        />
-      );
+      return <TextPropField value={str} placeholder={schema.placeholder} onChange={onChange} />;
 
     case "textarea":
-      return (
-        <TextareaPropField
-          value={str}
-          placeholder={schema.placeholder}
-          onChange={onChange}
-        />
-      );
+      return <TextareaPropField value={str} placeholder={schema.placeholder} onChange={onChange} />;
 
     case "richtext":
       return (
-        <RichtextPropField
-          label={schema.label}
-          value={str}
-          placeholder={schema.placeholder}
-          onChange={onChange}
-        />
+        <RichtextPropField label={schema.label} value={str} placeholder={schema.placeholder} onChange={onChange} />
       );
 
     case "number":
@@ -76,13 +59,7 @@ function PropInput({ schema, value, onChange }: Props) {
       return <BooleanPropField value={bool} onChange={onChange} />;
 
     case "select":
-      return (
-        <SelectPropField
-          value={str}
-          options={schema.options ?? []}
-          onChange={onChange}
-        />
-      );
+      return <SelectPropField value={str} options={schema.options ?? []} onChange={onChange} />;
 
     case "color":
       return <ColorPropField label={schema.label} value={str} onChange={onChange} />;
@@ -97,7 +74,10 @@ function PropInput({ schema, value, onChange }: Props) {
       return (
         <SpacingPropField
           label={schema.label}
-          value={(value as SpacingValue | undefined) ?? (schema.defaultValue as SpacingValue) ?? { top: 0, right: 0, bottom: 0, left: 0 }}
+          value={
+            (value as SpacingValue | undefined) ??
+            (schema.defaultValue as SpacingValue) ?? { top: 0, right: 0, bottom: 0, left: 0 }
+          }
           onChange={onChange}
         />
       );
@@ -109,7 +89,10 @@ function PropInput({ schema, value, onChange }: Props) {
       return (
         <BorderPropField
           label={schema.label}
-          value={(value as BorderValue | undefined) ?? (schema.defaultValue as BorderValue) ?? { style: "solid", width: 1, color: "#000000", radius: 0 }}
+          value={
+            (value as BorderValue | undefined) ??
+            (schema.defaultValue as BorderValue) ?? { style: "solid", width: 1, color: "#000000", radius: 0 }
+          }
           onChange={onChange}
         />
       );

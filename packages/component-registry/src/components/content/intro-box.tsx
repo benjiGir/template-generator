@@ -22,10 +22,7 @@ function IntroBox({ theme, content = "", accentColor }: Props) {
         marginBottom: 16,
       }}
     >
-      <RichBlock
-        text={content}
-        style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.colors.text }}
-      />
+      <RichBlock text={content} style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.colors.text }} />
     </div>
   );
 }

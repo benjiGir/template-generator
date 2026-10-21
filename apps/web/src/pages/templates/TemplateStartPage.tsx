@@ -34,7 +34,9 @@ export function TemplateStartPage() {
     setCreating(source?.id ?? "blank");
     setError(null);
     try {
-      const created = source ? await api.templates.duplicate(source.id) : await api.templates.create(newTemplateDraft());
+      const created = source
+        ? await api.templates.duplicate(source.id)
+        : await api.templates.create(newTemplateDraft());
       navigate(TEMPLATE_WORKFLOW.steps[1]!.path(created.id), { replace: true });
     } catch (e) {
       console.error("Erreur création template:", e);
@@ -44,7 +46,9 @@ export function TemplateStartPage() {
   };
 
   const query = search.trim().toLowerCase();
-  const visible = query ? templates.filter((t) => `${t.name} ${t.description ?? ""}`.toLowerCase().includes(query)) : templates;
+  const visible = query
+    ? templates.filter((t) => `${t.name} ${t.description ?? ""}`.toLowerCase().includes(query))
+    : templates;
 
   return (
     <WorkflowLayout
@@ -83,7 +87,9 @@ export function TemplateStartPage() {
               {!isLoading && visible.length === 0 && (
                 <p className="py-6 text-center text-sm text-gray-500">
                   Aucun template ne correspond à « {search} ».{" "}
-                  <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">Effacer la recherche</button>
+                  <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">
+                    Effacer la recherche
+                  </button>
                 </p>
               )}
 
@@ -118,7 +124,12 @@ export function TemplateStartPage() {
                           <TemplateStatusBadge template={t} />
                         </div>
                         <p className="mt-1 text-[11px] text-gray-400">
-                          Modifié le {new Date(t.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                          Modifié le{" "}
+                          {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </p>
                       </div>
                     </button>
@@ -155,11 +166,21 @@ export function TemplateStartPage() {
                 </span>
                 <span>
                   <span className="block text-sm font-semibold text-gray-900">Page blanche</span>
-                  <span className="mt-0.5 block text-xs text-gray-500">Choisir un thème puis assembler les composants.</span>
+                  <span className="mt-0.5 block text-xs text-gray-500">
+                    Choisir un thème puis assembler les composants.
+                  </span>
                 </span>
               </button>
-              <SoonOption icon={<Upload size={18} />} label="Importer un document Word" hint="Reprendre la structure d'un .docx" />
-              <SoonOption icon={<Sparkles size={18} />} label="Générer à partir d'une description" hint="Décrire le document en quelques phrases" />
+              <SoonOption
+                icon={<Upload size={18} />}
+                label="Importer un document Word"
+                hint="Reprendre la structure d'un .docx"
+              />
+              <SoonOption
+                icon={<Sparkles size={18} />}
+                label="Générer à partir d'une description"
+                hint="Décrire le document en quelques phrases"
+              />
             </div>
           </section>
         </div>
@@ -179,8 +200,13 @@ export function TemplateStartPage() {
 
 function SoonOption({ icon, label, hint }: { icon: React.ReactNode; label: string; hint: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-dashed border-gray-200 bg-white/60 p-4 text-left" aria-disabled="true">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400">{icon}</span>
+    <div
+      className="flex items-start gap-3 rounded-lg border border-dashed border-gray-200 bg-white/60 p-4 text-left"
+      aria-disabled="true"
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400">
+        {icon}
+      </span>
       <span>
         <span className="flex items-center gap-1.5 text-sm font-semibold text-gray-500">
           {label}

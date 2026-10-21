@@ -3,24 +3,24 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
-  },
   "exports": {
     "./registry": "./src/registry.ts",
     "./renderer": "./src/renderer.tsx",
     "./components": "./src/components.ts"
   },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@template-generator/shared": "workspace:*",
     "lucide-react": "^0.469.0"
   },
-  "peerDependencies": {
-    "react": "^19.0.0"
-  },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }

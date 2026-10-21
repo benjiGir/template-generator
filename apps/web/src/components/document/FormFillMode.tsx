@@ -27,7 +27,13 @@ export function FormFillMode() {
     if (!target) return;
     const field = editableFields.find((f) => fieldKey(f) === target);
     if (field) focusField(field);
-    setSearchParams((p) => { p.delete(FOCUS_PARAM); return p; }, { replace: true });
+    setSearchParams(
+      (p) => {
+        p.delete(FOCUS_PARAM);
+        return p;
+      },
+      { replace: true },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -69,9 +75,13 @@ export function FormFillMode() {
         <div className="shrink-0 border-b border-gray-100 px-5 py-3">
           <div className="mb-1.5 flex items-baseline justify-between text-xs">
             <span className="font-medium text-gray-700">
-              {remaining === 0 ? "Tous les champs sont remplis" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""} à remplir`}
+              {remaining === 0
+                ? "Tous les champs sont remplis"
+                : `Encore ${remaining} champ${remaining > 1 ? "s" : ""} à remplir`}
             </span>
-            <span className="font-mono text-xs text-gray-700">{completion.filled} / {completion.total}</span>
+            <span className="font-mono text-xs text-gray-700">
+              {completion.filled} / {completion.total}
+            </span>
           </div>
           <SegmentedProgress filled={completion.filled} total={completion.total} />
           {completion.missingRequired.length > 0 && (
@@ -80,7 +90,9 @@ export function FormFillMode() {
               onClick={() => focusField(completion.missingRequired[0]!)}
               className="mt-2 text-xs text-amber-700 hover:underline"
             >
-              {completion.missingRequired.length} champ{completion.missingRequired.length > 1 ? "s" : ""} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""} — aller au premier
+              {completion.missingRequired.length} champ{completion.missingRequired.length > 1 ? "s" : ""} obligatoire
+              {completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""}{" "}
+              — aller au premier
             </button>
           )}
         </div>
@@ -93,7 +105,7 @@ export function FormFillMode() {
               {Array.from(groups.entries()).map(([group, fields]) => (
                 <FormFieldGroup
                   key={group ?? "__"}
-                  group={ungroupedOnly ? null : group ?? "Autres champs"}
+                  group={ungroupedOnly ? null : (group ?? "Autres champs")}
                   fields={fields}
                   data={data}
                   onUpdate={updateField}
@@ -108,7 +120,13 @@ export function FormFillMode() {
 
       <div className="min-w-0 flex-1">
         {mergedTemplate && (
-          <PreviewPane template={mergedTemplate} highlightNodeId={active?.nodeId ?? null} highlightTone="doc" framed onBackgroundClick={handlePreviewClick} />
+          <PreviewPane
+            template={mergedTemplate}
+            highlightNodeId={active?.nodeId ?? null}
+            highlightTone="doc"
+            framed
+            onBackgroundClick={handlePreviewClick}
+          />
         )}
       </div>
     </div>

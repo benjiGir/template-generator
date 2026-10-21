@@ -53,7 +53,8 @@ export function FormFieldGroup({ group, fields, data, onUpdate, activeKey, onFoc
           {group}
         </span>
         <span className="font-mono text-[11px] text-gray-700">
-          {filled}/{fields.length}{filled === fields.length ? " ✓" : ""}
+          {filled}/{fields.length}
+          {filled === fields.length ? " ✓" : ""}
         </span>
       </button>
       {open && <div className="pt-3">{list}</div>}

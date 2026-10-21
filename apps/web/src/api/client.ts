@@ -1,4 +1,10 @@
-import type { Template, EditableField, Theme, PageFormat, TemplatePage } from "@template-generator/shared/types/template";
+import type {
+  Template,
+  EditableField,
+  Theme,
+  PageFormat,
+  TemplatePage,
+} from "@template-generator/shared/types/template";
 import type { ComponentPreset, Document } from "@template-generator/shared/types/document";
 
 export interface ThemeRecord {
@@ -10,7 +16,10 @@ export interface ThemeRecord {
 }
 
 export class ApiError extends Error {
-  constructor(public status: number, path: string) {
+  constructor(
+    public status: number,
+    path: string,
+  ) {
     super(`API ${status}: ${path}`);
   }
 }
@@ -62,7 +71,10 @@ export interface DocumentSummary {
   createdAt: string;
 }
 
-export type TemplateWritable = Pick<Template, "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "tags">;
+export type TemplateWritable = Pick<
+  Template,
+  "name" | "description" | "theme" | "pageFormat" | "pages" | "editableFields" | "tags"
+>;
 
 export const api = {
   templates: {

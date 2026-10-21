@@ -20,7 +20,9 @@ export function MarkedNode({ node, theme }: { node: ComponentNode; theme: Theme 
     <div data-node-id={node.id} style={{ display: "contents" }}>
       {definition.acceptsChildren && node.children ? (
         <Component {...props}>
-          {node.children.map((child) => <MarkedNode key={child.id} node={child} theme={theme} />)}
+          {node.children.map((child) => (
+            <MarkedNode key={child.id} node={child} theme={theme} />
+          ))}
         </Component>
       ) : (
         <Component {...props} />
@@ -57,7 +59,9 @@ export function DocumentView({ template, renderNodes, zoom = 1, framed = false }
         return (
           <div key={page.id}>
             <div className="mb-2 flex justify-between px-3 font-mono text-[11px] uppercase tracking-[0.04em] text-gray-700">
-              <span>Page {index + 1}/{count} · {format.width} de large · exportée telle quelle</span>
+              <span>
+                Page {index + 1}/{count} · {format.width} de large · exportée telle quelle
+              </span>
             </div>
             <CropMarks>{content}</CropMarks>
           </div>
@@ -95,11 +99,11 @@ interface ThumbnailProps {
 
 /** Réduction fidèle des pages, pour les listes et les aperçus */
 export function DocumentThumbnail({ template, width, pages = 1, fullHeight = false, cropHeight }: ThumbnailProps) {
-  const pageWidthPx  = dimToPx(template.pageFormat.width);
+  const pageWidthPx = dimToPx(template.pageFormat.width);
   const pageHeightPx = dimToPx(template.pageFormat.height);
   const scale = width / pageWidthPx;
   const shown = template.pages.slice(0, pages);
-  const height = fullHeight ? undefined : cropHeight ?? pageHeightPx * scale;
+  const height = fullHeight ? undefined : (cropHeight ?? pageHeightPx * scale);
 
   return (
     <div className="flex flex-col gap-4" aria-hidden>
@@ -119,7 +123,11 @@ export function DocumentThumbnail({ template, width, pages = 1, fullHeight = fal
         >
           {/* zoom (et non transform) : la hauteur de mise en page est réduite elle aussi */}
           <div style={{ zoom: scale, width: pageWidthPx }}>
-            <DocumentPage theme={template.theme} format={page.format ?? template.pageFormat} chromeStyle={{ boxShadow: "none" }}>
+            <DocumentPage
+              theme={template.theme}
+              format={page.format ?? template.pageFormat}
+              chromeStyle={{ boxShadow: "none" }}
+            >
               {page.children.map((node) => (
                 <ComponentRenderer key={node.id} node={node} theme={template.theme} />
               ))}

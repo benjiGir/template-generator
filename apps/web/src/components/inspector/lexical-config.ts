@@ -1,22 +1,8 @@
 import { ListNode, ListItemNode } from "@lexical/list";
 import { LinkNode, AutoLinkNode } from "@lexical/link";
-import {
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  ITALIC_STAR,
-  UNORDERED_LIST,
-  ORDERED_LIST,
-  LINK,
-} from "@lexical/markdown";
+import { BOLD_ITALIC_STAR, BOLD_STAR, ITALIC_STAR, UNORDERED_LIST, ORDERED_LIST, LINK } from "@lexical/markdown";
 
-export const MARKDOWN_TRANSFORMERS = [
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  ITALIC_STAR,
-  UNORDERED_LIST,
-  ORDERED_LIST,
-  LINK,
-];
+export const MARKDOWN_TRANSFORMERS = [BOLD_ITALIC_STAR, BOLD_STAR, ITALIC_STAR, UNORDERED_LIST, ORDERED_LIST, LINK];
 
 export const EDITOR_NODES = [ListNode, ListItemNode, LinkNode, AutoLinkNode];
 

@@ -8,15 +8,15 @@ import type { PageFormat, Theme } from "@template-generator/shared/types/templat
  */
 export function pageStyle(theme: Theme, format: PageFormat): CSSProperties {
   return {
-    width:           format.width,
-    minHeight:       format.height,
-    padding:         format.padding,
-    boxSizing:       "border-box",
-    position:        "relative",
+    width: format.width,
+    minHeight: format.height,
+    padding: format.padding,
+    boxSizing: "border-box",
+    position: "relative",
     backgroundColor: theme.colors.background,
-    fontFamily:      theme.typography.fontFamily,
-    fontSize:        theme.typography.baseFontSize,
-    color:           theme.colors.text,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.baseFontSize,
+    color: theme.colors.text,
   };
 }
 

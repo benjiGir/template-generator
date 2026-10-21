@@ -17,21 +17,40 @@ const SHAPES: Record<Shape, string> = {
 
 function Status({ shape, children, title }: { shape: Shape; children: string; title?: string }) {
   return (
-    <span title={title} className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
+    <span
+      title={title}
+      className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-ink"
+    >
       <span aria-hidden="true" className={`box-border inline-block h-2 w-2 ${SHAPES[shape]}`} />
       {children}
     </span>
   );
 }
 
-export function TemplateStatusBadge({ template }: { template: Pick<Template, "published" | "publishedAt" | "updatedAt"> }) {
+export function TemplateStatusBadge({
+  template,
+}: {
+  template: Pick<Template, "published" | "publishedAt" | "updatedAt">;
+}) {
   switch (templateStatus(template)) {
     case "draft":
-      return <Status shape="dashed" title="Pas encore disponible dans le Studio">Brouillon</Status>;
+      return (
+        <Status shape="dashed" title="Pas encore disponible dans le Studio">
+          Brouillon
+        </Status>
+      );
     case "published":
-      return <Status shape="filled" title="Disponible dans le Studio">Publié</Status>;
+      return (
+        <Status shape="filled" title="Disponible dans le Studio">
+          Publié
+        </Status>
+      );
     case "published-with-changes":
-      return <Status shape="diamond" title="Le Studio utilise encore la version publiée précédente">Modifs non publiées</Status>;
+      return (
+        <Status shape="diamond" title="Le Studio utilise encore la version publiée précédente">
+          Modifs non publiées
+        </Status>
+      );
   }
 }
 
@@ -40,8 +59,16 @@ export function DocumentStatusBadge({ document }: { document: Pick<Document, "st
     case "draft":
       return <Status shape="hollow">Brouillon</Status>;
     case "finalized":
-      return <Status shape="filled" title="Exporté en PDF">Finalisé</Status>;
+      return (
+        <Status shape="filled" title="Exporté en PDF">
+          Finalisé
+        </Status>
+      );
     case "modified-after-export":
-      return <Status shape="diamond" title="Modifié depuis le dernier export PDF">Modifié depuis l'export</Status>;
+      return (
+        <Status shape="diamond" title="Modifié depuis le dernier export PDF">
+          Modifié depuis l'export
+        </Status>
+      );
   }
 }

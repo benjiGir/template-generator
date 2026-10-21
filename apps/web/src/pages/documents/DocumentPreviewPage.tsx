@@ -33,7 +33,8 @@ export function DocumentPreviewPage() {
             <>
               <span className="flex items-center gap-1.5 font-medium text-amber-800">
                 <AlertTriangle size={13} />
-                {missingRequired.length} champ{missingRequired.length > 1 ? "s" : ""} obligatoire{missingRequired.length > 1 ? "s" : ""} vide{missingRequired.length > 1 ? "s" : ""} :
+                {missingRequired.length} champ{missingRequired.length > 1 ? "s" : ""} obligatoire
+                {missingRequired.length > 1 ? "s" : ""} vide{missingRequired.length > 1 ? "s" : ""} :
               </span>
               {missingRequired.map((f) => (
                 <Link
@@ -58,7 +59,9 @@ export function DocumentPreviewPage() {
           )}
         </div>
         <div className="min-h-0 flex-1">
-          {mergedTemplate && <PreviewPane template={mergedTemplate} highlightNodeId={hovered} highlightTone="warning" framed />}
+          {mergedTemplate && (
+            <PreviewPane template={mergedTemplate} highlightNodeId={hovered} highlightTone="warning" framed />
+          )}
         </div>
       </div>
     </WorkflowLayout>

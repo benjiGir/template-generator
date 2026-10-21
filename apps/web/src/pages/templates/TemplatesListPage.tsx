@@ -14,7 +14,11 @@ export function TemplatesListPage() {
   const queryClient = useQueryClient();
   const confirm = useConfirm();
 
-  const { data: templates = [], isLoading, error } = useQuery({
+  const {
+    data: templates = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: queryKeys.templates.list(),
     queryFn: () => api.templates.list(),
   });
@@ -40,7 +44,7 @@ export function TemplatesListPage() {
       consequences.push(
         `${t.documentCount} document${t.documentCount > 1 ? "s ont" : " a"} été créé${t.documentCount > 1 ? "s" : ""} à partir de ce template. ${
           t.documentCount > 1 ? "Ils restent" : "Il reste"
-        } consultable${t.documentCount > 1 ? "s" : ""}, modifiable${t.documentCount > 1 ? "s" : ""} et exportable${t.documentCount > 1 ? "s" : ""}.`
+        } consultable${t.documentCount > 1 ? "s" : ""}, modifiable${t.documentCount > 1 ? "s" : ""} et exportable${t.documentCount > 1 ? "s" : ""}.`,
       );
     }
     consequences.push("Cette action est irréversible.");
@@ -60,7 +64,11 @@ export function TemplatesListPage() {
         tag="Templates"
         title="Atelier"
         subtitle="Dessinez les templates que le Studio utilisera pour produire les documents."
-        action={<CreateButton kind="tpl" onClick={() => navigate("/templates/new")}>Nouveau template</CreateButton>}
+        action={
+          <CreateButton kind="tpl" onClick={() => navigate("/templates/new")}>
+            Nouveau template
+          </CreateButton>
+        }
       />
 
       <div className="px-8 py-8">
@@ -102,12 +110,17 @@ export function TemplatesListPage() {
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm font-semibold text-ink">{t.name}</h3>
-                    <div className="mt-0.5"><TemplateStatusBadge template={t} /></div>
+                    <div className="mt-0.5">
+                      <TemplateStatusBadge template={t} />
+                    </div>
                     {t.description && <p className="mt-1 line-clamp-1 text-xs text-gray-500">{t.description}</p>}
                   </div>
                   <div className="ml-2 flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                     <button
-                      onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate(t.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        duplicateMutation.mutate(t.id);
+                      }}
                       className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-blue-600"
                       title="Dupliquer"
                       aria-label={`Dupliquer ${t.name}`}
@@ -125,7 +138,12 @@ export function TemplatesListPage() {
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-gray-400">
-                  Modifié le {new Date(t.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                  Modifié le{" "}
+                  {new Date(t.updatedAt).toLocaleDateString("fr-FR", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                   {t.documentCount > 0 && ` · ${t.documentCount} document${t.documentCount > 1 ? "s" : ""}`}
                 </p>
               </div>

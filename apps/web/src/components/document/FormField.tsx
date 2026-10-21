@@ -38,13 +38,13 @@ export function FormField({ field, value, onChange, onFocus, active }: Props) {
   const filled = isFilled(value);
 
   const schema = {
-    key:          field.propKey,
-    label:        field.label,
-    type:         field.type,
+    key: field.propKey,
+    label: field.label,
+    type: field.type,
     defaultValue: usesPlaceholder ? (field.type === "list" ? [] : "") : field.defaultValue,
-    placeholder:  usesPlaceholder && defaultText ? defaultText : undefined,
-    required:     field.required,
-    group:        field.group,
+    placeholder: usesPlaceholder && defaultText ? defaultText : undefined,
+    required: field.required,
+    group: field.group,
   };
 
   const requiredBadge = field.required ? (

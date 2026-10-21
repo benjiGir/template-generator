@@ -28,9 +28,7 @@ register({
   icon: "Columns2",
   category: "layout",
   description: "Disposition en 2 colonnes égales",
-  schema: [
-    { key: "gap", label: "Espacement (px)", type: "number", defaultValue: 16 },
-  ],
+  schema: [{ key: "gap", label: "Espacement (px)", type: "number", defaultValue: 16 }],
   acceptsChildren: true,
   defaultProps: { gap: 16 },
   render: TwoColumnGrid as RegisteredComponent["render"],

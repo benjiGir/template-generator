@@ -13,13 +13,20 @@ export function HelpLink({ to, children }: { to: string; children: ReactNode }) 
 
   if (inPanel && help) {
     return (
-      <button type="button" onClick={() => help.open(slug, sectionId)} className="font-medium text-ink underline underline-offset-2 hover:no-underline">
+      <button
+        type="button"
+        onClick={() => help.open(slug, sectionId)}
+        className="font-medium text-ink underline underline-offset-2 hover:no-underline"
+      >
         {children}
       </button>
     );
   }
   return (
-    <Link to={helpPath(slug, sectionId)} className="font-medium text-ink underline underline-offset-2 hover:no-underline">
+    <Link
+      to={helpPath(slug, sectionId)}
+      className="font-medium text-ink underline underline-offset-2 hover:no-underline"
+    >
       {children}
     </Link>
   );

@@ -149,27 +149,28 @@ export function WorkflowLayout({
   );
 
   // Avancer est à l'encre ; l'action qui termine prend la couleur de l'objet produit
-  const primaryButton = isLast && finalAction ? (
-    <button
-      onClick={() => run(finalAction.onClick)}
-      disabled={pending || finalAction.disabled}
-      className={`flex min-h-9 items-center gap-1.5 rounded-sm px-4 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 ${kindStyle.bg}`}
-    >
-      {finalAction.icon ?? <Check size={15} />}
-      {finalAction.label}
-    </button>
-  ) : (
-    !isLast && (
+  const primaryButton =
+    isLast && finalAction ? (
       <button
-        onClick={handleNext}
-        disabled={pending || !guard.ok}
-        className="flex min-h-9 items-center gap-1.5 rounded-sm bg-ink px-4 text-sm font-medium text-paper hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+        onClick={() => run(finalAction.onClick)}
+        disabled={pending || finalAction.disabled}
+        className={`flex min-h-9 items-center gap-1.5 rounded-sm px-4 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 ${kindStyle.bg}`}
       >
-        {nextLabel === "Suivant" && next ? next.label : nextLabel}
-        <ArrowRight size={14} />
+        {finalAction.icon ?? <Check size={15} />}
+        {finalAction.label}
       </button>
-    )
-  );
+    ) : (
+      !isLast && (
+        <button
+          onClick={handleNext}
+          disabled={pending || !guard.ok}
+          className="flex min-h-9 items-center gap-1.5 rounded-sm bg-ink px-4 text-sm font-medium text-paper hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {nextLabel === "Suivant" && next ? next.label : nextLabel}
+          <ArrowRight size={14} />
+        </button>
+      )
+    );
 
   const quit = (
     <Link

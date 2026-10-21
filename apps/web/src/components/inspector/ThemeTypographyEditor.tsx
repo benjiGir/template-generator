@@ -43,7 +43,9 @@ export function ThemeTypographyEditor() {
           className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
         />
         <datalist id="font-suggestions">
-          {FONT_SUGGESTIONS.map((f) => <option key={f} value={f} />)}
+          {FONT_SUGGESTIONS.map((f) => (
+            <option key={f} value={f} />
+          ))}
         </datalist>
       </div>
 
@@ -64,7 +66,8 @@ export function ThemeTypographyEditor() {
           <label className="text-xs text-gray-500 block mb-1">Taille base (px)</label>
           <input
             type="number"
-            min={10} max={20}
+            min={10}
+            max={20}
             value={t.baseFontSize}
             onChange={(e) => update("baseFontSize", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
@@ -74,7 +77,9 @@ export function ThemeTypographyEditor() {
           <label className="text-xs text-gray-500 block mb-1">Interlignage</label>
           <input
             type="number"
-            min={1} max={2.5} step={0.05}
+            min={1}
+            max={2.5}
+            step={0.05}
             value={t.lineHeight}
             onChange={(e) => update("lineHeight", Number(e.target.value))}
             className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
@@ -91,7 +96,8 @@ export function ThemeTypographyEditor() {
               <label className="text-xs text-gray-500 block mb-1 uppercase">{h}</label>
               <input
                 type="number"
-                min={10} max={60}
+                min={10}
+                max={60}
                 value={t.headingSizes[h]}
                 onChange={(e) => updateHeading(h, Number(e.target.value))}
                 className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
@@ -106,7 +112,9 @@ export function ThemeTypographyEditor() {
         className="mt-2 p-2 bg-gray-50 rounded border border-gray-200"
         style={{ fontFamily: t.fontFamily, fontSize: t.baseFontSize, lineHeight: t.lineHeight }}
       >
-        <div style={{ fontSize: t.headingSizes.h1, fontWeight: t.fontWeights.extrabold, lineHeight: 1.2, marginBottom: 4 }}>
+        <div
+          style={{ fontSize: t.headingSizes.h1, fontWeight: t.fontWeights.extrabold, lineHeight: 1.2, marginBottom: 4 }}
+        >
           Titre H1
         </div>
         <div style={{ fontSize: t.headingSizes.h2, fontWeight: t.fontWeights.bold, lineHeight: 1.3, marginBottom: 4 }}>

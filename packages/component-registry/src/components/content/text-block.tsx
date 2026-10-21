@@ -10,10 +10,7 @@ interface Props {
 
 function TextBlock({ theme, content = "" }: Props) {
   return (
-    <RichBlock
-      text={content}
-      style={{ margin: "0 0 8px", fontSize: 13, lineHeight: 1.65, color: theme.colors.text }}
-    />
+    <RichBlock text={content} style={{ margin: "0 0 8px", fontSize: 13, lineHeight: 1.65, color: theme.colors.text }} />
   );
 }
 
@@ -23,9 +20,7 @@ register({
   icon: "AlignLeft",
   category: "content",
   description: "Paragraphe de texte libre",
-  schema: [
-    { key: "content", label: "Contenu", type: "richtext", defaultValue: "Votre texte ici..." },
-  ],
+  schema: [{ key: "content", label: "Contenu", type: "richtext", defaultValue: "Votre texte ici..." }],
   acceptsChildren: false,
   defaultProps: { content: "Votre texte ici..." },
   render: TextBlock as RegisteredComponent["render"],

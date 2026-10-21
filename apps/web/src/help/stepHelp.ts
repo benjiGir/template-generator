@@ -3,21 +3,21 @@ import type { ObjectKind } from "@/components/ui/ObjectIdentity";
 /** Section d'aide de chaque étape des parcours (type d'objet produit → clé d'étape → article#section) */
 const STEP_HELP: Record<ObjectKind, Record<string, string>> = {
   doc: {
-    select:  "studio#choisir",
-    fill:    "studio#remplir",
+    select: "studio#choisir",
+    fill: "studio#remplir",
     preview: "studio#relire",
-    export:  "studio#exporter",
+    export: "studio#exporter",
   },
   tpl: {
-    start:   "atelier#point-de-depart",
-    theme:   "atelier#theme",
-    build:   "atelier#construire",
+    start: "atelier#point-de-depart",
+    theme: "atelier#theme",
+    build: "atelier#construire",
     publish: "atelier#champs",
   },
   preset: {
-    select:    "bibliotheque#preset",
+    select: "bibliotheque#preset",
     configure: "bibliotheque#preset",
-    save:      "bibliotheque#preset",
+    save: "bibliotheque#preset",
   },
 };
 

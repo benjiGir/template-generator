@@ -30,7 +30,11 @@ export function DocumentCard({ doc, onDuplicate, onDelete, compact = false }: Pr
 
   return (
     <div className="group flex flex-col overflow-hidden border border-rule bg-white transition-colors hover:border-ink">
-      <button onClick={() => navigate(`/documents/${doc.id}`)} className="block text-left" aria-label={`Ouvrir ${doc.name}`}>
+      <button
+        onClick={() => navigate(`/documents/${doc.id}`)}
+        className="block text-left"
+        aria-label={`Ouvrir ${doc.name}`}
+      >
         <div className="flex justify-center overflow-hidden border-b border-rule bg-table px-5 pt-4">
           {preview ? (
             <div className="overflow-hidden border border-b-0 border-gray-300 shadow-[3px_0_0_var(--color-doc)]">
@@ -44,11 +48,19 @@ export function DocumentCard({ doc, onDuplicate, onDelete, compact = false }: Pr
         </div>
         <div className="px-4 pb-2 pt-3">
           <h3 className="truncate text-sm font-semibold text-ink">{doc.name}</h3>
-          {doc.templateName && <div className="mt-0.5 flex"><TemplateRef name={doc.templateName} /></div>}
-          <div className="mt-1.5"><DocumentStatusBadge document={doc} /></div>
+          {doc.templateName && (
+            <div className="mt-0.5 flex">
+              <TemplateRef name={doc.templateName} />
+            </div>
+          )}
+          <div className="mt-1.5">
+            <DocumentStatusBadge document={doc} />
+          </div>
           {doc.status === "draft" ? (
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex-1"><SegmentedProgress filled={doc.completionPercent} total={100} height={6} /></div>
+              <div className="flex-1">
+                <SegmentedProgress filled={doc.completionPercent} total={100} height={6} />
+              </div>
               <span className="shrink-0 font-mono text-[11px] text-gray-700">{doc.completionPercent} %</span>
             </div>
           ) : null}

@@ -67,7 +67,9 @@ export function DocumentSelectPage() {
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-base font-semibold text-gray-900">Quel document voulez-vous produire ?</h2>
-              <p className="mt-0.5 text-sm text-gray-500">Le document reprend la mise en page du template ; vous n'aurez qu'à remplir le contenu.</p>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Le document reprend la mise en page du template ; vous n'aurez qu'à remplir le contenu.
+              </p>
             </div>
             {templates.length > 6 && (
               <label className="flex w-64 items-center gap-2 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 focus-within:border-ink">
@@ -90,7 +92,9 @@ export function DocumentSelectPage() {
           {!isLoading && templates.length > 0 && visible.length === 0 && (
             <p className="py-10 text-center text-sm text-gray-500">
               Aucun template ne correspond à « {search} ».{" "}
-              <button onClick={() => setSearch("")} className="text-doc-strong hover:underline">Effacer la recherche</button>
+              <button onClick={() => setSearch("")} className="text-doc-strong hover:underline">
+                Effacer la recherche
+              </button>
             </p>
           )}
 
@@ -126,9 +130,12 @@ export function DocumentSelectPage() {
                       <h3 className="truncate text-sm font-semibold text-gray-900">{t.name}</h3>
                       {t.description && <p className="mt-1 line-clamp-2 text-xs text-gray-500">{t.description}</p>}
                       <p className="mt-3 text-xs text-gray-500">
-                        <span className="mr-1.5 rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-700">{effort.size}</span>
+                        <span className="mr-1.5 rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-700">
+                          {effort.size}
+                        </span>
                         {effort.total} champ{effort.total > 1 ? "s" : ""} à remplir
-                        {effort.required > 0 && `, dont ${effort.required} obligatoire${effort.required > 1 ? "s" : ""}`}
+                        {effort.required > 0 &&
+                          `, dont ${effort.required} obligatoire${effort.required > 1 ? "s" : ""}`}
                       </p>
                     </div>
                   </button>

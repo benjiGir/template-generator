@@ -10,12 +10,23 @@ export function RichText({ text }: { text: string }) {
       {segments.map((seg, i) => {
         if (seg.href) {
           return (
-            <a key={i} href={seg.href} style={{ color: "inherit", textDecoration: "underline" }} target="_blank" rel="noopener noreferrer">
+            <a
+              key={i}
+              href={seg.href}
+              style={{ color: "inherit", textDecoration: "underline" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {seg.bold ? <strong>{seg.text}</strong> : seg.italic ? <em>{seg.text}</em> : seg.text}
             </a>
           );
         }
-        if (seg.bold && seg.italic) return <strong key={i}><em>{seg.text}</em></strong>;
+        if (seg.bold && seg.italic)
+          return (
+            <strong key={i}>
+              <em>{seg.text}</em>
+            </strong>
+          );
         if (seg.bold) return <strong key={i}>{seg.text}</strong>;
         if (seg.italic) return <em key={i}>{seg.text}</em>;
         return <span key={i}>{seg.text}</span>;
@@ -44,9 +55,11 @@ export function RichBlock({ text, style }: { text: string; style?: CSSProperties
       elements.push(
         <ul key={`ul-${i}`} style={{ margin: "0 0 4px", paddingLeft: 16, listStyleType: "disc" }}>
           {items.map((content, j) => (
-            <li key={j} style={style}><RichText text={content} /></li>
+            <li key={j} style={style}>
+              <RichText text={content} />
+            </li>
           ))}
-        </ul>
+        </ul>,
       );
     } else if (block.type === "ol-item") {
       const items: string[] = [];
@@ -57,15 +70,17 @@ export function RichBlock({ text, style }: { text: string; style?: CSSProperties
       elements.push(
         <ol key={`ol-${i}`} style={{ margin: "0 0 4px", paddingLeft: 16 }}>
           {items.map((content, j) => (
-            <li key={j} style={style}><RichText text={content} /></li>
+            <li key={j} style={style}>
+              <RichText text={content} />
+            </li>
           ))}
-        </ol>
+        </ol>,
       );
     } else {
       elements.push(
         <p key={`p-${i}`} style={{ ...style, margin: "0 0 4px" }}>
           <RichText text={block.content} />
-        </p>
+        </p>,
       );
       i++;
     }

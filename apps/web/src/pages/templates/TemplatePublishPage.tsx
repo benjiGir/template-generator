@@ -41,7 +41,10 @@ export function TemplatePublishPage() {
   const [pickMessage, setPickMessage] = useState<string | null>(null);
 
   const detected = useMemo(() => detectFields(template, (type) => get(type)), [template]);
-  const { retained, excluded } = useMemo(() => reconcileFields(template.editableFields, detected), [template.editableFields, detected]);
+  const { retained, excluded } = useMemo(
+    () => reconcileFields(template.editableFields, detected),
+    [template.editableFields, detected],
+  );
 
   // Première visite d'un brouillon : la pré-sélection sert de point de départ
   useEffect(() => {
@@ -54,7 +57,8 @@ export function TemplatePublishPage() {
   const resetToSuggestion = async () => {
     const ok = await confirm({
       title: "Revenir à la pré-sélection ?",
-      message: "Les champs, libellés, groupes et champs obligatoires que vous avez définis seront remplacés par la proposition automatique.",
+      message:
+        "Les champs, libellés, groupes et champs obligatoires que vous avez définis seront remplacés par la proposition automatique.",
       confirmLabel: "Remplacer",
       tone: "danger",
     });
@@ -83,7 +87,9 @@ export function TemplatePublishPage() {
 
   const publish = async () => {
     await session?.flush();
-    const result = await api.templates.publish(template.id, { editableFields: retained.map(({ location: _l, ...f }) => f) });
+    const result = await api.templates.publish(template.id, {
+      editableFields: retained.map(({ location: _l, ...f }) => f),
+    });
     applyServerState(result);
     queryClient.setQueryData(queryKeys.templates.detail(result.id), result);
     await queryClient.invalidateQueries({ queryKey: ["templates", "list"] });
@@ -94,8 +100,8 @@ export function TemplatePublishPage() {
 
   const tabs: { key: Tab; label: string; badge?: string }[] = [
     { key: "fields", label: "Champs", badge: String(retained.length) },
-    { key: "form",   label: "Formulaire du Studio" },
-    { key: "info",   label: "Nom et description", badge: nameMissing ? "!" : undefined },
+    { key: "form", label: "Formulaire du Studio" },
+    { key: "info", label: "Nom et description", badge: nameMissing ? "!" : undefined },
   ];
 
   return (
@@ -105,7 +111,12 @@ export function TemplatePublishPage() {
       entityId={template.id}
       title={<TemplateTitle />}
       finalAction={{
-        label: status === "draft" ? "Publier dans le Studio" : status === "published-with-changes" ? "Publier les modifications" : "Republier",
+        label:
+          status === "draft"
+            ? "Publier dans le Studio"
+            : status === "published-with-changes"
+              ? "Publier les modifications"
+              : "Republier",
         icon: <Send size={14} />,
         onClick: publish,
         disabled: nameMissing,
@@ -122,12 +133,16 @@ export function TemplatePublishPage() {
                 aria-selected={tab === t.key}
                 onClick={() => setTab(t.key)}
                 className={`-mb-px flex items-center gap-1.5 border-b-2 px-2.5 py-2 text-xs font-medium ${
-                  tab === t.key ? "border-blue-600 text-blue-700" : "border-transparent text-gray-500 hover:text-gray-800"
+                  tab === t.key
+                    ? "border-blue-600 text-blue-700"
+                    : "border-transparent text-gray-500 hover:text-gray-800"
                 }`}
               >
                 {t.label}
                 {t.badge && (
-                  <span className={`rounded-full px-1.5 text-[10px] ${t.badge === "!" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"}`}>
+                  <span
+                    className={`rounded-full px-1.5 text-[10px] ${t.badge === "!" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"}`}
+                  >
                     {t.badge}
                   </span>
                 )}
@@ -179,10 +194,14 @@ export function TemplatePublishPage() {
                     onChange={(e) => updateTemplateMeta(e.target.value)}
                     className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                   />
-                  <p className="mt-1 text-[11px] text-gray-400">C'est ce nom que les contributeurs verront dans le Studio.</p>
+                  <p className="mt-1 text-[11px] text-gray-400">
+                    C'est ce nom que les contributeurs verront dans le Studio.
+                  </p>
                 </div>
                 <div>
-                  <label htmlFor="tpl-desc" className="mb-1 block text-xs font-medium text-gray-600">Description</label>
+                  <label htmlFor="tpl-desc" className="mb-1 block text-xs font-medium text-gray-600">
+                    Description
+                  </label>
                   <textarea
                     id="tpl-desc"
                     value={template.description ?? ""}

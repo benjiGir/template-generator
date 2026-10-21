@@ -24,10 +24,7 @@ function TwoColumnText({ theme, leftContent = "", rightContent = "", ratio = "50
   return (
     <div style={{ display: "flex", gap, marginBottom: 12 }}>
       <div style={{ width: leftW, minWidth: 0 }}>
-        <RichBlock
-          text={leftContent}
-          style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: theme.colors.text }}
-        />
+        <RichBlock text={leftContent} style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: theme.colors.text }} />
       </div>
       <div style={{ width: rightW, minWidth: 0 }}>
         <RichBlock
@@ -46,8 +43,20 @@ register({
   category: "layout",
   description: "Deux colonnes de texte richtext avec ratio configurable",
   schema: [
-    { key: "leftContent", label: "Colonne gauche", type: "richtext", defaultValue: "Contenu gauche…", group: "Contenu" },
-    { key: "rightContent", label: "Colonne droite", type: "richtext", defaultValue: "Contenu droite…", group: "Contenu" },
+    {
+      key: "leftContent",
+      label: "Colonne gauche",
+      type: "richtext",
+      defaultValue: "Contenu gauche…",
+      group: "Contenu",
+    },
+    {
+      key: "rightContent",
+      label: "Colonne droite",
+      type: "richtext",
+      defaultValue: "Contenu droite…",
+      group: "Contenu",
+    },
     {
       key: "ratio",
       label: "Ratio",

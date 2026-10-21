@@ -24,7 +24,15 @@ function isContentProp(p: PropSchema): boolean {
 }
 
 /** Réglages de style regroupés et repliables : on n'ouvre que ce dont on a besoin */
-function StyleSections({ schema, node, onUpdate }: { schema: PropSchema[]; node: ComponentNode; onUpdate: (key: string, value: unknown) => void }) {
+function StyleSections({
+  schema,
+  node,
+  onUpdate,
+}: {
+  schema: PropSchema[];
+  node: ComponentNode;
+  onUpdate: (key: string, value: unknown) => void;
+}) {
   const groups = new Map<string, PropSchema[]>();
   for (const p of schema) {
     const g = p.group && p.group !== "Style" ? p.group : "Apparence";
@@ -140,7 +148,12 @@ export function Inspector() {
       <>
         {content.length > 0 && style.length > 0 && (
           <div className="mb-4 flex gap-1 rounded-lg bg-gray-100 p-0.5" role="tablist">
-            {([["content", "Contenu", content.length], ["style", "Style", style.length]] as const).map(([key, label, count]) => (
+            {(
+              [
+                ["content", "Contenu", content.length],
+                ["style", "Style", style.length],
+              ] as const
+            ).map(([key, label, count]) => (
               <button
                 key={key}
                 role="tab"
@@ -161,8 +174,13 @@ export function Inspector() {
             {content.map((s) => {
               const editingInline = inlineEditingNodeId === node.id && inlineEditingPropKey === s.key;
               return (
-                <div key={s.key} className={editingInline ? "-mx-2 rounded-md bg-amber-50 px-2 py-1 ring-1 ring-amber-200" : ""}>
-                  {editingInline && <p className="mb-1 text-[10px] font-medium text-amber-800">En cours d'édition dans le document</p>}
+                <div
+                  key={s.key}
+                  className={editingInline ? "-mx-2 rounded-md bg-amber-50 px-2 py-1 ring-1 ring-amber-200" : ""}
+                >
+                  {editingInline && (
+                    <p className="mb-1 text-[10px] font-medium text-amber-800">En cours d'édition dans le document</p>
+                  )}
                   <PropField schema={s} value={node.props[s.key]} onChange={(v) => onUpdate(s.key, v)} />
                 </div>
               );
@@ -180,17 +198,11 @@ export function Inspector() {
       <div className="h-full flex flex-col border-l border-gray-200 bg-white">
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-200 shrink-0">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Inspecteur
-          </h2>
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Inspecteur</h2>
           {selectedNode && definition && (
             <p className="text-sm font-semibold text-gray-900 mt-0.5">{definition.label}</p>
           )}
-          {!selectedNode && (
-            <p className="text-xs text-gray-400 mt-0.5">
-              {template?.name ?? "Aucun template"}
-            </p>
-          )}
+          {!selectedNode && <p className="text-xs text-gray-400 mt-0.5">{template?.name ?? "Aucun template"}</p>}
 
           {/* Tabs — affichés quand aucun composant n'est sélectionné */}
           {showNoSelection && (
@@ -224,9 +236,7 @@ export function Inspector() {
           {selectedNode && definition ? (
             <div className="p-4">
               {definition.schema.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center">
-                  Ce composant n'a pas de propriétés éditables.
-                </p>
+                <p className="text-xs text-gray-400 text-center">Ce composant n'a pas de propriétés éditables.</p>
               ) : (
                 renderSchema(definition.schema, selectedNode)
               )}
@@ -244,9 +254,7 @@ export function Inspector() {
 
           {!selectedNode && !template && (
             <div className="flex-1 flex items-center justify-center p-4">
-              <p className="text-xs text-gray-400 text-center">
-                Cliquez sur un composant pour l'éditer
-              </p>
+              <p className="text-xs text-gray-400 text-center">Cliquez sur un composant pour l'éditer</p>
             </div>
           )}
         </div>
@@ -278,12 +286,7 @@ export function Inspector() {
         )}
       </div>
 
-      {showPresetDialog && (
-        <SavePresetDialog
-          onSave={handleSavePreset}
-          onCancel={() => setShowPresetDialog(false)}
-        />
-      )}
+      {showPresetDialog && <SavePresetDialog onSave={handleSavePreset} onCancel={() => setShowPresetDialog(false)} />}
     </>
   );
 }

@@ -27,8 +27,8 @@ export function DragOverlay({ activeDragData }: Props) {
           {activeDragData.source === "library"
             ? (get(activeDragData.componentType)?.label ?? activeDragData.componentType)
             : activeDragData.source === "preset"
-            ? `${get(activeDragData.baseType)?.label ?? activeDragData.baseType} (preset)`
-            : `Déplacer`}
+              ? `${get(activeDragData.baseType)?.label ?? activeDragData.baseType} (preset)`
+              : `Déplacer`}
         </div>
       ) : null}
     </DndDragOverlay>

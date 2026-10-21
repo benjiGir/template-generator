@@ -46,21 +46,25 @@ export function GettingStarted({ templates, documentCount }: Props) {
     <section className="border-2 border-ink bg-white p-6">
       <h2 className="text-lg font-bold">Bienvenue dans DocForge</h2>
       <p className="mt-1 text-sm text-gray-700">
-        La mise en page se conçoit une fois dans un <strong>template</strong> ; chaque <strong>document</strong> n'en remplit que le contenu.
-        Voici les trois étapes.
+        La mise en page se conçoit une fois dans un <strong>template</strong> ; chaque <strong>document</strong> n'en
+        remplit que le contenu. Voici les trois étapes.
       </p>
       <ol className="mt-5 grid grid-cols-3 gap-4">
         {steps.map((step, i) => (
           <li
             key={step.title}
             className={`border border-t-4 p-4 ${KIND_STYLES[step.kind].borderTop} ${
-              i === current ? `border-x-rule border-b-rule ${KIND_STYLES[step.kind].tint}` : "border-x-rule border-b-rule"
+              i === current
+                ? `border-x-rule border-b-rule ${KIND_STYLES[step.kind].tint}`
+                : "border-x-rule border-b-rule"
             }`}
           >
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs font-semibold text-gray-700">{String(i + 1).padStart(2, "0")}</span>
               <ObjectMark kind={step.kind} size={9} />
-              <span className={`text-sm font-semibold ${step.done ? "text-gray-500 line-through" : "text-ink"}`}>{step.title}</span>
+              <span className={`text-sm font-semibold ${step.done ? "text-gray-500 line-through" : "text-ink"}`}>
+                {step.title}
+              </span>
               {step.done && <Check size={13} strokeWidth={3} aria-label="fait" />}
             </div>
             <p className="mt-2 text-xs text-gray-700">{step.text}</p>

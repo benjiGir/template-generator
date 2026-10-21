@@ -9,12 +9,7 @@ interface Props {
   showChevron?: boolean;
 }
 
-function PageHeader({
-  theme,
-  brandName = "Marque",
-  brandSub = "",
-  showChevron = true,
-}: Props) {
+function PageHeader({ theme, brandName = "Marque", brandSub = "", showChevron = true }: Props) {
   return (
     <div
       style={{
@@ -55,13 +50,7 @@ function PageHeader({
 
       {/* Chevrons décoratifs */}
       {showChevron && (
-        <svg
-          width="60"
-          height="24"
-          viewBox="0 0 60 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="60" height="24" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M0 0 L12 12 L0 24"
             stroke={theme.colors.primary}

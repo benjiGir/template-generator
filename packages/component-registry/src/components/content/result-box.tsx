@@ -37,9 +37,7 @@ register({
   icon: "CheckSquare",
   category: "content",
   description: "Encadré de résumé ou de résultat",
-  schema: [
-    { key: "text", label: "Texte", type: "textarea", defaultValue: "Résultat..." },
-  ],
+  schema: [{ key: "text", label: "Texte", type: "textarea", defaultValue: "Résultat..." }],
   acceptsChildren: false,
   defaultProps: { text: "Résultat..." },
   render: ResultBox as RegisteredComponent["render"],

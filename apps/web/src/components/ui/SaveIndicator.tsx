@@ -5,7 +5,10 @@ import type { Autosave } from "@/hooks/useAutosave";
 export function SaveIndicator({ autosave }: { autosave: Autosave }) {
   if (autosave.status === "error") {
     return (
-      <span className="flex items-center gap-1.5 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700" role="alert">
+      <span
+        className="flex items-center gap-1.5 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700"
+        role="alert"
+      >
         <AlertCircle size={13} />
         Enregistrement impossible — vos modifications sont conservées dans cet onglet
         <button onClick={() => void autosave.flush()} className="ml-1 underline hover:no-underline">

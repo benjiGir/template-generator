@@ -37,11 +37,47 @@ function MiniToolbar() {
   const btn = "px-1.5 py-0.5 text-xs text-gray-600 hover:bg-gray-100 rounded";
   return (
     <div className="flex items-center gap-0.5 px-1 py-0.5 bg-white border border-gray-200 rounded shadow-md">
-      <button type="button" className={`${btn} font-bold`} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold"); }}>B</button>
-      <button type="button" className={`${btn} italic`} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic"); }}>I</button>
+      <button
+        type="button"
+        className={`${btn} font-bold`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+        }}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        className={`${btn} italic`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+        }}
+      >
+        I
+      </button>
       <span className="w-px h-3 bg-gray-200 mx-0.5" />
-      <button type="button" className={btn} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined); }}>•</button>
-      <button type="button" className={btn} onMouseDown={(e) => { e.preventDefault(); editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined); }}>1.</button>
+      <button
+        type="button"
+        className={btn}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+        }}
+      >
+        •
+      </button>
+      <button
+        type="button"
+        className={btn}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+        }}
+      >
+        1.
+      </button>
     </div>
   );
 }
@@ -82,15 +118,18 @@ export function InlineEditor({ nodeId, propKey, value }: Props) {
     return () => document.removeEventListener("mousedown", handler);
   }, [stopInlineEdit]);
 
-  const handleChange = useCallback((editorState: import("lexical").EditorState) => {
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      editorState.read(() => {
-        const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-        updateNodeProps(nodeId, { [propKey]: md });
-      });
-    }, 200);
-  }, [nodeId, propKey, updateNodeProps]);
+  const handleChange = useCallback(
+    (editorState: import("lexical").EditorState) => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        editorState.read(() => {
+          const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+          updateNodeProps(nodeId, { [propKey]: md });
+        });
+      }, 200);
+    },
+    [nodeId, propKey, updateNodeProps],
+  );
 
   const initialConfig = {
     namespace: "inline-editor",
@@ -137,7 +176,10 @@ export function InlineTextEditor({ nodeId, propKey, value }: Props) {
   const initial = useRef(value);
 
   return (
-    <div style={{ position: "absolute", inset: -2, zIndex: 200, display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+    <div
+      style={{ position: "absolute", inset: -2, zIndex: 200, display: "flex", alignItems: "center" }}
+      onClick={(e) => e.stopPropagation()}
+    >
       <input
         autoFocus
         defaultValue={value}

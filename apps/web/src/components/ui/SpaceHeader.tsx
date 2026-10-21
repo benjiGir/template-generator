@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import { ObjectTag, type ObjectKind } from "./ObjectIdentity";
 
 /** En-tête d'une liste d'espace : type d'objet, titre, ce qu'on y fait, action de création */
-export function SpaceHeader({ kind, tag, title, subtitle, action }: {
+export function SpaceHeader({
+  kind,
+  tag,
+  title,
+  subtitle,
+  action,
+}: {
   kind: ObjectKind;
   tag: string;
   title: string;
@@ -22,10 +28,21 @@ export function SpaceHeader({ kind, tag, title, subtitle, action }: {
 }
 
 /** Bouton de création dans la couleur du type d'objet */
-export function CreateButton({ kind, onClick, children }: { kind: ObjectKind; onClick: () => void; children: ReactNode }) {
+export function CreateButton({
+  kind,
+  onClick,
+  children,
+}: {
+  kind: ObjectKind;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   const bg = kind === "doc" ? "bg-doc" : kind === "tpl" ? "bg-tpl" : "bg-preset";
   return (
-    <button onClick={onClick} className={`inline-flex min-h-[42px] items-center gap-2 rounded-sm px-4 font-semibold text-white hover:brightness-95 ${bg}`}>
+    <button
+      onClick={onClick}
+      className={`inline-flex min-h-[42px] items-center gap-2 rounded-sm px-4 font-semibold text-white hover:brightness-95 ${bg}`}
+    >
       {children}
     </button>
   );

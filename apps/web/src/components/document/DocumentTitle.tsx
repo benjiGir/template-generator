@@ -40,7 +40,10 @@ export function DocumentTitle() {
         onBlur={() => void commit()}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.currentTarget.blur();
-          if (e.key === "Escape") { setDraft(document.name); setEditing(false); }
+          if (e.key === "Escape") {
+            setDraft(document.name);
+            setEditing(false);
+          }
         }}
         aria-label="Nom du document"
         className="w-full rounded border border-ink px-1.5 py-0.5 text-sm font-semibold text-gray-900 focus:outline-none"
@@ -50,7 +53,10 @@ export function DocumentTitle() {
 
   return (
     <button
-      onClick={() => { setDraft(document.name); setEditing(true); }}
+      onClick={() => {
+        setDraft(document.name);
+        setEditing(true);
+      }}
       title="Renommer le document"
       className="group flex max-w-full items-center gap-1.5 rounded text-left hover:text-doc-strong"
     >

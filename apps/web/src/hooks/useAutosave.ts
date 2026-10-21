@@ -27,7 +27,14 @@ export interface Autosave {
  * attend une pause de saisie, n'envoie qu'une requête à la fois,
  * sauvegarde ce qui reste au démontage et prévient avant de fermer l'onglet.
  */
-export function useAutosave<T>({ revision, savedRevision, getSnapshot, save, onSaved, delay = 1200 }: Options<T>): Autosave {
+export function useAutosave<T>({
+  revision,
+  savedRevision,
+  getSnapshot,
+  save,
+  onSaved,
+  delay = 1200,
+}: Options<T>): Autosave {
   const [status, setStatus] = useState<SaveStatus>("idle");
   const dirty = revision !== savedRevision;
 
@@ -77,14 +84,19 @@ export function useAutosave<T>({ revision, savedRevision, getSnapshot, save, onS
   useEffect(() => {
     if (!dirty) return;
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => { void run(); }, delay);
+    timer.current = setTimeout(() => {
+      void run();
+    }, delay);
   }, [revision, dirty, delay, run]);
 
   // Au démontage : on envoie ce qui reste plutôt que de le perdre
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-    void run();
-  }, [run]);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+      void run();
+    },
+    [run],
+  );
 
   useEffect(() => {
     if (!dirty && status !== "saving") return;

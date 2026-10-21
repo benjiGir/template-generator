@@ -190,10 +190,4 @@ export const VIBRANT_GRADIENT: Theme = {
   borders: { radius: 10, radiusLg: 16, width: 1 },
 };
 
-export const BUILTIN_THEMES: Theme[] = [
-  KOMITY_BLUE,
-  MINIMAL_LIGHT,
-  MINIMAL_DARK,
-  CORPORATE_GRAY,
-  VIBRANT_GRADIENT,
-];
+export const BUILTIN_THEMES: Theme[] = [KOMITY_BLUE, MINIMAL_LIGHT, MINIMAL_DARK, CORPORATE_GRAY, VIBRANT_GRADIENT];

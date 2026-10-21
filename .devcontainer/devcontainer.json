@@ -42,10 +42,7 @@
       }
     },
     "jetbrains": {
-      "plugins": [
-        "com.jetbrains.plugins.tailwindcss",
-        "intellij.prettierJS"
-      ]
+      "plugins": ["com.jetbrains.plugins.tailwindcss", "intellij.prettierJS"]
     }
   }
 }

@@ -15,23 +15,23 @@ function completionOf(snapshot: unknown, data: Record<string, unknown>): number 
 router.get("/", async (c) => {
   const result = await db
     .select({
-      id:                documents.id,
-      templateId:        documents.templateId,
-      templateName:      sql<string | null>`"documents"."template_snapshot" ->> 'name'`,
+      id: documents.id,
+      templateId: documents.templateId,
+      templateName: sql<string | null>`"documents"."template_snapshot" ->> 'name'`,
       // Première page du snapshot et données saisies : de quoi dessiner une miniature fidèle
-      preview:           sql<unknown>`jsonb_build_object(
+      preview: sql<unknown>`jsonb_build_object(
         'theme', "documents"."template_snapshot" -> 'theme',
         'pageFormat', "documents"."template_snapshot" -> 'pageFormat',
         'pages', jsonb_path_query_array("documents"."template_snapshot" -> 'pages', '$[0]'),
         'editableFields', "documents"."template_snapshot" -> 'editableFields'
       )`,
-      data:              documents.data,
-      name:              documents.name,
-      status:            documents.status,
+      data: documents.data,
+      name: documents.name,
+      status: documents.status,
       completionPercent: documents.completionPercent,
-      exportedAt:        documents.exportedAt,
-      updatedAt:         documents.updatedAt,
-      createdAt:         documents.createdAt,
+      exportedAt: documents.exportedAt,
+      updatedAt: documents.updatedAt,
+      createdAt: documents.createdAt,
     })
     .from(documents)
     .orderBy(desc(documents.updatedAt));
@@ -57,11 +57,11 @@ router.post("/", async (c) => {
   const [result] = await db
     .insert(documents)
     .values({
-      templateId:        template.id,
+      templateId: template.id,
       name,
-      data:              {},
-      templateSnapshot:  snapshot,
-      status:            "draft",
+      data: {},
+      templateSnapshot: snapshot,
+      status: "draft",
       completionPercent: completionOf(snapshot, {}),
     })
     .returning();
@@ -76,11 +76,11 @@ router.post("/:id/duplicate", async (c) => {
   const [result] = await db
     .insert(documents)
     .values({
-      templateId:        source.templateId,
-      name:              `${source.name} (copie)`,
-      data:              source.data,
-      templateSnapshot:  source.templateSnapshot,
-      status:            "draft",
+      templateId: source.templateId,
+      name: `${source.name} (copie)`,
+      data: source.data,
+      templateSnapshot: source.templateSnapshot,
+      status: "draft",
       completionPercent: source.completionPercent,
     })
     .returning();

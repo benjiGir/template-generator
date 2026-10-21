@@ -27,7 +27,10 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       {/* Onglet */}
       <button
         data-page-tab
-        onClick={() => { selectPage(pageIndex); selectNode(null); }}
+        onClick={() => {
+          selectPage(pageIndex);
+          selectNode(null);
+        }}
         style={{
           display: "inline-block",
           marginBottom: 4,
@@ -49,8 +52,14 @@ export function PageView({ page, pageIndex, theme, pageFormat }: Props) {
       <DocumentPage
         theme={theme}
         format={pageFormat}
-        chromeStyle={{ outline: isDropTarget ? "2px dashed #2448C8" : isActivePage ? "2px solid #C9D3F6" : "none", outlineOffset: 2 }}
-        onClick={() => { selectPage(pageIndex); selectNode(null); }}
+        chromeStyle={{
+          outline: isDropTarget ? "2px dashed #2448C8" : isActivePage ? "2px solid #C9D3F6" : "none",
+          outlineOffset: 2,
+        }}
+        onClick={() => {
+          selectPage(pageIndex);
+          selectNode(null);
+        }}
       >
         {/* DropZones entre chaque composant racine */}
         <DropZone pageIndex={pageIndex} parentId={null} index={0} />

@@ -33,11 +33,7 @@ export function ImagePropField({ label, value, onChange }: Props) {
       {/* Preview */}
       {src && (
         <div className="mb-2 relative group">
-          <img
-            src={src}
-            alt=""
-            className="w-full rounded border border-gray-200 object-contain max-h-32"
-          />
+          <img src={src} alt="" className="w-full rounded border border-gray-200 object-contain max-h-32" />
           <button
             type="button"
             onClick={() => onChange({ type: "url", value: "" })}

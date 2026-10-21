@@ -9,7 +9,12 @@ const GHOST = "ghost-";
 
 function ghost(type: string, index: number): ComponentNode {
   const def = get(type);
-  return { id: `${GHOST}${type}-${index}`, type, props: { ...(def?.defaultProps ?? {}) }, children: def?.acceptsChildren ? [] : undefined };
+  return {
+    id: `${GHOST}${type}-${index}`,
+    type,
+    props: { ...(def?.defaultProps ?? {}) },
+    children: def?.acceptsChildren ? [] : undefined,
+  };
 }
 
 /**
@@ -20,11 +25,19 @@ function inContext(node: ComponentNode): ComponentNode {
   const def = get(node.type);
   if (def?.acceptsChildren && (node.children ?? []).length === 0) {
     const childType = def.allowedChildren?.[0] ?? "text-block";
-    return { ...node, children: [0, 1, 2].slice(0, def.childrenLayout === "horizontal" ? 3 : 2).map((i) => ghost(childType, i)) };
+    return {
+      ...node,
+      children: [0, 1, 2].slice(0, def.childrenLayout === "horizontal" ? 3 : 2).map((i) => ghost(childType, i)),
+    };
   }
   const parent = getAll().find((d) => d.allowedChildren?.includes(node.type));
   if (parent) {
-    return { id: `${GHOST}parent`, type: parent.type, props: { ...parent.defaultProps }, children: [node, ghost(node.type, 1), ghost(node.type, 2)] };
+    return {
+      id: `${GHOST}parent`,
+      type: parent.type,
+      props: { ...parent.defaultProps },
+      children: [node, ghost(node.type, 1), ghost(node.type, 2)],
+    };
   }
   return node;
 }
@@ -62,7 +75,12 @@ export function ComponentPreview({ type, props, theme, maxHeight, compact = fals
   const node = inContext({ id: "preview", type, props, children: get(type)?.acceptsChildren ? [] : undefined });
 
   return (
-    <div ref={ref} data-component-preview style={{ maxHeight, overflow: "hidden", pointerEvents: "none", userSelect: "none" }} aria-hidden>
+    <div
+      ref={ref}
+      data-component-preview
+      style={{ maxHeight, overflow: "hidden", pointerEvents: "none", userSelect: "none" }}
+      aria-hidden
+    >
       {zoom > 0 && (
         <div style={{ zoom, width: pageWidth }}>
           <DocumentPage theme={theme} format={format} chromeStyle={{ boxShadow: "none" }}>

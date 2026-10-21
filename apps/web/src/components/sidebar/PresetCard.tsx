@@ -29,7 +29,9 @@ export function PresetCard({ preset }: Props) {
     >
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold leading-tight text-gray-800">{preset.label}</p>
-        <p className="mt-0.5 truncate text-xs leading-tight text-gray-400">{get(preset.baseType)?.label ?? preset.baseType}</p>
+        <p className="mt-0.5 truncate text-xs leading-tight text-gray-400">
+          {get(preset.baseType)?.label ?? preset.baseType}
+        </p>
       </div>
     </div>
   );

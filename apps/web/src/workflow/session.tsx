@@ -30,7 +30,7 @@ export function useWorkflowExitGuard(basePath: string, shouldBlock: () => boolea
       currentLocation.pathname !== nextLocation.pathname &&
       nextLocation.pathname !== basePath &&
       !nextLocation.pathname.startsWith(`${basePath}/`) &&
-      shouldBlock()
+      shouldBlock(),
   );
 
   useEffect(() => {
@@ -41,7 +41,9 @@ export function useWorkflowExitGuard(basePath: string, shouldBlock: () => boolea
       if (ok) blocker.proceed();
       else blocker.reset();
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocker.state]);
 }
@@ -61,6 +63,6 @@ export function useAutosaveExitGuard(basePath: string, autosave: Autosave) {
         cancelLabel: "Rester sur la page",
         tone: "danger",
       });
-    }
+    },
   );
 }

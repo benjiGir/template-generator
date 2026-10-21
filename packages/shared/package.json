@@ -3,12 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
   "exports": {
     "./types/template": "./src/types/template.ts",
     "./types/component": "./src/types/component.ts",
@@ -18,6 +12,12 @@
     "./themes/presets": "./src/themes/presets.ts",
     "./utils/fields": "./src/utils/fields.ts",
     "./utils/field-detection": "./src/utils/field-detection.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

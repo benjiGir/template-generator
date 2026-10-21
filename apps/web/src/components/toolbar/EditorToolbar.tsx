@@ -29,7 +29,8 @@ export function EditorToolbar() {
         <Redo2 size={15} />
       </button>
       <span className="ml-3 text-[11px] text-gray-400">
-        Les pages blanches sont le document exporté en PDF. Panneaux, poignées et contours n'apparaissent pas à l'export.
+        Les pages blanches sont le document exporté en PDF. Panneaux, poignées et contours n'apparaissent pas à
+        l'export.
       </span>
     </div>
   );

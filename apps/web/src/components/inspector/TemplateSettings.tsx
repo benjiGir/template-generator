@@ -1,8 +1,8 @@
 import { useEditorStore } from "@/store/editor-store";
 
 const FORMAT_FIELDS = [
-  { key: "width",   label: "Largeur",            hint: "ex. 210mm (A4)" },
-  { key: "height",  label: "Hauteur minimale",   hint: "La page s'allonge si le contenu dépasse" },
+  { key: "width", label: "Largeur", hint: "ex. 210mm (A4)" },
+  { key: "height", label: "Hauteur minimale", hint: "La page s'allonge si le contenu dépasse" },
   { key: "padding", label: "Marges intérieures", hint: "haut droite bas gauche, ex. 28px 36px" },
 ] as const;
 
@@ -22,7 +22,9 @@ export function TemplateSettings({ onOpenTheme }: { onOpenTheme?: () => void }) 
         <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Format de page</p>
         {FORMAT_FIELDS.map(({ key, label, hint }) => (
           <div key={key} className="space-y-1">
-            <label htmlFor={`format-${key}`} className="text-xs text-gray-600">{label}</label>
+            <label htmlFor={`format-${key}`} className="text-xs text-gray-600">
+              {label}
+            </label>
             <input
               id={`format-${key}`}
               type="text"
@@ -38,7 +40,9 @@ export function TemplateSettings({ onOpenTheme }: { onOpenTheme?: () => void }) 
       {onOpenTheme && (
         <p className="text-[11px] text-gray-500">
           Couleurs, typographie et espacements :{" "}
-          <button onClick={onOpenTheme} className="text-blue-600 hover:underline">onglet Thème</button>
+          <button onClick={onOpenTheme} className="text-blue-600 hover:underline">
+            onglet Thème
+          </button>
         </p>
       )}
     </div>

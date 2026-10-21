@@ -23,7 +23,10 @@ router.get("/:id", async (c) => {
 
 router.post("/", async (c) => {
   const body = pick<PresetInsert>(await c.req.json(), WRITABLE_FIELDS);
-  const [result] = await db.insert(componentPresets).values(body as PresetInsert).returning();
+  const [result] = await db
+    .insert(componentPresets)
+    .values(body as PresetInsert)
+    .returning();
   return c.json(result, 201);
 });
 
@@ -42,11 +45,7 @@ router.post("/:id/duplicate", async (c) => {
 router.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = pick<PresetInsert>(await c.req.json(), WRITABLE_FIELDS);
-  const [result] = await db
-    .update(componentPresets)
-    .set(body)
-    .where(eq(componentPresets.id, id))
-    .returning();
+  const [result] = await db.update(componentPresets).set(body).where(eq(componentPresets.id, id)).returning();
   if (!result) return c.json({ error: "Not found" }, 404);
   return c.json(result);
 });

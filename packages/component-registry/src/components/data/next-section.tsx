@@ -10,13 +10,7 @@ interface Props {
   summary?: string;
 }
 
-function NextSection({
-  theme,
-  title = "Et pour la suite ?",
-  intro = "",
-  items = [],
-  summary,
-}: Props) {
+function NextSection({ theme, title = "Et pour la suite ?", intro = "", items = [], summary }: Props) {
   return (
     <div
       style={{

@@ -31,9 +31,7 @@ register({
   icon: "Minus",
   category: "decoration",
   description: "Bande colorée avec texte de résumé",
-  schema: [
-    { key: "text", label: "Texte", type: "text", defaultValue: "Résumé" },
-  ],
+  schema: [{ key: "text", label: "Texte", type: "text", defaultValue: "Résumé" }],
   acceptsChildren: false,
   defaultProps: { text: "Résumé" },
   render: SummaryBar as RegisteredComponent["render"],

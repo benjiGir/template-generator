@@ -37,9 +37,7 @@ register({
   icon: "PanelBottom",
   category: "decoration",
   description: "Pied de page avec texte centré",
-  schema: [
-    { key: "text", label: "Texte", type: "textarea", defaultValue: "Pied de page" },
-  ],
+  schema: [{ key: "text", label: "Texte", type: "textarea", defaultValue: "Pied de page" }],
   acceptsChildren: false,
   defaultProps: { text: "Pied de page" },
   render: PageFooter as RegisteredComponent["render"],

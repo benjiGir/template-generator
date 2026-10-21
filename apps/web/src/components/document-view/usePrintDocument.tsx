@@ -34,7 +34,7 @@ export function usePrintDocument(): {
         resolveRef.current = resolve;
         setJob(next);
       }),
-    []
+    [],
   );
 
   useLayoutEffect(() => {
@@ -59,7 +59,12 @@ export function usePrintDocument(): {
       await Promise.all(
         Array.from(root.querySelectorAll("img"))
           .filter((img) => !img.complete)
-          .map((img) => new Promise((r) => { img.onload = img.onerror = r; }))
+          .map(
+            (img) =>
+              new Promise((r) => {
+                img.onload = img.onerror = r;
+              }),
+          ),
       );
 
       const pages = Array.from(root.querySelectorAll<HTMLElement>("[data-doc-page]"));
@@ -96,7 +101,7 @@ export function usePrintDocument(): {
         <div data-print-portal ref={rootRef}>
           <DocumentView template={job.template} />
         </div>,
-        document.body
+        document.body,
       )
     : null;
 

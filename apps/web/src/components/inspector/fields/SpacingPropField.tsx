@@ -33,9 +33,7 @@ export function SpacingPropField({ label, value, onChange }: Props) {
           title={linked ? "Délier les côtés" : "Lier les côtés"}
           onClick={() => setLinked((l) => !l)}
           className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
-            linked
-              ? "bg-blue-50 border-blue-300 text-blue-600"
-              : "border-gray-200 text-gray-400 hover:border-gray-300"
+            linked ? "bg-blue-50 border-blue-300 text-blue-600" : "border-gray-200 text-gray-400 hover:border-gray-300"
           }`}
         >
           {linked ? "⛓" : "⛓‍💥"}

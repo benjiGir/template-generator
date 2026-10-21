@@ -44,9 +44,7 @@ register({
   icon: "Stamp",
   category: "decoration",
   description: "Filigrane CONFIDENTIEL en arrière-plan",
-  schema: [
-    { key: "opacity", label: "Opacité", type: "number", defaultValue: 0.08 },
-  ],
+  schema: [{ key: "opacity", label: "Opacité", type: "number", defaultValue: 0.08 }],
   acceptsChildren: false,
   defaultProps: { opacity: 0.08 },
   render: Watermark as RegisteredComponent["render"],

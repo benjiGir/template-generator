@@ -52,13 +52,16 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
   const outline = isDropTarget
     ? `2px dashed ${check.ok ? "#2448C8" : "#9E1B32"}`
     : isSelected
-    ? "2px solid #2448C8"
-    : "2px solid transparent";
+      ? "2px solid #2448C8"
+      : "2px solid transparent";
 
   return (
     <div
       ref={setNodeRef}
-      onMouseOver={(e) => { e.stopPropagation(); if (!isHovered) hoverNode(nodeId); }}
+      onMouseOver={(e) => {
+        e.stopPropagation();
+        if (!isHovered) hoverNode(nodeId);
+      }}
       style={{
         position: "relative",
         opacity: isDragging ? 0.35 : 1,
@@ -69,7 +72,10 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
         transition: "outline-color 0.1s",
         backgroundColor: isDropTarget && check.ok ? "rgba(37,99,235,0.04)" : undefined,
       }}
-      onClick={(e) => { e.stopPropagation(); selectNode(nodeId); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        selectNode(nodeId);
+      }}
       onDoubleClick={handleDoubleClick}
     >
       {/* Poignée de déplacement (survol) */}
@@ -102,27 +108,57 @@ export function SelectableWrapper({ nodeId, nodeType, pageIndex, children }: Pro
       )}
 
       {isDropTarget && (
-        <div style={chipStyle(check.ok ? "#2448C8" : "#9E1B32")}>{check.ok ? `Déposer dans « ${label} »` : check.reason}</div>
+        <div style={chipStyle(check.ok ? "#2448C8" : "#9E1B32")}>
+          {check.ok ? `Déposer dans « ${label} »` : check.reason}
+        </div>
       )}
 
       {/* Sélection : nom du composant et actions rapides (hors document, jamais imprimées) */}
       {isSelected && !isDropTarget && (
         <div
-          style={{ ...chipStyle("#2448C8"), pointerEvents: "auto", display: "flex", alignItems: "center", gap: 2, padding: "0 2px 0 0" }}
+          style={{
+            ...chipStyle("#2448C8"),
+            pointerEvents: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            padding: "0 2px 0 0",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
-          <span {...listeners} {...attributes} title="Déplacer" style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 6px", cursor: "grab", touchAction: "none" }}>
+          <span
+            {...listeners}
+            {...attributes}
+            title="Déplacer"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "2px 6px",
+              cursor: "grab",
+              touchAction: "none",
+            }}
+          >
             <GripVertical size={11} />
             {label}
           </span>
-          <button type="button" title="Dupliquer" aria-label={`Dupliquer ${label}`} onClick={() => duplicateNode(pageIndex, nodeId)} style={chipButton}>
+          <button
+            type="button"
+            title="Dupliquer"
+            aria-label={`Dupliquer ${label}`}
+            onClick={() => duplicateNode(pageIndex, nodeId)}
+            style={chipButton}
+          >
             <Copy size={11} />
           </button>
           <button
             type="button"
             title="Supprimer (Ctrl+Z pour annuler)"
             aria-label={`Supprimer ${label}`}
-            onClick={() => { removeNode(pageIndex, nodeId); selectNode(null); }}
+            onClick={() => {
+              removeNode(pageIndex, nodeId);
+              selectNode(null);
+            }}
             style={chipButton}
           >
             <Trash2 size={11} />

@@ -24,10 +24,7 @@ export function useConfirm(): Confirm {
 export function ConfirmProvider({ children }: { children: ReactNode }) {
   const [request, setRequest] = useState<(ConfirmOptions & { resolve: (ok: boolean) => void }) | null>(null);
 
-  const confirm = useCallback<Confirm>(
-    (options) => new Promise((resolve) => setRequest({ ...options, resolve })),
-    []
-  );
+  const confirm = useCallback<Confirm>((options) => new Promise((resolve) => setRequest({ ...options, resolve })), []);
 
   const close = (ok: boolean) => {
     request?.resolve(ok);
@@ -57,7 +54,10 @@ function ConfirmModal({ options, onClose }: { options: ConfirmOptions; onClose: 
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/40 p-4" onMouseDown={() => onClose(false)}>
+    <div
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/40 p-4"
+      onMouseDown={() => onClose(false)}
+    >
       <div
         role="alertdialog"
         aria-modal="true"
@@ -72,12 +72,17 @@ function ConfirmModal({ options, onClose }: { options: ConfirmOptions; onClose: 
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <h2 id="confirm-title" className="text-sm font-semibold text-gray-900">{options.title}</h2>
+            <h2 id="confirm-title" className="text-sm font-semibold text-gray-900">
+              {options.title}
+            </h2>
             {options.message && <div className="mt-1.5 text-sm text-gray-600">{options.message}</div>}
             {options.consequences && options.consequences.length > 0 && (
               <ul className="mt-3 space-y-1 rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
                 {options.consequences.map((c, i) => (
-                  <li key={i} className="flex gap-2"><span className="text-gray-400">•</span><span>{c}</span></li>
+                  <li key={i} className="flex gap-2">
+                    <span className="text-gray-400">•</span>
+                    <span>{c}</span>
+                  </li>
                 ))}
               </ul>
             )}

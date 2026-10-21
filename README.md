@@ -4,17 +4,17 @@ Outil privé de création de documents techniques (présentations, rapports, rev
 
 ## Stack
 
-| Couche | Technologie |
-|---|---|
-| Monorepo | pnpm workspaces |
-| Frontend | React 19 + Vite + Tailwind CSS 4 |
-| Drag & drop | dnd-kit |
-| State | TanStack Query (serveur) + Zustand/immer (édition en cours) |
-| Backend | Hono + Node.js + tsx |
-| ORM | Drizzle ORM |
-| Base de données | PostgreSQL 18 |
-| Export PDF | `window.print()` + `@page` dynamique |
-| Déploiement | Docker + nginx |
+| Couche          | Technologie                                                 |
+| --------------- | ----------------------------------------------------------- |
+| Monorepo        | pnpm workspaces                                             |
+| Frontend        | React 19 + Vite + Tailwind CSS 4                            |
+| Drag & drop     | dnd-kit                                                     |
+| State           | TanStack Query (serveur) + Zustand/immer (édition en cours) |
+| Backend         | Hono + Node.js + tsx                                        |
+| ORM             | Drizzle ORM                                                 |
+| Base de données | PostgreSQL 18                                               |
+| Export PDF      | `window.print()` + `@page` dynamique                        |
+| Déploiement     | Docker + nginx                                              |
 
 ## Structure
 
@@ -111,15 +111,15 @@ Une fois les données vérifiées, l'ancien volume peut être supprimé (`docker
 
 ## Variables d'environnement
 
-| Variable | Description | Défaut |
-|---|---|---|
-| `DATABASE_URL` | URL de connexion PostgreSQL | `postgres://docforge:password@localhost:5432/docforge` |
-| `DB_PASSWORD` | Mot de passe PostgreSQL (Docker) | `password` |
-| `PORT` | Port de l'API | `3001` |
-| `CORS_ORIGIN` | Origine autorisée par CORS | `http://localhost:5173` |
-| `API_PROXY_TARGET` | API vers laquelle le serveur Vite relaie `/api` (dev) | `http://localhost:3001` |
-| `VITE_API_URL` | URL de l'API appelée directement par le front (vide = relatif, via le proxy) | vide |
-| `WEB_PORT` | Port exposé pour le frontend (Docker) | `8080` |
+| Variable           | Description                                                                  | Défaut                                                 |
+| ------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `DATABASE_URL`     | URL de connexion PostgreSQL                                                  | `postgres://docforge:password@localhost:5432/docforge` |
+| `DB_PASSWORD`      | Mot de passe PostgreSQL (Docker)                                             | `password`                                             |
+| `PORT`             | Port de l'API                                                                | `3001`                                                 |
+| `CORS_ORIGIN`      | Origine autorisée par CORS                                                   | `http://localhost:5173`                                |
+| `API_PROXY_TARGET` | API vers laquelle le serveur Vite relaie `/api` (dev)                        | `http://localhost:3001`                                |
+| `VITE_API_URL`     | URL de l'API appelée directement par le front (vide = relatif, via le proxy) | vide                                                   |
+| `WEB_PORT`         | Port exposé pour le frontend (Docker)                                        | `8080`                                                 |
 
 ## API
 
@@ -154,12 +154,14 @@ GET    /api/health                    Health check
 ## Composants disponibles
 
 ### Layout
+
 - `page-container` — Conteneur de page
 - `two-column-grid` — Grille 2 colonnes
 - `three-column-grid` — Grille 3 colonnes
 - `spacer` — Espacement vertical
 
 ### Content
+
 - `title-block` — Bloc titre + sous-titre
 - `intro-box` — Encadré d'introduction
 - `section-header` — En-tête de section
@@ -169,11 +171,13 @@ GET    /api/health                    Health check
 - `suite-text` — Texte "pour la suite"
 
 ### Data
+
 - `kpi-row` — Ligne de KPIs (conteneur)
 - `kpi-card` — Carte KPI (emoji, titre, description)
 - `next-section` — Section "Et pour la suite ?"
 
 ### Decoration
+
 - `page-header` — En-tête de page avec nom de marque
 - `page-footer` — Pied de page
 - `summary-bar` — Barre de résumé
@@ -181,18 +185,19 @@ GET    /api/health                    Health check
 
 ## Raccourcis clavier (éditeur)
 
-| Raccourci | Action |
-|---|---|
-| `Ctrl+Z` | Annuler |
-| `Ctrl+Shift+Z` | Rétablir |
-| `Ctrl+S` | Sauvegarder immédiatement (la sauvegarde est automatique) |
-| `Delete` | Supprimer le composant sélectionné |
+| Raccourci      | Action                                                    |
+| -------------- | --------------------------------------------------------- |
+| `Ctrl+Z`       | Annuler                                                   |
+| `Ctrl+Shift+Z` | Rétablir                                                  |
+| `Ctrl+S`       | Sauvegarder immédiatement (la sauvegarde est automatique) |
+| `Delete`       | Supprimer le composant sélectionné                        |
 
 ## Export PDF
 
 L'export passe par l'impression du navigateur. Le document est rendu à l'échelle 1 dans un portail dédié
 (`usePrintDocument`), avec les mêmes composants qu'à l'écran ; chaque page reçoit sa propre taille `@page`.
 Dans la boîte d'impression :
+
 - Destination : **Enregistrer au format PDF**
 - Marges : **Aucune**
 

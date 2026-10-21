@@ -28,11 +28,15 @@ export function ComponentLibrary() {
 
   const q = search.trim().toLowerCase();
   const filtered = allComponents.filter(
-    (def) => q === "" || def.label.toLowerCase().includes(q) || def.description.toLowerCase().includes(q)
+    (def) => q === "" || def.label.toLowerCase().includes(q) || def.description.toLowerCase().includes(q),
   );
   // Les presets sont cherchés par leur nom et par le composant dont ils dérivent
   const filteredPresets = presets.filter(
-    (p) => q === "" || `${p.label} ${p.description ?? ""} ${getAll().find((d) => d.type === p.baseType)?.label ?? ""}`.toLowerCase().includes(q)
+    (p) =>
+      q === "" ||
+      `${p.label} ${p.description ?? ""} ${getAll().find((d) => d.type === p.baseType)?.label ?? ""}`
+        .toLowerCase()
+        .includes(q),
   );
 
   const byCategory = CATEGORY_ORDER.map((cat) => ({
@@ -44,9 +48,7 @@ export function ComponentLibrary() {
   return (
     <div className="h-full flex flex-col border-r border-gray-200 bg-white">
       <div className="px-4 py-3 border-b border-gray-200">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-          Bibliothèque
-        </h2>
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Bibliothèque</h2>
         <input
           type="search"
           value={search}

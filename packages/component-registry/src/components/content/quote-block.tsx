@@ -48,16 +48,8 @@ function QuoteBlock({ theme, quote = "", author = "", role = "" }: Props) {
 
       {(author || role) && (
         <div style={{ borderTop: `1px solid ${theme.colors.borderLight}`, paddingTop: 8, marginTop: 4 }}>
-          {author && (
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: theme.colors.text }}>
-              {author}
-            </p>
-          )}
-          {role && (
-            <p style={{ margin: 0, fontSize: 11, color: theme.colors.textMuted }}>
-              {role}
-            </p>
-          )}
+          {author && <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: theme.colors.text }}>{author}</p>}
+          {role && <p style={{ margin: 0, fontSize: 11, color: theme.colors.textMuted }}>{role}</p>}
         </div>
       )}
     </div>

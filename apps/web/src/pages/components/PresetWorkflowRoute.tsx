@@ -61,11 +61,17 @@ export function PresetWorkflowRoute() {
       });
       if (ok) reset();
       return ok;
-    }
+    },
   );
 
   if (query.isError) {
-    return <NotFoundState message="Ce preset n'existe pas ou a été supprimé." backTo="/components" backLabel="Retour aux presets" />;
+    return (
+      <NotFoundState
+        message="Ce preset n'existe pas ou a été supprimé."
+        backTo="/components"
+        backLabel="Retour aux presets"
+      />
+    );
   }
   if (!ready) return <LoadingState label="Chargement du preset…" />;
 

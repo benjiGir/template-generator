@@ -26,7 +26,15 @@ export function HelpProvider({ children }: { children: ReactNode }) {
  * Aide contextuelle : une section de l'aide dans un panneau latéral, par-dessus l'écran en cours.
  * Le travail en cours reste en place ; l'aide complète s'ouvre dans un nouvel onglet.
  */
-function HelpPanel({ target, onNavigate, onClose }: { target: Target; onNavigate: (t: Target) => void; onClose: () => void }) {
+function HelpPanel({
+  target,
+  onNavigate,
+  onClose,
+}: {
+  target: Target;
+  onNavigate: (t: Target) => void;
+  onClose: () => void;
+}) {
   const article = findArticle(target.slug);
   const section = article?.sections.find((s) => s.id === target.sectionId) ?? article?.sections[0];
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -70,19 +78,28 @@ function HelpPanel({ target, onNavigate, onClose }: { target: Target; onNavigate
             Toute l'aide
             <ExternalLink size={12} />
           </a>
-          <button ref={closeRef} onClick={onClose} className="rounded p-1 text-gray-500 hover:bg-white hover:text-ink" aria-label="Fermer l'aide">
+          <button
+            ref={closeRef}
+            onClick={onClose}
+            className="rounded p-1 text-gray-500 hover:bg-white hover:text-ink"
+            aria-label="Fermer l'aide"
+          >
             <X size={16} />
           </button>
         </header>
 
         <div ref={bodyRef} className="flex-1 overflow-y-auto px-6 pb-10 pt-5">
           <p className="text-xs text-gray-600">{article.title}</p>
-          <h2 id="help-panel-title" className="mt-1 text-xl font-bold tracking-tight">{section.title}</h2>
+          <h2 id="help-panel-title" className="mt-1 text-xl font-bold tracking-tight">
+            {section.title}
+          </h2>
           <InHelpPanelContext.Provider value={true}>{section.body}</InHelpPanelContext.Provider>
 
           {article.sections.length > 1 && (
             <nav className="mt-8 border-t border-rule pt-4" aria-label="Dans cet article">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">Dans cet article</p>
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+                Dans cet article
+              </p>
               <ul className="mt-2 space-y-0.5">
                 {article.sections.map((s) => (
                   <li key={s.id}>
@@ -90,7 +107,9 @@ function HelpPanel({ target, onNavigate, onClose }: { target: Target; onNavigate
                       onClick={() => onNavigate({ slug: article.slug, sectionId: s.id })}
                       aria-current={s.id === section.id ? "true" : undefined}
                       className={`w-full border-l-[3px] px-2 py-1 text-left text-sm ${
-                        s.id === section.id ? "border-ink font-semibold text-ink" : "border-transparent text-gray-700 hover:text-ink hover:underline"
+                        s.id === section.id
+                          ? "border-ink font-semibold text-ink"
+                          : "border-transparent text-gray-700 hover:text-ink hover:underline"
                       }`}
                     >
                       {s.title}

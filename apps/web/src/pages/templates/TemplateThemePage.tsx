@@ -11,12 +11,7 @@ export function TemplateThemePage() {
   const isEmpty = template.pages.every((p) => p.children.length === 0);
 
   return (
-    <WorkflowLayout
-      workflow={TEMPLATE_WORKFLOW}
-      current="theme"
-      entityId={template.id}
-      title={<TemplateTitle />}
-    >
+    <WorkflowLayout workflow={TEMPLATE_WORKFLOW} current="theme" entityId={template.id} title={<TemplateTitle />}>
       <div className="flex h-full overflow-hidden">
         <aside className="w-[400px] shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
           <div className="border-b border-gray-100 px-4 py-3">
@@ -31,7 +26,8 @@ export function TemplateThemePage() {
         <div className="flex min-w-0 flex-1 flex-col">
           {isEmpty && (
             <p className="shrink-0 border-b border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-800">
-              Le template est encore vide : le thème s'applique ici à une page d'exemple, qui ne fait pas partie du template.
+              Le template est encore vide : le thème s'applique ici à une page d'exemple, qui ne fait pas partie du
+              template.
             </p>
           )}
           <div className="min-h-0 flex-1">

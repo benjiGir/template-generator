@@ -24,7 +24,13 @@ export const COLOR_GROUPS: { title: string; hint?: string; tokens: ColorToken[] 
   {
     title: "Couleur de marque",
     tokens: [
-      { key: "primary", label: "Marque", light: "primaryLight", usage: "Titres de section, encadré d'introduction, en-tête de page, barre de résumé, citations, cartes « bleu »" },
+      {
+        key: "primary",
+        label: "Marque",
+        light: "primaryLight",
+        usage:
+          "Titres de section, encadré d'introduction, en-tête de page, barre de résumé, citations, cartes « bleu »",
+      },
       { key: "primaryLight", label: "Marque claire", usage: "Fond des cartes et blocs « bleu »" },
     ],
   },
@@ -32,11 +38,26 @@ export const COLOR_GROUPS: { title: string; hint?: string; tokens: ColorToken[] 
     title: "Indicateurs et blocs colorés",
     hint: "Couleurs choisies sur chaque carte KPI, carte métrique ou bloc de détails.",
     tokens: [
-      { key: "success", label: "Vert", light: "successLight", usage: "Bordure et accents des cartes et blocs « vert »" },
+      {
+        key: "success",
+        label: "Vert",
+        light: "successLight",
+        usage: "Bordure et accents des cartes et blocs « vert »",
+      },
       { key: "successLight", label: "Vert clair", usage: "Fond des cartes et blocs « vert »" },
-      { key: "warning", label: "Ambre", light: "warningLight", usage: "Bordure et accents des cartes et blocs « ambre »" },
+      {
+        key: "warning",
+        label: "Ambre",
+        light: "warningLight",
+        usage: "Bordure et accents des cartes et blocs « ambre »",
+      },
       { key: "warningLight", label: "Ambre clair", usage: "Fond des cartes et blocs « ambre »" },
-      { key: "danger", label: "Rouge", light: "dangerLight", usage: "Bordure et accents des cartes et blocs « rouge »" },
+      {
+        key: "danger",
+        label: "Rouge",
+        light: "dangerLight",
+        usage: "Bordure et accents des cartes et blocs « rouge »",
+      },
       { key: "dangerLight", label: "Rouge clair", usage: "Fond des cartes et blocs « rouge »" },
     ],
   },
@@ -44,7 +65,11 @@ export const COLOR_GROUPS: { title: string; hint?: string; tokens: ColorToken[] 
     title: "Textes",
     tokens: [
       { key: "text", label: "Texte", usage: "Texte courant, titres, contenu des encadrés" },
-      { key: "textLight", label: "Texte secondaire", usage: "Sous-titres, descriptions des KPI, pied de page, texte de suite" },
+      {
+        key: "textLight",
+        label: "Texte secondaire",
+        usage: "Sous-titres, descriptions des KPI, pied de page, texte de suite",
+      },
       { key: "textMuted", label: "Texte discret", usage: "Légendes d'image, auteur des citations, tendances" },
     ],
   },
@@ -52,7 +77,11 @@ export const COLOR_GROUPS: { title: string; hint?: string; tokens: ColorToken[] 
     title: "Fonds et encadrés",
     tokens: [
       { key: "background", label: "Fond de page", usage: "Fond des pages du document" },
-      { key: "backgroundAlt", label: "Fond des encadrés", usage: "Encadrés de résultat, blocs de détails, citations, images" },
+      {
+        key: "backgroundAlt",
+        label: "Fond des encadrés",
+        usage: "Encadrés de résultat, blocs de détails, citations, images",
+      },
     ],
   },
   {

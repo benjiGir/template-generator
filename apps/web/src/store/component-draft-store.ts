@@ -16,7 +16,12 @@ interface ComponentDraftState {
   /** Thème utilisé pour l'aperçu (un preset n'a pas de thème propre) */
   previewTheme: string;
   setPreviewTheme: (name: string) => void;
-  setBaseType: (type: string, defaultProps: Record<string, unknown>, category: ComponentCategory, label: string) => void;
+  setBaseType: (
+    type: string,
+    defaultProps: Record<string, unknown>,
+    category: ComponentCategory,
+    label: string,
+  ) => void;
   updateProp: (key: string, value: unknown) => void;
   resetProps: (defaultProps: Record<string, unknown>) => void;
   setMeta: (meta: Partial<Pick<ComponentDraftState, "label" | "description" | "category">>) => void;
@@ -25,13 +30,13 @@ interface ComponentDraftState {
 }
 
 const EMPTY = {
-  baseType:    null,
-  props:       {},
-  editingId:   null,
-  label:       "",
+  baseType: null,
+  props: {},
+  editingId: null,
+  label: "",
   description: "",
-  category:    "content" as ComponentCategory,
-  dirty:       false,
+  category: "content" as ComponentCategory,
+  dirty: false,
 };
 
 /** Conservé dans sessionStorage : un rafraîchissement ne perd pas le preset en cours */
@@ -46,8 +51,7 @@ export const useComponentDraftStore = create<ComponentDraftState>()(
       setBaseType: (type, defaultProps, category, label) =>
         set({ baseType: type, props: { ...defaultProps }, category, label, dirty: true }),
 
-      updateProp: (key, value) =>
-        set((s) => ({ props: { ...s.props, [key]: value }, dirty: true })),
+      updateProp: (key, value) => set((s) => ({ props: { ...s.props, [key]: value }, dirty: true })),
 
       resetProps: (defaultProps) => set({ props: { ...defaultProps }, dirty: true }),
 
@@ -55,17 +59,17 @@ export const useComponentDraftStore = create<ComponentDraftState>()(
 
       loadPreset: (preset) =>
         set({
-          editingId:   preset.id,
-          baseType:    preset.baseType,
-          props:       { ...preset.defaultProps },
-          label:       preset.label,
+          editingId: preset.id,
+          baseType: preset.baseType,
+          props: { ...preset.defaultProps },
+          label: preset.label,
           description: preset.description ?? "",
-          category:    preset.category ?? "content",
-          dirty:       false,
+          category: preset.category ?? "content",
+          dirty: false,
         }),
 
       reset: () => set(EMPTY),
     }),
-    { name: "docforge-preset-draft", storage: createJSONStorage(() => sessionStorage) }
-  )
+    { name: "docforge-preset-draft", storage: createJSONStorage(() => sessionStorage) },
+  ),
 );

@@ -94,7 +94,7 @@ export function InlineFillMode() {
 
   if (!mergedTemplate) return null;
 
-  const selectedFields = selected ? fieldsByNode.get(selected) ?? [] : [];
+  const selectedFields = selected ? (fieldsByNode.get(selected) ?? []) : [];
   const remaining = completion.total - completion.filled;
 
   const panel = selected && selectedFields.length > 0 && (
@@ -103,7 +103,11 @@ export function InlineFillMode() {
         <span className="text-xs font-semibold text-gray-700">
           {selectedFields.length > 1 ? `Modifier ces ${selectedFields.length} contenus` : "Modifier ce contenu"}
         </span>
-        <button onClick={() => setSelected(null)} className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Fermer (Échap)">
+        <button
+          onClick={() => setSelected(null)}
+          className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+          aria-label="Fermer (Échap)"
+        >
           <X size={14} />
         </button>
       </div>
@@ -124,17 +128,28 @@ export function InlineFillMode() {
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-5 py-2 text-xs">
         <div className="flex w-56 items-center gap-2">
-          <div className="flex-1"><SegmentedProgress filled={completion.filled} total={completion.total} /></div>
-          <span className="shrink-0 font-mono text-gray-700">{completion.filled} / {completion.total}</span>
+          <div className="flex-1">
+            <SegmentedProgress filled={completion.filled} total={completion.total} />
+          </div>
+          <span className="shrink-0 font-mono text-gray-700">
+            {completion.filled} / {completion.total}
+          </span>
         </div>
         <span className="text-gray-600">
           {remaining === 0 ? "Tout est rempli" : `Encore ${remaining} champ${remaining > 1 ? "s" : ""}`}
           {completion.missingRequired.length > 0 && (
-            <span className="text-amber-700"> · {completion.missingRequired.length} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide{completion.missingRequired.length > 1 ? "s" : ""}</span>
+            <span className="text-amber-700">
+              {" "}
+              · {completion.missingRequired.length} obligatoire{completion.missingRequired.length > 1 ? "s" : ""} vide
+              {completion.missingRequired.length > 1 ? "s" : ""}
+            </span>
           )}
         </span>
         {remaining > 0 && (
-          <button onClick={goToNextEmpty} className="flex items-center gap-1 rounded px-2 py-1 font-medium text-doc-strong hover:bg-doc-tint">
+          <button
+            onClick={goToNextEmpty}
+            className="flex items-center gap-1 rounded px-2 py-1 font-medium text-doc-strong hover:bg-doc-tint"
+          >
             <SkipForward size={13} />
             Champ vide suivant
           </button>
@@ -170,12 +185,17 @@ export function InlineFillMode() {
             className="absolute left-1/2 top-4 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-xs text-white shadow-lg"
             // Le message reste tant qu'on le survole, le temps de cliquer sur « Pourquoi ? »
             onMouseEnter={() => clearTimeout(noticeTimer.current)}
-            onMouseLeave={() => { noticeTimer.current = setTimeout(() => setLockedNotice(false), 1500); }}
+            onMouseLeave={() => {
+              noticeTimer.current = setTimeout(() => setLockedNotice(false), 1500);
+            }}
           >
             <Lock size={12} />
             Cette partie fait partie du template : elle ne se modifie pas ici.
             <button
-              onClick={() => { setLockedNotice(false); help.open("bases", "zones-verrouillees"); }}
+              onClick={() => {
+                setLockedNotice(false);
+                help.open("bases", "zones-verrouillees");
+              }}
               className="font-semibold underline underline-offset-2 hover:no-underline"
             >
               Pourquoi ?

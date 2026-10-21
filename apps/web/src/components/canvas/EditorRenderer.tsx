@@ -34,7 +34,7 @@ function GridDropZone({ pageIndex, parentId, index, isEmpty }: GridDropZoneProps
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: isOver ? "2px solid #2448C8" : (isEmpty || isDragging) ? "1.5px dashed #C9C3B7" : "none",
+        border: isOver ? "2px solid #2448C8" : isEmpty || isDragging ? "1.5px dashed #C9C3B7" : "none",
         borderRadius: 4,
         backgroundColor: isOver ? "#EEF1FC" : "transparent",
         transition: "all 0.15s ease",
@@ -135,7 +135,12 @@ export function EditorRenderer({ node, theme, pageIndex }: Props) {
         {children.map((child) => (
           <EditorRenderer key={child.id} node={child} theme={theme} pageIndex={pageIndex} />
         ))}
-        <GridDropZone pageIndex={pageIndex} parentId={node.id} index={children.length} isEmpty={children.length === 0} />
+        <GridDropZone
+          pageIndex={pageIndex}
+          parentId={node.id}
+          index={children.length}
+          isEmpty={children.length === 0}
+        />
       </>
     );
   } else {

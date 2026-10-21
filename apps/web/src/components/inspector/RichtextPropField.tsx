@@ -38,16 +38,18 @@ function ToolbarPlugin() {
   const [showLink, setShowLink] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
 
-  useEffect(() =>
-    editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        const sel = $getSelection();
-        if ($isRangeSelection(sel)) {
-          setIsBold(sel.hasFormat("bold"));
-          setIsItalic(sel.hasFormat("italic"));
-        }
-      });
-    }), [editor]
+  useEffect(
+    () =>
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          const sel = $getSelection();
+          if ($isRangeSelection(sel)) {
+            setIsBold(sel.hasFormat("bold"));
+            setIsItalic(sel.hasFormat("italic"));
+          }
+        });
+      }),
+    [editor],
   );
 
   const btn = (active: boolean) =>
@@ -57,13 +59,43 @@ function ToolbarPlugin() {
 
   return (
     <div className="flex items-center gap-0.5 px-2 py-1 border-b border-slate-600 flex-wrap">
-      <button type="button" className={btn(isBold)} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")} title="Gras">B</button>
-      <button type="button" className={`${btn(isItalic)} italic`} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")} title="Italique">I</button>
+      <button
+        type="button"
+        className={btn(isBold)}
+        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+        title="Gras"
+      >
+        B
+      </button>
+      <button
+        type="button"
+        className={`${btn(isItalic)} italic`}
+        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
+        title="Italique"
+      >
+        I
+      </button>
       <span className="w-px h-3 bg-slate-600 mx-0.5" />
-      <button type="button" className={btn(false)} onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} title="Liste à puces">•—</button>
-      <button type="button" className={btn(false)} onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} title="Liste numérotée">1—</button>
+      <button
+        type="button"
+        className={btn(false)}
+        onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}
+        title="Liste à puces"
+      >
+        •—
+      </button>
+      <button
+        type="button"
+        className={btn(false)}
+        onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}
+        title="Liste numérotée"
+      >
+        1—
+      </button>
       <span className="w-px h-3 bg-slate-600 mx-0.5" />
-      <button type="button" className={btn(showLink)} onClick={() => setShowLink((s) => !s)} title="Lien">🔗</button>
+      <button type="button" className={btn(showLink)} onClick={() => setShowLink((s) => !s)} title="Lien">
+        🔗
+      </button>
 
       {showLink && (
         <div className="flex items-center gap-1 w-full mt-1">
@@ -84,7 +116,11 @@ function ToolbarPlugin() {
           />
           <button
             type="button"
-            onClick={() => { editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl); setShowLink(false); setLinkUrl("https://"); }}
+            onClick={() => {
+              editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+              setShowLink(false);
+              setLinkUrl("https://");
+            }}
             className="px-2 py-0.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             OK
@@ -106,15 +142,18 @@ interface Props {
 export function RichtextPropField({ label, value, onChange, placeholder }: Props) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const handleChange = useCallback((editorState: import("lexical").EditorState) => {
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      editorState.read(() => {
-        const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-        onChange(md);
-      });
-    }, 300);
-  }, [onChange]);
+  const handleChange = useCallback(
+    (editorState: import("lexical").EditorState) => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        editorState.read(() => {
+          const md = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+          onChange(md);
+        });
+      }, 300);
+    },
+    [onChange],
+  );
 
   const initialConfig = {
     namespace: "richtext-inspector",
@@ -132,9 +171,7 @@ export function RichtextPropField({ label, value, onChange, placeholder }: Props
             <ToolbarPlugin />
             <div className="relative">
               <RichTextPlugin
-                contentEditable={
-                  <ContentEditable className="outline-none min-h-[60px] p-2 leading-relaxed" />
-                }
+                contentEditable={<ContentEditable className="outline-none min-h-[60px] p-2 leading-relaxed" />}
                 placeholder={
                   <div className="absolute top-2 left-2 text-slate-500 pointer-events-none select-none">
                     {placeholder ?? "Contenu…"}

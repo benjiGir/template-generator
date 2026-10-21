@@ -46,7 +46,7 @@ function draggedType(drag: DragData, template: Template): string | null {
   if (drag.source === "library") return drag.componentType;
   if (drag.source === "preset") return drag.baseType;
   const page = template.pages[drag.pageIndex];
-  return page ? findNode(page.children, drag.nodeId)?.type ?? null : null;
+  return page ? (findNode(page.children, drag.nodeId)?.type ?? null) : null;
 }
 
 /** Ce dépôt est-il possible ? (enfants autorisés, nombre maximal, pas de dépôt dans soi-même) */
@@ -59,7 +59,9 @@ export function checkDrop(drag: DragData, drop: DropZoneData, template: Template
   const type = draggedType(drag, template);
 
   if (drag.source === "canvas") {
-    const moved = template.pages[drag.pageIndex] ? findNode(template.pages[drag.pageIndex]!.children, drag.nodeId) : null;
+    const moved = template.pages[drag.pageIndex]
+      ? findNode(template.pages[drag.pageIndex]!.children, drag.nodeId)
+      : null;
     if (moved && (moved.id === parent.id || findNode(moved.children ?? [], parent.id))) {
       return { ok: false, reason: "Un composant ne peut pas être déposé dans lui-même" };
     }
@@ -94,7 +96,7 @@ export function useDragAndDrop() {
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -139,7 +141,7 @@ export function useDragAndDrop() {
         moveNode(drag.pageIndex, drop.pageIndex, drag.nodeId, drop.parentId, drop.index);
       }
     },
-    [addNode, moveNode]
+    [addNode, moveNode],
   );
 
   return { sensors, activeDragData, handleDragStart, handleDragEnd };

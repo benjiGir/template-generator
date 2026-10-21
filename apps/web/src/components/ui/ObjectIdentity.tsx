@@ -10,16 +10,46 @@ import type { ReactNode } from "react";
 export type ObjectKind = "doc" | "tpl" | "preset";
 
 /** Classes complètes (Tailwind ne repère que des noms de classe entiers) */
-export const KIND_STYLES: Record<ObjectKind, { text: string; bg: string; border: string; borderTop: string; tint: string; label: string }> = {
-  doc:    { text: "text-doc-strong", bg: "bg-doc",    border: "border-doc",    borderTop: "border-t-doc",    tint: "bg-doc-tint",    label: "Document" },
-  tpl:    { text: "text-tpl",        bg: "bg-tpl",    border: "border-tpl",    borderTop: "border-t-tpl",    tint: "bg-tpl-tint",    label: "Template" },
-  preset: { text: "text-preset",     bg: "bg-preset", border: "border-preset", borderTop: "border-t-preset", tint: "bg-preset-tint", label: "Preset" },
+export const KIND_STYLES: Record<
+  ObjectKind,
+  { text: string; bg: string; border: string; borderTop: string; tint: string; label: string }
+> = {
+  doc: {
+    text: "text-doc-strong",
+    bg: "bg-doc",
+    border: "border-doc",
+    borderTop: "border-t-doc",
+    tint: "bg-doc-tint",
+    label: "Document",
+  },
+  tpl: {
+    text: "text-tpl",
+    bg: "bg-tpl",
+    border: "border-tpl",
+    borderTop: "border-t-tpl",
+    tint: "bg-tpl-tint",
+    label: "Template",
+  },
+  preset: {
+    text: "text-preset",
+    bg: "bg-preset",
+    border: "border-preset",
+    borderTop: "border-t-preset",
+    tint: "bg-preset-tint",
+    label: "Preset",
+  },
 };
 
 export function ObjectMark({ kind, size = 10 }: { kind: ObjectKind; size?: number }) {
   const shape =
     kind === "doc" ? "bg-doc" : kind === "tpl" ? "border-2 border-dashed border-tpl" : "rounded-full bg-preset";
-  return <span aria-hidden="true" className={`inline-block shrink-0 box-border ${shape}`} style={{ width: size, height: size }} />;
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-block shrink-0 box-border ${shape}`}
+      style={{ width: size, height: size }}
+    />
+  );
 }
 
 /** Étiquette de type (« DOCUMENTS », « TEMPLATE »…) en tête de section ou d'écran */
@@ -28,10 +58,12 @@ export function ObjectTag({ kind, children }: { kind: ObjectKind; children?: str
     kind === "doc"
       ? "bg-doc text-white"
       : kind === "tpl"
-      ? "border-[1.5px] border-dashed border-tpl text-tpl"
-      : "rounded-full bg-preset text-white";
+        ? "border-[1.5px] border-dashed border-tpl text-tpl"
+        : "rounded-full bg-preset text-white";
   return (
-    <span className={`inline-block px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] ${style}`}>
+    <span
+      className={`inline-block px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] ${style}`}
+    >
       {children ?? KIND_STYLES[kind].label}
     </span>
   );
@@ -55,7 +87,11 @@ export function BlueprintFrame({ children, className = "" }: { children: ReactNo
 /** Vignette abstraite d'un template : tracé blanc, champs en pointillés */
 export function BlueprintGlyph() {
   return (
-    <div aria-hidden="true" className="box-border flex h-12 w-9 flex-col gap-[3px] bg-tpl p-[5px]" style={{ ...BLUEPRINT_GRID, backgroundSize: "6px 6px" }}>
+    <div
+      aria-hidden="true"
+      className="box-border flex h-12 w-9 flex-col gap-[3px] bg-tpl p-[5px]"
+      style={{ ...BLUEPRINT_GRID, backgroundSize: "6px 6px" }}
+    >
       <div className="h-1 w-3/5 border border-white" />
       <div className="h-1.5 border border-dashed border-white/90" />
       <div className="flex gap-0.5">

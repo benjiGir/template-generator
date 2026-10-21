@@ -19,11 +19,17 @@ interface NavItem {
 const HOME: NavItem = { to: "/", label: "Accueil", intent: "Reprendre mon travail", tour: "nav-home" };
 
 /** Le Studio d'abord : c'est l'espace des contributeurs, les deux autres servent à préparer les templates */
-const PRIMARY: NavItem = { to: "/documents", label: "Studio", intent: "Remplir des documents", kind: "doc", tour: "nav-studio" };
+const PRIMARY: NavItem = {
+  to: "/documents",
+  label: "Studio",
+  intent: "Remplir des documents",
+  kind: "doc",
+  tour: "nav-studio",
+};
 
 const DESIGN: NavItem[] = [
-  { to: "/templates",  label: "Atelier",      intent: "Dessiner les templates", kind: "tpl",    tour: "nav-templates" },
-  { to: "/components", label: "Bibliothèque", intent: "Régler les presets",     kind: "preset", tour: "nav-components" },
+  { to: "/templates", label: "Atelier", intent: "Dessiner les templates", kind: "tpl", tour: "nav-templates" },
+  { to: "/components", label: "Bibliothèque", intent: "Régler les presets", kind: "preset", tour: "nav-components" },
 ];
 
 /** Filet gauche de l'entrée active, dans la couleur de l'espace */
@@ -35,7 +41,11 @@ const ACTIVE_BAR: Record<ObjectKind | "home", string> = {
 };
 
 function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boolean; collapsed: boolean }) {
-  const mark = item.kind ? <ObjectMark kind={item.kind} size={collapsed ? 14 : 10} /> : <Home size={collapsed ? 17 : 13} className="shrink-0" aria-hidden />;
+  const mark = item.kind ? (
+    <ObjectMark kind={item.kind} size={collapsed ? 14 : 10} />
+  ) : (
+    <Home size={collapsed ? 17 : 13} className="shrink-0" aria-hidden />
+  );
 
   if (collapsed) {
     return (
@@ -70,7 +80,9 @@ function NavEntry({ item, end = false, collapsed }: { item: NavItem; end?: boole
         <>
           <span className="mt-[5px] flex w-3.5 justify-center">{mark}</span>
           <span className="min-w-0">
-            <span className={`block text-sm leading-5 ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+            <span className={`block text-sm leading-5 ${isActive ? "font-semibold" : "font-medium"}`}>
+              {item.label}
+            </span>
             {item.kind && <span className="block text-xs leading-4 text-gray-500">{item.intent}</span>}
           </span>
         </>

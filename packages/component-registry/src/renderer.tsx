@@ -23,11 +23,7 @@ export function ComponentRenderer({ node, theme, isEditor }: Props) {
   const definition = get(node.type);
 
   if (!definition) {
-    return (
-      <div style={{ color: "red", padding: 8, fontSize: 12 }}>
-        Composant inconnu : {node.type}
-      </div>
-    );
+    return <div style={{ color: "red", padding: 8, fontSize: 12 }}>Composant inconnu : {node.type}</div>;
   }
 
   const Component = definition.render;

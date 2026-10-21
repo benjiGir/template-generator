@@ -90,7 +90,9 @@ describe("buildDocumentSnapshot", () => {
 
 describe("buildPublishedVersion", () => {
   it("prend la valeur par défaut des champs dans le composant", () => {
-    const version = buildPublishedVersion(template({ editableFields: [{ ...field("n1", "title"), defaultValue: "" }] }));
+    const version = buildPublishedVersion(
+      template({ editableFields: [{ ...field("n1", "title"), defaultValue: "" }] }),
+    );
     expect(version.editableFields[0]!.defaultValue).toBe("Défaut");
   });
 });
@@ -98,12 +100,28 @@ describe("buildPublishedVersion", () => {
 describe("statuts", () => {
   it("détecte un template modifié après publication", () => {
     expect(templateStatus({ published: false, updatedAt: "2026-01-02T00:00:00Z" })).toBe("draft");
-    expect(templateStatus({ published: true, publishedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z" })).toBe("published");
-    expect(templateStatus({ published: true, publishedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-02T00:00:00Z" })).toBe("published-with-changes");
+    expect(
+      templateStatus({ published: true, publishedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z" }),
+    ).toBe("published");
+    expect(
+      templateStatus({ published: true, publishedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-02T00:00:00Z" }),
+    ).toBe("published-with-changes");
   });
   it("détecte un document modifié après export", () => {
     expect(documentDisplayStatus({ status: "draft", updatedAt: "2026-01-02T00:00:00Z" })).toBe("draft");
-    expect(documentDisplayStatus({ status: "finalized", exportedAt: "2026-01-02T00:00:00Z", updatedAt: "2026-01-02T00:00:00Z" })).toBe("finalized");
-    expect(documentDisplayStatus({ status: "finalized", exportedAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-02T00:00:00Z" })).toBe("modified-after-export");
+    expect(
+      documentDisplayStatus({
+        status: "finalized",
+        exportedAt: "2026-01-02T00:00:00Z",
+        updatedAt: "2026-01-02T00:00:00Z",
+      }),
+    ).toBe("finalized");
+    expect(
+      documentDisplayStatus({
+        status: "finalized",
+        exportedAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-02T00:00:00Z",
+      }),
+    ).toBe("modified-after-export");
   });
 });

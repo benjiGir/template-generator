@@ -14,9 +14,9 @@ import type { ComponentCategory } from "@template-generator/shared/types/compone
 import type { ComponentPreset } from "@template-generator/shared/types/document";
 
 const CATEGORY_LABELS: Record<string, string> = {
-  layout:     "Mise en page",
-  content:    "Contenu",
-  data:       "Données",
+  layout: "Mise en page",
+  content: "Contenu",
+  data: "Données",
   decoration: "Décoration",
 };
 
@@ -69,9 +69,7 @@ export function ComponentsListPage() {
     return true;
   });
 
-  const categories = Array.from(
-    new Set(presets.map((p) => p.category).filter(Boolean))
-  ) as ComponentCategory[];
+  const categories = Array.from(new Set(presets.map((p) => p.category).filter(Boolean))) as ComponentCategory[];
 
   return (
     <div className="h-full overflow-y-auto bg-paper">
@@ -80,7 +78,11 @@ export function ComponentsListPage() {
         tag="Presets"
         title="Bibliothèque"
         subtitle="Des composants réglés une fois, réutilisables dans tous les templates."
-        action={<CreateButton kind="preset" onClick={handleNew}>{draftInProgress ? "Reprendre le preset en cours" : "Nouveau preset"}</CreateButton>}
+        action={
+          <CreateButton kind="preset" onClick={handleNew}>
+            {draftInProgress ? "Reprendre le preset en cours" : "Nouveau preset"}
+          </CreateButton>
+        }
       />
 
       <div className="flex items-center gap-4 border-b border-rule px-8 py-3">
@@ -124,8 +126,8 @@ export function ComponentsListPage() {
           <div className="mx-auto max-w-md py-20 text-center">
             <p className="text-sm font-medium text-gray-700">Aucun preset pour l'instant</p>
             <p className="mb-4 mt-1 text-sm text-gray-500">
-              Un preset est un composant réglé une fois (couleur de la charte, structure habituelle) et rangé ici.
-              Il apparaît ensuite dans la bibliothèque de l'éditeur, à côté des composants de base.
+              Un preset est un composant réglé une fois (couleur de la charte, structure habituelle) et rangé ici. Il
+              apparaît ensuite dans la bibliothèque de l'éditeur, à côté des composants de base.
             </p>
             <button
               onClick={handleNew}
@@ -139,7 +141,13 @@ export function ComponentsListPage() {
         {!isLoading && presets.length > 0 && filtered.length === 0 && (
           <p className="py-16 text-center text-sm text-gray-500">
             Aucun preset ne correspond à ces filtres.{" "}
-            <button onClick={() => { setSearch(""); setCategoryFilter("all"); }} className="text-preset hover:underline">
+            <button
+              onClick={() => {
+                setSearch("");
+                setCategoryFilter("all");
+              }}
+              className="text-preset hover:underline"
+            >
               Réinitialiser les filtres
             </button>
           </p>
@@ -147,7 +155,13 @@ export function ComponentsListPage() {
 
         <div className="grid max-w-6xl grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
           {filtered.map((p) => (
-            <PresetCard key={p.id} preset={p} onEdit={handleEdit} onDuplicate={(id) => duplicateMutation.mutate(id)} onDelete={handleDelete} />
+            <PresetCard
+              key={p.id}
+              preset={p}
+              onEdit={handleEdit}
+              onDuplicate={(id) => duplicateMutation.mutate(id)}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </div>
@@ -172,7 +186,13 @@ function PresetCard({
       <button onClick={() => onEdit(preset)} className="block text-left" aria-label={`Modifier ${preset.label}`}>
         <div className="h-[130px] overflow-hidden border-b border-gray-100 bg-table p-3">
           <div className="overflow-hidden rounded-sm bg-white shadow-sm">
-            <ComponentPreview type={preset.baseType} props={{ ...(base?.defaultProps ?? {}), ...preset.defaultProps }} theme={DEFAULT_THEME} maxHeight={106} compact />
+            <ComponentPreview
+              type={preset.baseType}
+              props={{ ...(base?.defaultProps ?? {}), ...preset.defaultProps }}
+              theme={DEFAULT_THEME}
+              maxHeight={106}
+              compact
+            />
           </div>
         </div>
         <div className="px-4 pb-1 pt-3">

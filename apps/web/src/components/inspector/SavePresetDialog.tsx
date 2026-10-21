@@ -15,17 +15,9 @@ export function SavePresetDialog({ onSave, onCancel }: Props) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
-      onClick={onCancel}
-    >
-      <div
-        className="bg-white rounded-lg shadow-xl p-5 w-72"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">
-          Sauvegarder comme preset
-        </h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
+      <div className="bg-white rounded-lg shadow-xl p-5 w-72" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">Sauvegarder comme preset</h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             autoFocus
@@ -36,11 +28,7 @@ export function SavePresetDialog({ onSave, onCancel }: Props) {
             className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:border-blue-400"
           />
           <div className="flex gap-2 justify-end">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700"
-            >
+            <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700">
               Annuler
             </button>
             <button

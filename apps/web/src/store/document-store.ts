@@ -24,12 +24,12 @@ interface DocumentState {
 }
 
 const EMPTY = {
-  document:         null,
+  document: null,
   templateSnapshot: null,
-  editableFields:   [],
-  data:             {},
-  revision:         0,
-  savedRevision:    0,
+  editableFields: [],
+  data: {},
+  revision: 0,
+  savedRevision: 0,
 };
 
 const FILL_MODE_KEY = "docforge-fill-mode";
@@ -50,18 +50,19 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   loadDocument: (doc) => {
     const snapshot = doc.templateSnapshot;
     set({
-      document:         doc,
+      document: doc,
       templateSnapshot: snapshot,
       // Documents antérieurs : la valeur par défaut est relue dans le snapshot
-      editableFields:   withNodeDefaults(snapshot?.editableFields ?? [], snapshot?.pages ?? []).sort((a, b) => a.order - b.order),
-      data:             doc.data ?? {},
-      revision:         0,
-      savedRevision:    0,
+      editableFields: withNodeDefaults(snapshot?.editableFields ?? [], snapshot?.pages ?? []).sort(
+        (a, b) => a.order - b.order,
+      ),
+      data: doc.data ?? {},
+      revision: 0,
+      savedRevision: 0,
     });
   },
 
-  applyServerState: (doc) =>
-    set((s) => (s.document?.id === doc.id ? { document: { ...doc, data: s.data } } : s)),
+  applyServerState: (doc) => set((s) => (s.document?.id === doc.id ? { document: { ...doc, data: s.data } } : s)),
 
   // Un champ vidé est retiré : le document reprend le contenu du template
   updateField: (fieldKey, value) =>

@@ -11,9 +11,9 @@ import { PresetPreviewPane } from "./PresetPreviewPane";
 import type { ComponentCategory } from "@template-generator/shared/types/component";
 
 const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
-  { value: "layout",     label: "Mise en page" },
-  { value: "content",    label: "Contenu" },
-  { value: "data",       label: "Données" },
+  { value: "layout", label: "Mise en page" },
+  { value: "content", label: "Contenu" },
+  { value: "data", label: "Données" },
   { value: "decoration", label: "Décoration" },
 ];
 
@@ -44,9 +44,7 @@ export function ComponentSavePage() {
         defaultProps: props,
         category,
       };
-      return editingId
-        ? api.presets.update(editingId, payload)
-        : api.presets.create(payload);
+      return editingId ? api.presets.update(editingId, payload) : api.presets.create(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.presets.list() });
@@ -56,7 +54,13 @@ export function ComponentSavePage() {
   });
 
   if (!baseType || !def) {
-    return <NotFoundState message="Aucun composant en cours de création." backTo={PRESET_WORKFLOW.steps[0]!.path("new")} backLabel="Recommencer" />;
+    return (
+      <NotFoundState
+        message="Aucun composant en cours de création."
+        backTo={PRESET_WORKFLOW.steps[0]!.path("new")}
+        backLabel="Recommencer"
+      />
+    );
   }
 
   return (
@@ -69,7 +73,9 @@ export function ComponentSavePage() {
       guard={label.trim() ? undefined : { ok: false, reason: "Donnez un nom au preset" }}
       finalAction={{
         label: editingId ? "Enregistrer les modifications" : "Ranger dans la bibliothèque",
-        onClick: async () => { await saveMutation.mutateAsync(); },
+        onClick: async () => {
+          await saveMutation.mutateAsync();
+        },
         disabled: !label.trim(),
       }}
     >
@@ -113,7 +119,9 @@ export function ComponentSavePage() {
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-ink bg-white"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
                 ))}
               </select>
             </div>

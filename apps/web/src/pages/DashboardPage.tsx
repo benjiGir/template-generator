@@ -49,14 +49,19 @@ export function DashboardPage() {
   });
 
   const today = useMemo(
-    () => new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).toUpperCase(),
-    []
+    () =>
+      new Date()
+        .toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+        .toUpperCase(),
+    [],
   );
 
   return (
     <div className="h-full overflow-y-auto bg-paper">
       <div className="mx-auto flex max-w-[1100px] flex-col gap-9 px-14 py-10">
-        {templatesLoaded && documentsLoaded && <GettingStarted templates={allTemplates} documentCount={allDocuments.length} />}
+        {templatesLoaded && documentsLoaded && (
+          <GettingStarted templates={allTemplates} documentCount={allDocuments.length} />
+        )}
 
         <header className="flex flex-wrap items-end justify-between gap-5 border-b-2 border-ink pb-6">
           <div>
@@ -69,7 +74,15 @@ export function DashboardPage() {
               data-tour="action-document"
               className="inline-flex min-h-[42px] items-center gap-2 rounded-sm bg-doc px-4 font-semibold text-white hover:brightness-95"
             >
-              <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                width="14"
+                height="16"
+                viewBox="0 0 14 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <rect x="1" y="1" width="12" height="14" />
                 <path d="M4 5h6M4 8h6M4 11h4" />
               </svg>
@@ -80,7 +93,15 @@ export function DashboardPage() {
               data-tour="action-template"
               className="inline-flex min-h-[42px] items-center gap-2 rounded-sm bg-tpl px-4 font-semibold text-white hover:brightness-95"
             >
-              <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                width="14"
+                height="16"
+                viewBox="0 0 14 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <rect x="1" y="1" width="12" height="14" strokeDasharray="2 2" />
                 <path d="M4 5h6M4 9h6" />
               </svg>
@@ -93,7 +114,9 @@ export function DashboardPage() {
           <section aria-labelledby="dash-docs" className="flex min-w-0 flex-[999_1_560px] flex-col gap-8">
             <div className="flex items-center gap-3">
               <ObjectTag kind="doc">Documents</ObjectTag>
-              <h2 id="dash-docs" className="text-sm text-gray-700">Ce que vous remplissez et exportez en PDF</h2>
+              <h2 id="dash-docs" className="text-sm text-gray-700">
+                Ce que vous remplissez et exportez en PDF
+              </h2>
             </div>
 
             <div data-tour="recent-documents">
@@ -104,7 +127,9 @@ export function DashboardPage() {
                     {drafts.length} brouillon{drafts.length > 1 ? "s" : ""}
                   </span>
                 </h3>
-                <Link to="/documents" className="text-[13px] underline-offset-2 hover:underline">Tous les documents</Link>
+                <Link to="/documents" className="text-[13px] underline-offset-2 hover:underline">
+                  Tous les documents
+                </Link>
               </div>
               {documentsLoaded && drafts.length === 0 ? (
                 <p className="border-t border-rule py-4 text-sm text-gray-600">Aucun brouillon en cours.</p>
@@ -118,7 +143,10 @@ export function DashboardPage() {
                           {d.completionPercent} % rempli · {shortDate(d.updatedAt)}
                         </div>
                       </div>
-                      <Link to={`/documents/${d.id}`} className="justify-self-end text-[13px] font-semibold text-doc-strong hover:underline">
+                      <Link
+                        to={`/documents/${d.id}`}
+                        className="justify-self-end text-[13px] font-semibold text-doc-strong hover:underline"
+                      >
                         Reprendre →
                       </Link>
                     </DocumentRow>
@@ -156,7 +184,9 @@ export function DashboardPage() {
 
           <aside aria-labelledby="dash-tpls" className="min-w-0 flex-[1_1_300px] border border-tpl bg-tpl-tint p-5">
             <div className="mb-3.5 flex flex-col gap-1.5">
-              <span className="self-start"><ObjectTag kind="tpl">Templates</ObjectTag></span>
+              <span className="self-start">
+                <ObjectTag kind="tpl">Templates</ObjectTag>
+              </span>
               <h2 id="dash-tpls" className="text-sm text-gray-800">
                 Les modèles : mise en page fixe, champs à remplir. Chaque document part de l'un d'eux.
               </h2>
@@ -166,7 +196,12 @@ export function DashboardPage() {
             ) : (
               <ul>
                 {templates.map((t) => (
-                  <TemplateRow key={t.id} template={t} onCreate={() => createFrom.mutate(t.id)} creating={createFrom.isPending} />
+                  <TemplateRow
+                    key={t.id}
+                    template={t}
+                    onCreate={() => createFrom.mutate(t.id)}
+                    creating={createFrom.isPending}
+                  />
                 ))}
               </ul>
             )}
@@ -185,11 +220,17 @@ function DocumentRow({ doc, children }: { doc: DocumentSummary; children: React.
   const preview = previewOf(doc);
   return (
     <li className="grid grid-cols-[48px_minmax(0,1fr)_170px_110px] items-center gap-4 border-t border-rule py-3">
-      <Link to={`/documents/${doc.id}`} aria-label={`Ouvrir ${doc.name}`} className="block h-[54px] w-10 overflow-hidden border border-gray-300 bg-white shadow-[3px_3px_0_var(--color-doc)]">
+      <Link
+        to={`/documents/${doc.id}`}
+        aria-label={`Ouvrir ${doc.name}`}
+        className="block h-[54px] w-10 overflow-hidden border border-gray-300 bg-white shadow-[3px_3px_0_var(--color-doc)]"
+      >
         {preview && <DocumentThumbnail template={preview} width={38} cropHeight={52} />}
       </Link>
       <div className="min-w-0">
-        <Link to={`/documents/${doc.id}`} className="block truncate font-semibold hover:underline">{doc.name}</Link>
+        <Link to={`/documents/${doc.id}`} className="block truncate font-semibold hover:underline">
+          {doc.name}
+        </Link>
         {doc.templateName && <TemplateRef name={doc.templateName} />}
       </div>
       {children}
@@ -198,20 +239,37 @@ function DocumentRow({ doc, children }: { doc: DocumentSummary; children: React.
 }
 
 /** Un template : vignette « plan » (tracé blanc sur cobalt), nom, statut, et de quoi en tirer un document */
-function TemplateRow({ template, onCreate, creating }: { template: TemplateSummary; onCreate: () => void; creating: boolean }) {
+function TemplateRow({
+  template,
+  onCreate,
+  creating,
+}: {
+  template: TemplateSummary;
+  onCreate: () => void;
+  creating: boolean;
+}) {
   const status = templateStatus(template);
   const published = status !== "draft";
   return (
     <li className="grid grid-cols-[40px_minmax(0,1fr)] items-center gap-3 border-t border-tpl-rule py-2.5">
       <BlueprintGlyph />
       <div className="min-w-0">
-        <Link to={`/templates/${template.id}/build`} className="block truncate font-semibold hover:underline">{template.name}</Link>
+        <Link to={`/templates/${template.id}/build`} className="block truncate font-semibold hover:underline">
+          {template.name}
+        </Link>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <span className="font-mono text-[11px] text-gray-700">
-            {published ? "PUBLIÉ" : "BROUILLON"} · {template.documentCount === 0 ? "AUCUN DOCUMENT" : `${template.documentCount} DOCUMENT${template.documentCount > 1 ? "S" : ""}`}
+            {published ? "PUBLIÉ" : "BROUILLON"} ·{" "}
+            {template.documentCount === 0
+              ? "AUCUN DOCUMENT"
+              : `${template.documentCount} DOCUMENT${template.documentCount > 1 ? "S" : ""}`}
           </span>
           {published ? (
-            <button onClick={onCreate} disabled={creating} className="text-xs font-semibold text-doc-strong hover:underline disabled:opacity-50">
+            <button
+              onClick={onCreate}
+              disabled={creating}
+              className="text-xs font-semibold text-doc-strong hover:underline disabled:opacity-50"
+            >
               Créer un document →
             </button>
           ) : (

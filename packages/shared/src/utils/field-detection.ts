@@ -24,15 +24,15 @@ const EDITABLE_TYPES: PropType[] = ["text", "textarea", "richtext", "list", "ima
 /** Composants dont le texte sert de titre de section : ils structurent le formulaire */
 const SECTION_TITLES: Record<string, string> = {
   "section-header": "text",
-  "kpi-row":        "sectionTitle",
-  "next-section":   "title",
+  "kpi-row": "sectionTitle",
+  "next-section": "title",
 };
 
 /** Noms stables : le titre du document, le nom d'un indicateur ou d'un bloc ne changent pas d'une édition à l'autre */
 const STABLE_NAMES: Record<string, string> = {
-  "title-block":  "title",
-  "kpi-card":     "title",
-  "metric-card":  "label",
+  "title-block": "title",
+  "kpi-card": "title",
+  "metric-card": "label",
   "detail-block": "title",
 };
 
@@ -53,7 +53,10 @@ function isStructural(type: string, prop: PropSchema): boolean {
 }
 
 function shorten(text: string, max = 40): string {
-  const plain = text.replace(/[*_#`>]/g, "").replace(/\s+/g, " ").trim();
+  const plain = text
+    .replace(/[*_#`>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain;
 }
 
@@ -106,16 +109,16 @@ export function detectFields(template: Pick<Template, "pages">, resolve: Resolve
         else label = `${numbered} — ${prop.label}`;
 
         fields.push({
-          nodeId:       node.id,
-          propKey:      prop.key,
+          nodeId: node.id,
+          propKey: prop.key,
           label,
-          type:         prop.type,
+          type: prop.type,
           defaultValue: node.props[prop.key] ?? prop.defaultValue,
-          required:     prop.required ?? false,
-          group:        section ?? undefined,
-          order:        order++,
-          location:     `${pageLabel} · ${info.label}${name ? ` « ${name.value} »` : ""}`,
-          suggested:    !structural,
+          required: prop.required ?? false,
+          group: section ?? undefined,
+          order: order++,
+          location: `${pageLabel} · ${info.label}${name ? ` « ${name.value} »` : ""}`,
+          suggested: !structural,
         });
       }
 
@@ -144,13 +147,13 @@ export function suggestedFields(detected: DetectedField[]): EditableField[] {
 
 export function toEditable(f: DetectedField, order: number): EditableField {
   return {
-    nodeId:       f.nodeId,
-    propKey:      f.propKey,
-    label:        f.label,
-    type:         f.type,
+    nodeId: f.nodeId,
+    propKey: f.propKey,
+    label: f.label,
+    type: f.type,
     defaultValue: f.defaultValue,
-    required:     f.required,
-    group:        f.group,
+    required: f.required,
+    group: f.group,
     order,
   };
 }

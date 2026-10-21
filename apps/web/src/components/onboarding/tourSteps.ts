@@ -17,8 +17,8 @@ export interface TourEnding {
 }
 
 export const TOUR_PROFILES: { key: TourProfile; title: string; hint: string }[] = [
-  { key: "contributor", title: "Produire un document",   hint: "Remplir un template existant et l'exporter en PDF" },
-  { key: "designer",    title: "Concevoir des templates", hint: "Créer la mise en page et choisir les champs à remplir" },
+  { key: "contributor", title: "Produire un document", hint: "Remplir un template existant et l'exporter en PDF" },
+  { key: "designer", title: "Concevoir des templates", hint: "Créer la mise en page et choisir les champs à remplir" },
 ];
 
 const REPLAY: TourStep = {
@@ -73,5 +73,5 @@ export const TOUR_STEPS: Record<TourProfile, TourStep[]> = {
 
 export const TOUR_ENDINGS: Record<TourProfile, TourEnding> = {
   contributor: { label: "Créer un document", to: "/documents/new" },
-  designer:    { label: "Créer un template", to: "/templates/new" },
+  designer: { label: "Créer un template", to: "/templates/new" },
 };

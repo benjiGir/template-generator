@@ -35,7 +35,10 @@ export function ThemePresetPicker() {
     if (record.isBuiltin) return;
     const ok = await confirm({
       title: `Supprimer le thème « ${record.name} » ?`,
-      consequences: ["Il ne sera plus proposé dans la liste des thèmes.", "Les templates qui l'utilisent gardent leurs couleurs."],
+      consequences: [
+        "Il ne sera plus proposé dans la liste des thèmes.",
+        "Les templates qui l'utilisent gardent leurs couleurs.",
+      ],
       confirmLabel: "Supprimer le thème",
       tone: "danger",
     });
@@ -53,9 +56,7 @@ export function ThemePresetPicker() {
               <button
                 onClick={() => applyTheme(record.theme)}
                 className={`w-full text-left p-2 rounded border transition-colors ${
-                  isActive
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  isActive ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 <div className="flex gap-1 mb-1.5">

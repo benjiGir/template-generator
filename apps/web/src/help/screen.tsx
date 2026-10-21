@@ -11,8 +11,14 @@ import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode }
  * (le plus sûr pour ne rien masquer) ; avec `at`, il est posé par-dessus l'extrait.
  */
 export function Mark({ n, at }: { n: number; at?: CSSProperties }) {
-  const circle = "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink font-mono text-[11px] font-semibold not-italic text-paper ring-2 ring-paper";
-  if (!at) return <span aria-hidden className={`inline-flex align-middle ${circle}`}>{n}</span>;
+  const circle =
+    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink font-mono text-[11px] font-semibold not-italic text-paper ring-2 ring-paper";
+  if (!at)
+    return (
+      <span aria-hidden className={`inline-flex align-middle ${circle}`}>
+        {n}
+      </span>
+    );
   return (
     <span aria-hidden className={`absolute z-10 -translate-x-1/2 -translate-y-1/2 ${circle}`} style={at}>
       {n}
@@ -40,7 +46,12 @@ function useFitScale() {
 }
 
 /** Extrait d'écran : un cadre, une étiquette d'emplacement et une légende numérotée */
-export function Figure({ where, legend, children, height = 240 }: {
+export function Figure({
+  where,
+  legend,
+  children,
+  height = 240,
+}: {
   /** Où l'on se trouve dans l'application (« Studio · 02 Remplir ») */
   where: string;
   legend: ReactNode[];
@@ -57,7 +68,10 @@ export function Figure({ where, legend, children, height = 240 }: {
           {where}
         </div>
         <div ref={ref} aria-hidden className="select-none overflow-hidden" style={{ height: height * scale }}>
-          <div className="relative origin-top-left overflow-hidden" style={{ width: DESIGN_WIDTH, height, transform: `scale(${scale})` }}>
+          <div
+            className="relative origin-top-left overflow-hidden"
+            style={{ width: DESIGN_WIDTH, height, transform: `scale(${scale})` }}
+          >
             {children}
           </div>
         </div>
@@ -90,20 +104,42 @@ export function Label({ children, className = "" }: { children: ReactNode; class
 
 /** Libellé en chasse fixe, capitales (titres de groupes, étiquettes) */
 export function MonoLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <span className={`block font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-600 ${className}`}>{children}</span>;
+  return (
+    <span className={`block font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-600 ${className}`}>
+      {children}
+    </span>
+  );
 }
 
 /** Champ de saisie factice */
-export function Input({ value, placeholder, className = "" }: { value?: string; placeholder?: string; className?: string }) {
+export function Input({
+  value,
+  placeholder,
+  className = "",
+}: {
+  value?: string;
+  placeholder?: string;
+  className?: string;
+}) {
   return (
-    <span className={`block truncate border border-gray-300 bg-white px-1.5 py-1 text-[10px] ${value ? "text-ink" : "text-gray-400"} ${className}`}>
+    <span
+      className={`block truncate border border-gray-300 bg-white px-1.5 py-1 text-[10px] ${value ? "text-ink" : "text-gray-400"} ${className}`}
+    >
       {value ?? placeholder ?? " "}
     </span>
   );
 }
 
 /** Bouton factice */
-export function Btn({ children, tone = "ink", className = "" }: { children: ReactNode; tone?: "ink" | "outline" | "doc" | "tpl" | "preset" | "ghost"; className?: string }) {
+export function Btn({
+  children,
+  tone = "ink",
+  className = "",
+}: {
+  children: ReactNode;
+  tone?: "ink" | "outline" | "doc" | "tpl" | "preset" | "ghost";
+  className?: string;
+}) {
   const tones = {
     ink: "bg-ink text-paper",
     outline: "border border-ink text-ink",
@@ -112,7 +148,13 @@ export function Btn({ children, tone = "ink", className = "" }: { children: Reac
     preset: "bg-preset text-white",
     ghost: "text-gray-600",
   } as const;
-  return <span className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-[10px] font-semibold ${tones[tone]} ${className}`}>{children}</span>;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-[10px] font-semibold ${tones[tone]} ${className}`}
+    >
+      {children}
+    </span>
+  );
 }
 
 /** Stepper d'un workflow, tel qu'il apparaît dans l'en-tête */
@@ -147,7 +189,12 @@ const ZONE_STYLES: Record<ZoneLook, string> = {
   warn: "outline outline-2 outline-amber-500 outline-offset-1 bg-amber-50",
 };
 
-export function MiniPage({ zones = {}, dense = false, className = "", style }: {
+export function MiniPage({
+  zones = {},
+  dense = false,
+  className = "",
+  style,
+}: {
   zones?: Partial<Record<"title" | "intro" | "kpis" | "left" | "right" | "box", ZoneLook>>;
   /** Vignette très petite : marges et espacements réduits */
   dense?: boolean;
@@ -156,7 +203,10 @@ export function MiniPage({ zones = {}, dense = false, className = "", style }: {
 }) {
   const z = (k: keyof typeof zones) => ZONE_STYLES[zones[k] ?? "plain"];
   return (
-    <div className={`flex flex-col bg-white shadow-[0_1px_3px_rgba(22,22,26,0.18)] ${dense ? "gap-1.5 p-2" : "gap-2 p-3"} ${className}`} style={style}>
+    <div
+      className={`flex flex-col bg-white shadow-[0_1px_3px_rgba(22,22,26,0.18)] ${dense ? "gap-1.5 p-2" : "gap-2 p-3"} ${className}`}
+      style={style}
+    >
       <div className="flex items-center justify-between">
         <span className="font-mono text-[7px] font-bold tracking-wide text-ink">KOMITY</span>
         <Line w="30%" h={3} tone="bg-gray-200" />

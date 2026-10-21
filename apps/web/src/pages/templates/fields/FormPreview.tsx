@@ -12,7 +12,11 @@ export function FormPreview({ fields }: { fields: EditableField[] }) {
   const ungroupedOnly = groups.length === 1 && groups[0] === null;
 
   if (fields.length === 0) {
-    return <p className="py-8 text-center text-xs text-gray-500">Aucun champ retenu : le formulaire du Studio serait vide.</p>;
+    return (
+      <p className="py-8 text-center text-xs text-gray-500">
+        Aucun champ retenu : le formulaire du Studio serait vide.
+      </p>
+    );
   }
 
   return (
@@ -23,7 +27,7 @@ export function FormPreview({ fields }: { fields: EditableField[] }) {
       {groups.map((g) => (
         <FormFieldGroup
           key={g ?? "__"}
-          group={ungroupedOnly ? null : g ?? "Autres champs"}
+          group={ungroupedOnly ? null : (g ?? "Autres champs")}
           fields={fields.filter((f) => (f.group ?? null) === g)}
           data={data}
           onUpdate={(key, value) => setData((d) => ({ ...d, [key]: value }))}

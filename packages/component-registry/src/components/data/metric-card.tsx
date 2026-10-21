@@ -15,7 +15,14 @@ interface Props {
 const TREND_ICONS = { up: "↑", down: "↓", neutral: "→" } as const;
 const TREND_COLORS = { up: "#16A34A", down: "#DC2626", neutral: "#6B7280" } as const;
 
-function MetricCard({ theme, value = "0", label = "Métrique", trend = "neutral", trendValue = "", color = "blue" }: Props) {
+function MetricCard({
+  theme,
+  value = "0",
+  label = "Métrique",
+  trend = "neutral",
+  trendValue = "",
+  color = "blue",
+}: Props) {
   const accentColor = resolveColor(color, theme);
   const bgColor = resolveLightBg(color, theme);
   const trendColor = TREND_COLORS[trend] ?? TREND_COLORS.neutral;
