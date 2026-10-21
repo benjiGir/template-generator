@@ -1,5 +1,11 @@
 import { createContext, useContext } from "react";
 
+/** Section d'aide à afficher : un article, et éventuellement une de ses sections */
+export interface HelpTarget {
+  slug: string;
+  sectionId?: string;
+}
+
 export interface HelpContextValue {
   /** Ouvre le panneau d'aide sur une section, sans quitter l'écran en cours */
   open: (slug: string, sectionId?: string) => void;

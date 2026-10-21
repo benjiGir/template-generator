@@ -1,24 +1,16 @@
+import type { ComponentType } from "react";
 import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-router-dom";
 import { RootLayout } from "@/layouts/RootLayout";
 import { RouteError } from "@/components/ui/RouteError";
-import { DashboardPage } from "@/pages/DashboardPage";
-import { TemplatesListPage } from "@/pages/templates/TemplatesListPage";
-import { TemplateStartPage } from "@/pages/templates/TemplateStartPage";
-import { TemplateWorkflowRoute } from "@/pages/templates/TemplateWorkflowRoute";
-import { TemplateThemePage } from "@/pages/templates/TemplateThemePage";
-import { TemplateBuildPage } from "@/pages/templates/TemplateBuildPage";
-import { TemplatePublishPage } from "@/pages/templates/TemplatePublishPage";
-import { ComponentsListPage } from "@/pages/components/ComponentsListPage";
-import { PresetWorkflowRoute, PresetEntry } from "@/pages/components/PresetWorkflowRoute";
-import { ComponentEditPage } from "@/pages/components/ComponentEditPage";
-import { ComponentSavePage } from "@/pages/components/ComponentSavePage";
-import { DocumentsListPage } from "@/pages/documents/DocumentsListPage";
-import { DocumentSelectPage } from "@/pages/documents/DocumentSelectPage";
-import { DocumentWorkflowRoute, DocumentEntryRedirect } from "@/pages/documents/DocumentWorkflowRoute";
-import { DocumentFillPage } from "@/pages/documents/DocumentFillPage";
-import { DocumentPreviewPage } from "@/pages/documents/DocumentPreviewPage";
-import { DocumentExportPage } from "@/pages/documents/DocumentExportPage";
-import { HelpPage } from "@/pages/HelpPage";
+import { AppLoading } from "@/components/ui/AppLoading";
+
+/**
+ * Chaque écran est un fichier JavaScript à part, chargé à la première visite : l'accueil ne télécharge
+ * ni l'éditeur (Lexical, dnd-kit), ni l'aperçu des documents, ni l'aide.
+ */
+function screen<M>(load: () => Promise<M>, pick: (module: M) => ComponentType) {
+  return async () => ({ Component: pick(await load()) });
+}
 
 /** Anciennes URL de l'éditeur (/templates/:id/edit) */
 function LegacyTemplateEdit() {
@@ -30,56 +22,175 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     errorElement: <RouteError />,
+    // Premier affichage, le temps de charger l'écran demandé
+    hydrateFallbackElement: <AppLoading />,
     children: [
       {
         // Un écran qui plante est remplacé par un message, la navigation reste autour
         errorElement: <RouteError />,
         children: [
-          { path: "/", element: <DashboardPage /> },
+          {
+            path: "/",
+            lazy: screen(
+              () => import("@/pages/DashboardPage"),
+              (m) => m.DashboardPage,
+            ),
+          },
 
           // Studio de Publication
-          { path: "/documents", element: <DocumentsListPage /> },
-          { path: "/documents/new", element: <DocumentSelectPage /> },
+          {
+            path: "/documents",
+            lazy: screen(
+              () => import("@/pages/documents/DocumentsListPage"),
+              (m) => m.DocumentsListPage,
+            ),
+          },
+          {
+            path: "/documents/new",
+            lazy: screen(
+              () => import("@/pages/documents/DocumentSelectPage"),
+              (m) => m.DocumentSelectPage,
+            ),
+          },
           {
             path: "/documents/:id",
-            element: <DocumentWorkflowRoute />,
+            lazy: screen(
+              () => import("@/pages/documents/DocumentWorkflowRoute"),
+              (m) => m.DocumentWorkflowRoute,
+            ),
             children: [
-              { index: true, element: <DocumentEntryRedirect /> },
-              { path: "fill", element: <DocumentFillPage /> },
-              { path: "preview", element: <DocumentPreviewPage /> },
-              { path: "export", element: <DocumentExportPage /> },
+              {
+                index: true,
+                lazy: screen(
+                  () => import("@/pages/documents/DocumentWorkflowRoute"),
+                  (m) => m.DocumentEntryRedirect,
+                ),
+              },
+              {
+                path: "fill",
+                lazy: screen(
+                  () => import("@/pages/documents/DocumentFillPage"),
+                  (m) => m.DocumentFillPage,
+                ),
+              },
+              {
+                path: "preview",
+                lazy: screen(
+                  () => import("@/pages/documents/DocumentPreviewPage"),
+                  (m) => m.DocumentPreviewPage,
+                ),
+              },
+              {
+                path: "export",
+                lazy: screen(
+                  () => import("@/pages/documents/DocumentExportPage"),
+                  (m) => m.DocumentExportPage,
+                ),
+              },
             ],
           },
 
           // Atelier Templates
-          { path: "/templates", element: <TemplatesListPage /> },
-          { path: "/templates/new", element: <TemplateStartPage /> },
+          {
+            path: "/templates",
+            lazy: screen(
+              () => import("@/pages/templates/TemplatesListPage"),
+              (m) => m.TemplatesListPage,
+            ),
+          },
+          {
+            path: "/templates/new",
+            lazy: screen(
+              () => import("@/pages/templates/TemplateStartPage"),
+              (m) => m.TemplateStartPage,
+            ),
+          },
           { path: "/templates/:id/edit", element: <LegacyTemplateEdit /> },
           {
             path: "/templates/:id",
-            element: <TemplateWorkflowRoute />,
+            lazy: screen(
+              () => import("@/pages/templates/TemplateWorkflowRoute"),
+              (m) => m.TemplateWorkflowRoute,
+            ),
             children: [
               { index: true, element: <Navigate to="build" replace /> },
-              { path: "theme", element: <TemplateThemePage /> },
-              { path: "build", element: <TemplateBuildPage /> },
-              { path: "publish", element: <TemplatePublishPage /> },
+              {
+                path: "theme",
+                lazy: screen(
+                  () => import("@/pages/templates/TemplateThemePage"),
+                  (m) => m.TemplateThemePage,
+                ),
+              },
+              {
+                path: "build",
+                lazy: screen(
+                  () => import("@/pages/templates/TemplateBuildPage"),
+                  (m) => m.TemplateBuildPage,
+                ),
+              },
+              {
+                path: "publish",
+                lazy: screen(
+                  () => import("@/pages/templates/TemplatePublishPage"),
+                  (m) => m.TemplatePublishPage,
+                ),
+              },
             ],
           },
 
           // Bibliothèque de presets (« new » ou identifiant du preset modifié)
-          { path: "/components", element: <ComponentsListPage /> },
+          {
+            path: "/components",
+            lazy: screen(
+              () => import("@/pages/components/ComponentsListPage"),
+              (m) => m.ComponentsListPage,
+            ),
+          },
           {
             path: "/components/:presetId",
-            element: <PresetWorkflowRoute />,
+            lazy: screen(
+              () => import("@/pages/components/PresetWorkflowRoute"),
+              (m) => m.PresetWorkflowRoute,
+            ),
             children: [
-              { index: true, element: <PresetEntry /> },
-              { path: "configure", element: <ComponentEditPage /> },
-              { path: "save", element: <ComponentSavePage /> },
+              {
+                index: true,
+                lazy: screen(
+                  () => import("@/pages/components/PresetWorkflowRoute"),
+                  (m) => m.PresetEntry,
+                ),
+              },
+              {
+                path: "configure",
+                lazy: screen(
+                  () => import("@/pages/components/ComponentEditPage"),
+                  (m) => m.ComponentEditPage,
+                ),
+              },
+              {
+                path: "save",
+                lazy: screen(
+                  () => import("@/pages/components/ComponentSavePage"),
+                  (m) => m.ComponentSavePage,
+                ),
+              },
             ],
           },
 
-          { path: "/aide", element: <HelpPage /> },
-          { path: "/aide/:slug", element: <HelpPage /> },
+          {
+            path: "/aide",
+            lazy: screen(
+              () => import("@/pages/HelpPage"),
+              (m) => m.HelpPage,
+            ),
+          },
+          {
+            path: "/aide/:slug",
+            lazy: screen(
+              () => import("@/pages/HelpPage"),
+              (m) => m.HelpPage,
+            ),
+          },
 
           { path: "*", element: <Navigate to="/" replace /> },
         ],

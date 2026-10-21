@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigation } from "react-router-dom";
 import { BookOpen, CircleHelp, Home } from "lucide-react";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { OnboardingProvider, useOnboarding } from "@/components/onboarding/Onboarding";
@@ -132,6 +132,22 @@ function ReplayTourButton({ collapsed }: { collapsed: boolean }) {
 /** Dans un workflow, la navigation se replie pour laisser la place à l'espace de travail */
 const WORKFLOW_PATH = /^\/(templates|documents|components)\/[^/]+/;
 
+/**
+ * Filet animé en haut de l'écran pendant qu'un écran pas encore visité se télécharge :
+ * l'écran actuel reste affiché jusque-là. Il n'apparaît qu'au bout d'un instant, pour ne pas clignoter.
+ */
+function NavigationProgress() {
+  const loading = useNavigation().state === "loading";
+  if (!loading) return null;
+  return (
+    <div
+      role="progressbar"
+      aria-label="Chargement de l'écran"
+      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 animate-pulse bg-ink opacity-0 [animation-delay:150ms] [animation-fill-mode:forwards]"
+    />
+  );
+}
+
 export function RootLayout() {
   const collapsed = WORKFLOW_PATH.test(useLocation().pathname);
 
@@ -165,7 +181,8 @@ export function RootLayout() {
               <ReplayTourButton collapsed={collapsed} />
             </nav>
 
-            <main className="flex-1 overflow-hidden">
+            <main className="relative flex-1 overflow-hidden">
+              <NavigationProgress />
               <Outlet />
             </main>
           </div>

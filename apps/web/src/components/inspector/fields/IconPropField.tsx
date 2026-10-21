@@ -1,91 +1,7 @@
 import { useState } from "react";
 import { HelpCircle } from "lucide-react";
-import { ICONS, IconByName } from "@template-generator/component-registry/icons";
+import { ICON_NAMES, ICONS, IconByName } from "@template-generator/component-registry/icons";
 import { Button } from "@/components/ui/Button";
-
-// Curated list of common icons
-const ICON_NAMES = [
-  "AlertCircle",
-  "AlertTriangle",
-  "Archive",
-  "ArrowDown",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "Award",
-  "BarChart",
-  "BarChart2",
-  "BarChart3",
-  "Bell",
-  "BookOpen",
-  "Bookmark",
-  "Briefcase",
-  "Building",
-  "Calendar",
-  "CheckCircle",
-  "CheckSquare",
-  "ChevronDown",
-  "ChevronRight",
-  "Circle",
-  "Clipboard",
-  "Clock",
-  "Cloud",
-  "Code",
-  "Cog",
-  "Download",
-  "Edit",
-  "Eye",
-  "File",
-  "FileText",
-  "Flag",
-  "Folder",
-  "Globe",
-  "Hash",
-  "Heart",
-  "Home",
-  "Image",
-  "Info",
-  "Layers",
-  "Layout",
-  "Link",
-  "List",
-  "Lock",
-  "Mail",
-  "MapPin",
-  "Menu",
-  "MessageCircle",
-  "Minus",
-  "Monitor",
-  "Moon",
-  "MoreHorizontal",
-  "Package",
-  "Pencil",
-  "Phone",
-  "Plus",
-  "Power",
-  "Printer",
-  "RefreshCw",
-  "Search",
-  "Send",
-  "Settings",
-  "Share",
-  "Shield",
-  "ShoppingCart",
-  "Star",
-  "Sun",
-  "Tag",
-  "Target",
-  "Trash",
-  "TrendingUp",
-  "TrendingDown",
-  "Upload",
-  "User",
-  "Users",
-  "Wifi",
-  "X",
-  "XCircle",
-  "Zap",
-];
 
 interface Props {
   label: string;
@@ -135,7 +51,6 @@ export function IconPropField({ label, value, onChange }: Props) {
           <div className="overflow-y-auto max-h-52 p-1.5">
             <div className="grid grid-cols-6 gap-1">
               {filtered.map((name) => {
-                if (!ICONS.has(name)) return null;
                 return (
                   <button
                     key={name}
