@@ -32,8 +32,8 @@ Outil privé de création de documents techniques (présentations, rapports, rev
 
 ### Prérequis
 
-- Node.js 22+
-- pnpm 10+
+- Node.js 24 (version dans `.nvmrc` : `nvm use`)
+- pnpm 11, à la version fixée par `packageManager` dans `package.json` (`corepack enable` l'installe)
 - Docker (pour PostgreSQL)
 
 ### Installation
@@ -207,10 +207,25 @@ Les fonds de couleur sont forcés par `print-color-adjust: exact`.
 
 ```bash
 pnpm dev                    # Lancer frontend + API en parallèle
+pnpm check                  # Lint, format, types et tests : ce que vérifie la CI
+pnpm lint                   # oxlint (pnpm lint:fix corrige ce qui peut l'être)
+pnpm format                 # oxfmt : formate tout le dépôt (pnpm format:check pour vérifier)
 pnpm typecheck              # Vérification TypeScript sur tout le monorepo
+pnpm test                   # Tests unitaires
 pnpm build                  # Build de production
 
 pnpm --filter @template-generator/api run db:migrate   # Appliquer les migrations
 pnpm --filter @template-generator/api run db:generate  # Générer une migration
 pnpm --filter @template-generator/api run db:seed      # Seeder le template KOMITY
 ```
+
+## Qualité du code
+
+- **Lint** : [oxlint](https://oxc.rs/docs/guide/usage/linter), configuré dans `.oxlintrc.json` (règles React et hooks,
+  accessibilité, TypeScript, imports, Vitest). Aucun avertissement n'est toléré. Une règle désactivée l'est avec la raison
+  en commentaire, dans la config ou sur la ligne concernée (`// oxlint-disable-next-line <règle>`).
+- **Format** : [oxfmt](https://oxc.rs/docs/guide/usage/formatter), configuré dans `.oxfmtrc.json` (lignes de 120 caractères,
+  guillemets doubles). Avec VS Code, l'extension Oxc formate à l'enregistrement.
+- **CI** : `.github/workflows/ci.yml` et `.gitlab-ci.yml` lancent les mêmes étapes à chaque push (installation figée, lint,
+  format, types, tests, build). Les deux fichiers sont à garder alignés.
+- **Versions** : Node dans `.nvmrc`, pnpm dans `packageManager` ; les Dockerfiles et le devcontainer suivent les mêmes.

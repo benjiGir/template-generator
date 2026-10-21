@@ -1,0 +1,29 @@
+# Mêmes vérifications que .github/workflows/ci.yml : garder les deux fichiers alignés
+
+# Une seule pipeline par push : celle de la merge request quand il y en a une, sinon celle de la branche
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  # pnpm à la version fixée par le champ packageManager de package.json
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+verify:
+  image: node:24-slim
+  cache:
+    key:
+      files: [pnpm-lock.yaml]
+    paths: [.pnpm-store]
+  before_script:
+    - corepack enable
+    - pnpm install --frozen-lockfile --store-dir .pnpm-store
+  script:
+    - pnpm lint
+    - pnpm format:check
+    - pnpm typecheck
+    - pnpm test
+    - pnpm build

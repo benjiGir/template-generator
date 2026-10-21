@@ -5,6 +5,7 @@ dist
 .env.local
 
 # pnpm
+.pnpm-store
 .pnp
 .pnp.js
 

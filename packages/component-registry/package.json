@@ -9,7 +9,6 @@
     "./components": "./src/components.ts"
   },
   "scripts": {
-    "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

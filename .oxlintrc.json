@@ -1,0 +1,72 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react", "import", "jsx-a11y", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "ignorePatterns": ["**/dist/**", "apps/api/drizzle/**"],
+  "rules": {
+    // Transformation JSX automatique (React 17+) : React n'a pas à être importé
+    "react/react-in-jsx-scope": "off",
+    // Imports à effet de bord voulus : feuilles de style, enregistrement des composants du registre
+    "import/no-unassigned-import": "off",
+
+    // Règles pensées pour le React Compiler, que le projet n'utilise pas. Les règles des hooks
+    // (rules-of-hooks, exhaustive-deps) restent actives.
+    "react/purity": "off",
+    "react/refs": "off",
+    "react/set-state-in-effect": "off",
+    "react/no-deriving-state-in-effects": "off",
+    "react/exhaustive-effect-dependencies": "off",
+
+    // Listes statiques ou entièrement contrôlées : la clé d'index n'y perd aucun état
+    "react/no-array-index-key": "off",
+    // Préférences de style plutôt que des défauts
+    "unicorn/consistent-function-scoping": "off",
+    "oxc/no-map-spread": "off",
+
+    // Champs d'édition ouverts à la demande et dialogues : le focus initial est voulu
+    "jsx-a11y/no-autofocus": "off",
+    // Rôles ARIA sur des boutons ou des conteneurs stylés, en attendant des primitives d'interface
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  "overrides": [
+    {
+      // Scripts de seed : insertions volontairement séquentielles
+      "files": ["apps/api/src/seed/**"],
+      "rules": {
+        "no-await-in-loop": "off"
+      }
+    },
+    {
+      // Interactions au pointeur par conception (canevas d'édition, aperçus cliquables, survol
+      // synchronisé entre liste et page) et fonds de dialogue cliquables. À reprendre avec une
+      // primitive de dialogue et un mode clavier pour l'éditeur ; tout nouveau fichier reste contrôlé.
+      "files": [
+        "apps/web/src/components/canvas/**",
+        "apps/web/src/components/document-view/**",
+        "apps/web/src/components/document/FormField.tsx",
+        "apps/web/src/components/document/InlineFillMode.tsx",
+        "apps/web/src/components/inspector/InlineEditor.tsx",
+        "apps/web/src/components/inspector/SavePresetDialog.tsx",
+        "apps/web/src/components/ui/ConfirmDialog.tsx",
+        "apps/web/src/help/HelpProvider.tsx",
+        "apps/web/src/pages/templates/TemplatesListPage.tsx",
+        "apps/web/src/pages/templates/fields/FieldsEditor.tsx"
+      ],
+      "rules": {
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/mouse-events-have-key-events": "off",
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off"
+      }
+    }
+  ]
+}
