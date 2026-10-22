@@ -63,13 +63,21 @@ Appliquer les migrations :
 pnpm --filter @template-generator/api run db:migrate
 ```
 
-Charger les données de démonstration (optionnel) : thèmes intégrés, 5 templates, 8 presets et 10 documents.
-Elles sont décrites en JSON dans `apps/api/src/seed/data` (un fichier par template), vérifiées à la lecture avec les
-schémas de l'API, et n'insèrent que ce qui manque :
+Charger les données de démonstration (optionnel). Deux jeux sont décrits en JSON dans `apps/api/src/seed/data`
+(un fichier par template), vérifiés à la lecture avec les schémas de l'API ; le seed n'insère que ce qui manque :
+
+- **`demo`** (par défaut) : 10 templates variés — newsletter, compte rendu, proposition commerciale sur deux pages,
+  note de version, rétrospective, attestation au format paysage, rapport annuel sur trois pages, fiche de poste,
+  programme de séminaire et un brouillon non publié —, les 5 thèmes et presque tous les composants, 10 presets
+  et 18 documents à différents stades (brouillons, finalisés, modifiés depuis l'export) ;
+- **`komity`** : l'ancien jeu, 5 rapports KOMITY de même structure.
 
 ```bash
-pnpm --filter @template-generator/api run db:seed
+pnpm --filter @template-generator/api run db:seed          # jeu « demo »
+pnpm --filter @template-generator/api run db:seed:komity   # jeu « komity »
 ```
+
+Le test `apps/web/src/seed-data.test.ts` confronte les deux jeux au registre de composants (composants, props, champs).
 
 ### Lancer l'application
 
@@ -271,7 +279,7 @@ pnpm build                  # Build de production
 
 pnpm --filter @template-generator/api run db:migrate   # Appliquer les migrations
 pnpm --filter @template-generator/api run db:generate  # Générer une migration
-pnpm --filter @template-generator/api run db:seed      # Données de démonstration (apps/api/src/seed/data)
+pnpm --filter @template-generator/api run db:seed      # Données de démonstration, jeu « demo » (db:seed:komity : l'ancien)
 ```
 
 ## Tests

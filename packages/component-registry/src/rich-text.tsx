@@ -59,7 +59,7 @@ export function RichBlock({ text, style }: { text: string; style?: CSSProperties
       const listStyle: CSSProperties =
         block.type === "ul-item"
           ? { margin: "0 0 4px", paddingLeft: 16, listStyleType: "disc" }
-          : { margin: "0 0 4px", paddingLeft: 16 };
+          : { margin: "0 0 4px", paddingLeft: 18, listStyleType: "decimal" };
       const items = takeItems(block.type);
       elements.push(
         <List key={`${List}-${i}`} style={listStyle}>

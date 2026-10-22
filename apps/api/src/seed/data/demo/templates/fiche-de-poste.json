@@ -1,0 +1,179 @@
+{
+  "name": "Fiche de poste",
+  "description": "Offre d'emploi : missions, profil, avantages et déroulé du recrutement.",
+  "theme": "Corporate Gray",
+  "published": true,
+  "daysAgo": 9,
+  "tags": ["recrutement", "rh"],
+  "editableFields": [
+    {
+      "nodeId": "fp-title-block-1",
+      "propKey": "title",
+      "label": "Intitulé du poste",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Poste",
+      "order": 0
+    },
+    {
+      "nodeId": "fp-title-block-1",
+      "propKey": "subtitle",
+      "label": "Contrat et lieu",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Poste",
+      "order": 1
+    },
+    {
+      "nodeId": "fp-summary-bar-1",
+      "propKey": "text",
+      "label": "Rémunération, date, équipe",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Poste",
+      "order": 2
+    },
+    {
+      "nodeId": "fp-text-block-1",
+      "propKey": "content",
+      "label": "Missions",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Missions",
+      "order": 3
+    },
+    {
+      "nodeId": "fp-detail-block-1",
+      "propKey": "paragraphs",
+      "label": "Profil",
+      "type": "list",
+      "defaultValue": [],
+      "required": false,
+      "group": "Profil",
+      "order": 4
+    },
+    {
+      "nodeId": "fp-detail-block-1",
+      "propKey": "benefits",
+      "label": "Compétences",
+      "type": "list",
+      "defaultValue": [],
+      "required": true,
+      "group": "Profil",
+      "order": 5
+    },
+    {
+      "nodeId": "fp-detail-block-2",
+      "propKey": "benefits",
+      "label": "Avantages",
+      "type": "list",
+      "defaultValue": [],
+      "required": false,
+      "group": "Ce que nous offrons",
+      "order": 6
+    }
+  ],
+  "pages": [
+    {
+      "id": "fp-page-1",
+      "label": "Offre",
+      "children": [
+        {
+          "id": "fp-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "STUDIO ARDOISE",
+            "brandSub": "Recrutement",
+            "showChevron": true
+          }
+        },
+        {
+          "id": "fp-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Intitulé du poste",
+            "subtitle": "Contrat — Lieu"
+          }
+        },
+        {
+          "id": "fp-summary-bar-1",
+          "type": "summary-bar",
+          "props": {
+            "text": "Rémunération : … · Prise de poste : … · Équipe : …"
+          }
+        },
+        {
+          "id": "fp-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Vos missions"
+          }
+        },
+        {
+          "id": "fp-text-block-1",
+          "type": "text-block",
+          "props": {
+            "content": "- Mission principale\n- Deuxième mission\n- Troisième mission"
+          }
+        },
+        {
+          "id": "fp-two-column-grid-1",
+          "type": "two-column-grid",
+          "props": {
+            "gap": 16
+          },
+          "children": [
+            {
+              "id": "fp-detail-block-1",
+              "type": "detail-block",
+              "props": {
+                "title": "Profil recherché",
+                "paragraphs": ["Expérience et parcours attendus."],
+                "benefits": ["Compétence 1", "Compétence 2"],
+                "benefitsLabel": "Compétences",
+                "result": "",
+                "suite": "",
+                "color": "blue"
+              }
+            },
+            {
+              "id": "fp-detail-block-2",
+              "type": "detail-block",
+              "props": {
+                "title": "Ce que nous offrons",
+                "paragraphs": ["Une équipe à taille humaine, des projets variés."],
+                "benefits": ["Télétravail partiel", "Mutuelle prise en charge à 80 %", "Budget formation"],
+                "benefitsLabel": "Avantages",
+                "result": "",
+                "suite": "",
+                "color": "green"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fp-callout-box-1",
+          "type": "callout-box",
+          "props": {
+            "icon": "Users",
+            "title": "Processus de recrutement",
+            "content": "Un échange de 30 minutes, un cas pratique, puis une rencontre avec l'équipe.",
+            "variant": "info",
+            "color": ""
+          }
+        },
+        {
+          "id": "fp-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Studio Ardoise — candidatures : recrutement@ardoise.example"
+          }
+        }
+      ]
+    }
+  ]
+}

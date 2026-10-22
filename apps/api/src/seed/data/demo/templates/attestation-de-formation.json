@@ -1,0 +1,140 @@
+{
+  "name": "Attestation de formation",
+  "description": "Attestation au format paysage, à remplir pour chaque stagiaire.",
+  "theme": "Minimal Light",
+  "published": true,
+  "daysAgo": 33,
+  "tags": ["formation", "attestation"],
+  "pageFormat": {
+    "width": "297mm",
+    "height": "210mm",
+    "padding": "40px 64px 36px"
+  },
+  "editableFields": [
+    {
+      "nodeId": "at-title-block-1",
+      "propKey": "subtitle",
+      "label": "Stagiaire",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Stagiaire",
+      "order": 0
+    },
+    {
+      "nodeId": "at-summary-bar-1",
+      "propKey": "text",
+      "label": "Durée, modalité, résultat",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Formation",
+      "order": 1
+    },
+    {
+      "nodeId": "at-text-block-1",
+      "propKey": "content",
+      "label": "Formation suivie, dates et durée",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Formation",
+      "order": 2
+    },
+    {
+      "nodeId": "at-two-column-text-1",
+      "propKey": "leftContent",
+      "label": "Lieu et date",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Signature",
+      "order": 3
+    }
+  ],
+  "pages": [
+    {
+      "id": "at-page-1",
+      "label": "Attestation",
+      "children": [
+        {
+          "id": "at-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "CAMPUS NUMÉRIQUE RIVAGE",
+            "brandSub": "Organisme de formation",
+            "showChevron": false
+          }
+        },
+        {
+          "id": "at-spacer-1",
+          "type": "spacer",
+          "props": {
+            "height": 40
+          }
+        },
+        {
+          "id": "at-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Attestation de formation",
+            "subtitle": "Délivrée à : Prénom Nom"
+          }
+        },
+        {
+          "id": "at-summary-bar-1",
+          "type": "summary-bar",
+          "props": {
+            "text": "Durée : 21 heures · Modalité : présentiel · Résultat : acquis validés"
+          }
+        },
+        {
+          "id": "at-spacer-2",
+          "type": "spacer",
+          "props": {
+            "height": 8
+          }
+        },
+        {
+          "id": "at-text-block-1",
+          "type": "text-block",
+          "props": {
+            "content": "Nous attestons que **Prénom Nom** a suivi la formation **Intitulé de la formation** du 6 au 8 octobre 2026 et en a validé les acquis.\n\nCette attestation est délivrée pour servir et valoir ce que de droit."
+          }
+        },
+        {
+          "id": "at-spacer-3",
+          "type": "spacer",
+          "props": {
+            "height": 56
+          }
+        },
+        {
+          "id": "at-two-column-text-1",
+          "type": "two-column-text",
+          "props": {
+            "ratio": "50-50",
+            "leftContent": "**Fait à Rivage**, le 9 octobre 2026",
+            "rightContent": "**Agathe Roy**\n\nDirectrice pédagogique"
+          }
+        },
+        {
+          "id": "at-divider-1",
+          "type": "divider",
+          "props": {
+            "style": "solid",
+            "color": "",
+            "thickness": 1
+          }
+        },
+        {
+          "id": "at-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Campus Numérique Rivage — Déclaration d'activité n° 00 00 00000 00"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "name": "Newsletter interne — Le Fil",
+  "description": "Newsletter mensuelle : l'article à la une, la citation du mois, l'agenda et les arrivées.",
+  "theme": "Vibrant",
+  "published": true,
+  "daysAgo": 21,
+  "tags": ["communication", "mensuel", "interne"],
+  "editableFields": [
+    {
+      "nodeId": "nl-title-block-1",
+      "propKey": "subtitle",
+      "label": "Numéro et mois",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 0
+    },
+    {
+      "nodeId": "nl-intro-box-1",
+      "propKey": "content",
+      "label": "Mot d'introduction",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "En-tête",
+      "order": 1
+    },
+    {
+      "nodeId": "nl-two-column-text-1",
+      "propKey": "leftContent",
+      "label": "Article à la une",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "À la une",
+      "order": 2
+    },
+    {
+      "nodeId": "nl-two-column-text-1",
+      "propKey": "rightContent",
+      "label": "En bref",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "À la une",
+      "order": 3
+    },
+    {
+      "nodeId": "nl-quote-block-1",
+      "propKey": "quote",
+      "label": "Citation",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Citation du mois",
+      "order": 4
+    },
+    {
+      "nodeId": "nl-quote-block-1",
+      "propKey": "author",
+      "label": "Auteur",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Citation du mois",
+      "order": 5
+    },
+    {
+      "nodeId": "nl-quote-block-1",
+      "propKey": "role",
+      "label": "Fonction",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Citation du mois",
+      "order": 6
+    },
+    {
+      "nodeId": "nl-callout-box-1",
+      "propKey": "title",
+      "label": "Événement 1",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 7
+    },
+    {
+      "nodeId": "nl-callout-box-1",
+      "propKey": "content",
+      "label": "Événement 1 — détail",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 8
+    },
+    {
+      "nodeId": "nl-callout-box-2",
+      "propKey": "title",
+      "label": "Événement 2",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 9
+    },
+    {
+      "nodeId": "nl-callout-box-2",
+      "propKey": "content",
+      "label": "Événement 2 — détail",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 10
+    },
+    {
+      "nodeId": "nl-callout-box-3",
+      "propKey": "title",
+      "label": "Événement 3",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 11
+    },
+    {
+      "nodeId": "nl-callout-box-3",
+      "propKey": "content",
+      "label": "Événement 3 — détail",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Agenda",
+      "order": 12
+    },
+    {
+      "nodeId": "nl-text-block-1",
+      "propKey": "content",
+      "label": "Nouvelles arrivées",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Bienvenue",
+      "order": 13
+    }
+  ],
+  "pages": [
+    {
+      "id": "nl-page-1",
+      "label": "Édition",
+      "children": [
+        {
+          "id": "nl-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "NORDLYS",
+            "brandSub": "Le Fil — newsletter interne",
+            "showChevron": true
+          }
+        },
+        {
+          "id": "nl-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Le Fil",
+            "subtitle": "Édition n°12 — Octobre"
+          }
+        },
+        {
+          "id": "nl-image-block-1",
+          "type": "image-block",
+          "props": {
+            "image": {
+              "type": "base64",
+              "value": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3QzNBRUQiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNFQzQ4OTkiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0wIDE1MCBDMTUwIDkwIDMwMCAyMDAgNDUwIDE0MCBTNzAwIDgwIDgwMCAxMjAgVjIwMCBIMFoiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4xOCIvPjxwYXRoIGQ9Ik0wIDE3NSBDMjAwIDEzMCAzNTAgMjEwIDUyMCAxNjUgUzcyMCAxMzAgODAwIDE2MCBWMjAwIEgwWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjI1Ii8+PHRleHQgeD0iNDAiIHk9IjkyIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLEFyaWFsIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmIj5MZSBGaWw8L3RleHQ+PHRleHQgeD0iNDIiIHk9IjEyNCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjg1Ij5DZSBxdWkgZmFpdCBib3VnZXIgTm9yZGx5czwvdGV4dD48L3N2Zz4="
+            },
+            "alt": "Bandeau de la newsletter Le Fil",
+            "caption": "",
+            "width": "full",
+            "alignment": "center"
+          }
+        },
+        {
+          "id": "nl-intro-box-1",
+          "type": "intro-box",
+          "props": {
+            "content": "Bonjour à toutes et à tous ! Ce mois-ci : notre nouvelle offre entreprise, la parole à l'équipe support et un agenda bien rempli.",
+            "accentColor": "theme.accent"
+          }
+        },
+        {
+          "id": "nl-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "À la une"
+          }
+        },
+        {
+          "id": "nl-two-column-text-1",
+          "type": "two-column-text",
+          "props": {
+            "ratio": "60-40",
+            "leftContent": "**Nordlys Entreprise est lancé.** Après six mois de travail, la nouvelle offre est ouverte aux premiers clients. Elle réunit l'authentification unique, les journaux d'audit et un support dédié.\n\nMerci aux équipes produit, sécurité et commerciale qui ont rendu ce lancement possible.",
+            "rightContent": "**En bref**\n\n- 3 nouveaux clients signés\n- Disponibilité : 99,98 %\n- Prochain point mensuel le 7 novembre"
+          }
+        },
+        {
+          "id": "nl-quote-block-1",
+          "type": "quote-block",
+          "props": {
+            "quote": "Le meilleur retour client de la semaine : *« On ne s'en sert plus, on s'en sert tout le temps. »*",
+            "author": "Inès Moreau",
+            "role": "Responsable support"
+          }
+        },
+        {
+          "id": "nl-section-header-2",
+          "type": "section-header",
+          "props": {
+            "text": "Agenda"
+          }
+        },
+        {
+          "id": "nl-three-column-grid-1",
+          "type": "three-column-grid",
+          "props": {
+            "gap": 12
+          },
+          "children": [
+            {
+              "id": "nl-callout-box-1",
+              "type": "callout-box",
+              "props": {
+                "icon": "Calendar",
+                "title": "Afterwork",
+                "content": "Jeudi 24 à 18 h, sur la terrasse.",
+                "variant": "info",
+                "color": ""
+              }
+            },
+            {
+              "id": "nl-callout-box-2",
+              "type": "callout-box",
+              "props": {
+                "icon": "Award",
+                "title": "Hackathon",
+                "content": "Inscriptions ouvertes jusqu'au 30.",
+                "variant": "success",
+                "color": ""
+              }
+            },
+            {
+              "id": "nl-callout-box-3",
+              "type": "callout-box",
+              "props": {
+                "icon": "AlertCircle",
+                "title": "Fermeture",
+                "content": "Bureaux fermés le 1er novembre.",
+                "variant": "warning",
+                "color": ""
+              }
+            }
+          ]
+        },
+        {
+          "id": "nl-divider-1",
+          "type": "divider",
+          "props": {
+            "style": "dotted",
+            "color": "",
+            "thickness": 1
+          }
+        },
+        {
+          "id": "nl-section-header-3",
+          "type": "section-header",
+          "props": {
+            "text": "Bienvenue à"
+          }
+        },
+        {
+          "id": "nl-text-block-1",
+          "type": "text-block",
+          "props": {
+            "content": "- **Hugo Lefèvre**, développeur back-end\n- **Sarah N'Diaye**, chargée de clientèle\n- **Tom Garnier**, alternant design"
+          }
+        },
+        {
+          "id": "nl-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Nordlys — Le Fil — Diffusion interne"
+          }
+        }
+      ]
+    }
+  ]
+}

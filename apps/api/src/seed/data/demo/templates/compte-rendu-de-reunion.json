@@ -1,0 +1,234 @@
+{
+  "name": "Compte rendu de réunion",
+  "description": "Ordre du jour, décisions, points ouverts et actions : la trame de tous les comités.",
+  "theme": "Minimal Light",
+  "published": true,
+  "daysAgo": 48,
+  "tags": ["réunion", "gouvernance"],
+  "editableFields": [
+    {
+      "nodeId": "cr-title-block-1",
+      "propKey": "title",
+      "label": "Instance",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 0
+    },
+    {
+      "nodeId": "cr-title-block-1",
+      "propKey": "subtitle",
+      "label": "Date de la réunion",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 1
+    },
+    {
+      "nodeId": "cr-summary-bar-1",
+      "propKey": "text",
+      "label": "Participants, durée, prochaine réunion",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "En-tête",
+      "order": 2
+    },
+    {
+      "nodeId": "cr-text-block-1",
+      "propKey": "content",
+      "label": "Ordre du jour",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Ordre du jour",
+      "order": 3
+    },
+    {
+      "nodeId": "cr-callout-box-1",
+      "propKey": "title",
+      "label": "Décision 1",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Décisions",
+      "order": 4
+    },
+    {
+      "nodeId": "cr-callout-box-1",
+      "propKey": "content",
+      "label": "Décision 1 — détail",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Décisions",
+      "order": 5
+    },
+    {
+      "nodeId": "cr-callout-box-2",
+      "propKey": "title",
+      "label": "Décision 2",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Décisions",
+      "order": 6
+    },
+    {
+      "nodeId": "cr-callout-box-2",
+      "propKey": "content",
+      "label": "Décision 2 — détail",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Décisions",
+      "order": 7
+    },
+    {
+      "nodeId": "cr-callout-box-3",
+      "propKey": "content",
+      "label": "Point ouvert",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Points ouverts",
+      "order": 8
+    },
+    {
+      "nodeId": "cr-next-section-1",
+      "propKey": "items",
+      "label": "Actions",
+      "type": "list",
+      "defaultValue": [],
+      "required": true,
+      "group": "Actions",
+      "order": 9
+    },
+    {
+      "nodeId": "cr-next-section-1",
+      "propKey": "summary",
+      "label": "Échéance",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Actions",
+      "order": 10
+    }
+  ],
+  "pages": [
+    {
+      "id": "cr-page-1",
+      "label": "Compte rendu",
+      "children": [
+        {
+          "id": "cr-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "STUDIO ARDOISE",
+            "brandSub": "Compte rendu",
+            "showChevron": false
+          }
+        },
+        {
+          "id": "cr-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Comité de pilotage",
+            "subtitle": "Réunion du 14 octobre"
+          }
+        },
+        {
+          "id": "cr-summary-bar-1",
+          "type": "summary-bar",
+          "props": {
+            "text": "Participants : 6 · Durée : 1 h 30 · Prochaine réunion : 4 novembre"
+          }
+        },
+        {
+          "id": "cr-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Ordre du jour"
+          }
+        },
+        {
+          "id": "cr-text-block-1",
+          "type": "text-block",
+          "props": {
+            "content": "1. Avancement du projet\n2. Budget du quatrième trimestre\n3. Recrutements"
+          }
+        },
+        {
+          "id": "cr-section-header-2",
+          "type": "section-header",
+          "props": {
+            "text": "Décisions"
+          }
+        },
+        {
+          "id": "cr-callout-box-1",
+          "type": "callout-box",
+          "props": {
+            "icon": "CheckCircle",
+            "title": "Budget validé",
+            "content": "Le budget du T4 est validé à 120 k€.",
+            "variant": "success",
+            "color": ""
+          }
+        },
+        {
+          "id": "cr-callout-box-2",
+          "type": "callout-box",
+          "props": {
+            "icon": "CheckCircle",
+            "title": "Recrutement lancé",
+            "content": "Ouverture d'un poste de designer produit.",
+            "variant": "success",
+            "color": ""
+          }
+        },
+        {
+          "id": "cr-section-header-3",
+          "type": "section-header",
+          "props": {
+            "text": "Points ouverts"
+          }
+        },
+        {
+          "id": "cr-callout-box-3",
+          "type": "callout-box",
+          "props": {
+            "icon": "AlertTriangle",
+            "title": "À arbitrer",
+            "content": "Calendrier de la migration : avant ou après les fêtes ?",
+            "variant": "warning",
+            "color": ""
+          }
+        },
+        {
+          "id": "cr-next-section-1",
+          "type": "next-section",
+          "props": {
+            "title": "Actions",
+            "intro": "Qui fait quoi d'ici la prochaine réunion :",
+            "items": [
+              "Diffuser le budget validé — Claire",
+              "Publier l'offre d'emploi — Marc",
+              "Proposer deux scénarios de migration — Inès"
+            ],
+            "summary": "3 actions, échéance le 4 novembre."
+          }
+        },
+        {
+          "id": "cr-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Studio Ardoise — Document interne"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx src/seed/seed.ts",
+    "db:seed:komity": "tsx src/seed/seed.ts komity",
     "db:seed:themes": "tsx src/seed/seed-themes.ts"
   },
   "dependencies": {

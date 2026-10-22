@@ -1,0 +1,266 @@
+[
+  {
+    "template": "Newsletter interne — Le Fil",
+    "name": "Le Fil — Septembre",
+    "status": "finalized",
+    "daysAgo": 20,
+    "data": {
+      "nl-title-block-1.subtitle": "Édition n°11 — Septembre",
+      "nl-intro-box-1.content": "La rentrée est là, et avec elle beaucoup de nouveautés.",
+      "nl-two-column-text-1.leftContent": "**Nouveaux bureaux.** Depuis le 2 septembre, toute l'équipe est réunie au 4e étage. Merci à celles et ceux qui ont porté les cartons !",
+      "nl-two-column-text-1.rightContent": "**En bref**\n\n- 2 nouveaux clients\n- Séminaire d'équipe le 26",
+      "nl-quote-block-1.quote": "Un déménagement sans incident, c'est rare : bravo à toutes et à tous.",
+      "nl-quote-block-1.author": "Paul Renaud",
+      "nl-quote-block-1.role": "Directeur général",
+      "nl-callout-box-1.title": "Pot de rentrée",
+      "nl-callout-box-1.content": "Vendredi 13 à 17 h.",
+      "nl-callout-box-2.title": "Séminaire",
+      "nl-callout-box-2.content": "Le 26, toute la journée.",
+      "nl-callout-box-3.title": "Formation sécurité",
+      "nl-callout-box-3.content": "Obligatoire, avant le 30.",
+      "nl-text-block-1.content": "- **Clara Petit**, product manager"
+    }
+  },
+  {
+    "template": "Newsletter interne — Le Fil",
+    "name": "Le Fil — Octobre",
+    "status": "finalized",
+    "daysAgo": 3,
+    "data": {
+      "nl-title-block-1.subtitle": "Édition n°12 — Octobre",
+      "nl-intro-box-1.content": "Ce mois-ci : le lancement de l'offre Entreprise et un agenda chargé.",
+      "nl-two-column-text-1.leftContent": "**Nordlys Entreprise est lancé.** Après six mois de travail, l'offre est ouverte aux premiers clients.",
+      "nl-quote-block-1.quote": "On ne s'en sert plus, on s'en sert tout le temps.",
+      "nl-quote-block-1.author": "Inès Moreau",
+      "nl-quote-block-1.role": "Responsable support",
+      "nl-callout-box-1.title": "Afterwork",
+      "nl-callout-box-1.content": "Jeudi 24 à 18 h.",
+      "nl-text-block-1.content": "- **Hugo Lefèvre**, développeur back-end\n- **Sarah N'Diaye**, chargée de clientèle"
+    },
+    "modifiedAfterExport": true
+  },
+  {
+    "template": "Newsletter interne — Le Fil",
+    "name": "Le Fil — Novembre",
+    "status": "draft",
+    "daysAgo": 0,
+    "data": {
+      "nl-title-block-1.subtitle": "Édition n°13 — Novembre"
+    }
+  },
+  {
+    "template": "Compte rendu de réunion",
+    "name": "Comité de pilotage — 16 septembre",
+    "status": "finalized",
+    "daysAgo": 36,
+    "data": {
+      "cr-title-block-1.title": "Comité de pilotage",
+      "cr-title-block-1.subtitle": "Réunion du 16 septembre",
+      "cr-summary-bar-1.text": "Participants : 5 · Durée : 1 h · Prochaine réunion : 14 octobre",
+      "cr-text-block-1.content": "1. Bilan de l'été\n2. Feuille de route du T4",
+      "cr-callout-box-1.title": "Feuille de route adoptée",
+      "cr-callout-box-1.content": "Trois priorités retenues pour le T4.",
+      "cr-next-section-1.items": ["Diffuser la feuille de route — Claire", "Chiffrer la migration — Inès"],
+      "cr-next-section-1.summary": "Échéance : 14 octobre."
+    }
+  },
+  {
+    "template": "Compte rendu de réunion",
+    "name": "Comité de pilotage — 14 octobre",
+    "status": "finalized",
+    "daysAgo": 8,
+    "data": {
+      "cr-title-block-1.title": "Comité de pilotage",
+      "cr-title-block-1.subtitle": "Réunion du 14 octobre",
+      "cr-summary-bar-1.text": "Participants : 6 · Durée : 1 h 30 · Prochaine réunion : 4 novembre",
+      "cr-text-block-1.content": "1. Avancement du projet\n2. Budget du T4\n3. Recrutements",
+      "cr-callout-box-1.title": "Budget validé",
+      "cr-callout-box-1.content": "Le budget du T4 est validé à 120 k€.",
+      "cr-callout-box-2.title": "Recrutement lancé",
+      "cr-callout-box-2.content": "Ouverture d'un poste de designer produit.",
+      "cr-callout-box-3.content": "Calendrier de la migration : avant ou après les fêtes ?",
+      "cr-next-section-1.items": [
+        "Diffuser le budget validé — Claire",
+        "Publier l'offre d'emploi — Marc",
+        "Proposer deux scénarios de migration — Inès"
+      ],
+      "cr-next-section-1.summary": "Échéance : 4 novembre."
+    }
+  },
+  {
+    "template": "Compte rendu de réunion",
+    "name": "Réunion d'équipe — 21 octobre",
+    "status": "draft",
+    "daysAgo": 1,
+    "data": {
+      "cr-title-block-1.title": "Réunion d'équipe",
+      "cr-title-block-1.subtitle": "Réunion du 21 octobre",
+      "cr-text-block-1.content": "1. Tour de table\n2. Organisation des congés"
+    }
+  },
+  {
+    "template": "Proposition commerciale",
+    "name": "Proposition — Groupe Aubrac",
+    "status": "finalized",
+    "daysAgo": 11,
+    "data": {
+      "pc-title-block-1.subtitle": "Pour : Groupe Aubrac — Réf. PR-2026-028",
+      "pc-intro-box-1.content": "Vous souhaitez **réorganiser votre service client** pour absorber la croissance sans dégrader la qualité.",
+      "pc-metric-card-1.value": "42 jours",
+      "pc-metric-card-2.value": "38 500 €",
+      "pc-metric-card-3.value": "+18 %",
+      "pc-result-box-1.text": "Montant total : 38 500 € HT, payable en trois échéances.",
+      "pc-callout-box-1.content": "Valable jusqu'au 15 novembre 2026."
+    },
+    "modifiedAfterExport": true
+  },
+  {
+    "template": "Proposition commerciale",
+    "name": "Proposition — Maison Verlaine",
+    "status": "draft",
+    "daysAgo": 2,
+    "data": {
+      "pc-title-block-1.subtitle": "Pour : Maison Verlaine — Réf. PR-2026-031",
+      "pc-metric-card-1.value": "20 jours"
+    }
+  },
+  {
+    "template": "Note de version produit",
+    "name": "Nordlys 5.1",
+    "status": "finalized",
+    "daysAgo": 5,
+    "data": {
+      "nv-title-block-1.title": "Nordlys 5.1",
+      "nv-title-block-1.subtitle": "Disponible le 6 octobre",
+      "nv-metric-card-1.value": "12 %",
+      "nv-metric-card-2.value": "7",
+      "nv-metric-card-3.value": "19",
+      "nv-two-column-text-1.leftContent": "**Tableau de bord**\n\n- Filtres enregistrés\n- Graphiques empilés",
+      "nv-two-column-text-1.rightContent": "**Intégrations**\n\n- Connecteur Slack",
+      "nv-suite-text-1.text": "Prochaine version : 5.2, début novembre."
+    }
+  },
+  {
+    "template": "Note de version produit",
+    "name": "Nordlys 5.2",
+    "status": "draft",
+    "daysAgo": 0,
+    "data": {
+      "nv-title-block-1.title": "Nordlys 5.2",
+      "nv-title-block-1.subtitle": "Disponible le 3 novembre",
+      "nv-two-column-text-1.leftContent": "**Tableau de bord**\n\n- Widgets déplaçables\n- Thème sombre"
+    }
+  },
+  {
+    "template": "Rétrospective de projet",
+    "name": "Saison 2026 — Ateliers de réparation",
+    "status": "finalized",
+    "daysAgo": 52,
+    "data": {
+      "rt-title.subtitle": "Ateliers de réparation — saison 2026",
+      "rt-kpi-card-1.description": "412 vélos remis en état.",
+      "rt-kpi-card-2.description": "38 bénévoles actifs.",
+      "rt-kpi-card-3.description": "24 ateliers dans 6 quartiers.",
+      "rt-kpi-card-4.description": "92 % du budget consommé.",
+      "rt-detail-block-1.paragraphs": [
+        "Les ateliers du samedi matin ont fait le plein.",
+        "Les partenariats avec les écoles ont attiré un nouveau public."
+      ],
+      "rt-detail-block-2.paragraphs": ["Le stock de pièces a manqué en juillet."],
+      "rt-timeline-item-1.description": "Premier atelier place du Marché.",
+      "rt-timeline-item-2.description": "**150 visiteurs** sur la journée.",
+      "rt-timeline-item-3.description": "Le triporteur atelier circule dans trois quartiers.",
+      "rt-next-section-1.items": ["Ouvrir un deuxième local", "Lancer des ateliers pour débutants"]
+    }
+  },
+  {
+    "template": "Attestation de formation",
+    "name": "Attestation — Camille Durand",
+    "status": "finalized",
+    "daysAgo": 22,
+    "data": {
+      "at-title-block-1.subtitle": "Délivrée à : Camille Durand",
+      "at-summary-bar-1.text": "Durée : 21 heures · Modalité : présentiel · Résultat : acquis validés",
+      "at-text-block-1.content": "Nous attestons que **Camille Durand** a suivi la formation **Accessibilité numérique** du 6 au 8 octobre 2026 et en a validé les acquis.\n\nCette attestation est délivrée pour servir et valoir ce que de droit.",
+      "at-two-column-text-1.leftContent": "**Fait à Rivage**, le 9 octobre 2026"
+    }
+  },
+  {
+    "template": "Attestation de formation",
+    "name": "Attestation — Malik Benali",
+    "status": "finalized",
+    "daysAgo": 22,
+    "data": {
+      "at-title-block-1.subtitle": "Délivrée à : Malik Benali",
+      "at-summary-bar-1.text": "Durée : 21 heures · Modalité : présentiel · Résultat : acquis validés",
+      "at-text-block-1.content": "Nous attestons que **Malik Benali** a suivi la formation **Accessibilité numérique** du 6 au 8 octobre 2026 et en a validé les acquis.\n\nCette attestation est délivrée pour servir et valoir ce que de droit.",
+      "at-two-column-text-1.leftContent": "**Fait à Rivage**, le 9 octobre 2026"
+    }
+  },
+  {
+    "template": "Attestation de formation",
+    "name": "Attestation — Léa Rousseau",
+    "status": "draft",
+    "daysAgo": 1,
+    "data": {
+      "at-title-block-1.subtitle": "Délivrée à : Léa Rousseau"
+    }
+  },
+  {
+    "template": "Rapport annuel",
+    "name": "Rapport annuel 2025",
+    "status": "draft",
+    "daysAgo": 6,
+    "data": {
+      "ra-title-block-1.title": "Rapport annuel 2025",
+      "ra-intro-box-1.content": "*Le mot du président.* 2025 a été l'année de tous les records pour la Fondation.",
+      "ra-metric-card-1.value": "1 240",
+      "ra-metric-card-2.value": "310",
+      "ra-metric-card-3.value": "4",
+      "ra-timeline-item-1.title": "Ouverture de la Maison des Tilleuls",
+      "ra-timeline-item-1.description": "Notre premier lieu d'accueil en propre.",
+      "ra-timeline-item-2.title": "Campagne « Un été pour tous »",
+      "ra-timeline-item-2.description": "**480 enfants** partis en vacances.",
+      "ra-two-column-text-1.leftContent": "**Ressources — 2,4 M€**\n\n- Dons : 58 %\n- Mécénat : 27 %\n- Subventions : 15 %",
+      "ra-two-column-text-1.rightContent": "**Emplois — 2,3 M€**\n\n- Missions sociales : 84 %\n- Collecte : 9 %\n- Fonctionnement : 7 %"
+    }
+  },
+  {
+    "template": "Fiche de poste",
+    "name": "Offre — Designer produit senior",
+    "status": "finalized",
+    "daysAgo": 7,
+    "data": {
+      "fp-title-block-1.title": "Designer produit senior",
+      "fp-title-block-1.subtitle": "CDI — Lyon ou télétravail partiel",
+      "fp-summary-bar-1.text": "Rémunération : 48–55 k€ · Prise de poste : janvier · Équipe : 6 personnes",
+      "fp-text-block-1.content": "- Concevoir les parcours de nos applications\n- Animer les tests utilisateurs\n- Faire vivre le design system",
+      "fp-detail-block-1.paragraphs": ["Cinq ans d'expérience en design d'interfaces."],
+      "fp-detail-block-1.benefits": ["Figma", "Recherche utilisateur", "Accessibilité"],
+      "fp-detail-block-2.benefits": ["Télétravail partiel", "Mutuelle prise en charge à 80 %", "Budget formation"]
+    }
+  },
+  {
+    "template": "Fiche de poste",
+    "name": "Offre — Développeur·se front-end",
+    "status": "draft",
+    "daysAgo": 2,
+    "data": {
+      "fp-title-block-1.title": "Développeur·se front-end",
+      "fp-title-block-1.subtitle": "CDI — Lyon",
+      "fp-detail-block-1.benefits": ["React", "TypeScript"]
+    }
+  },
+  {
+    "template": "Programme de séminaire",
+    "name": "Journées pédagogiques — novembre",
+    "status": "draft",
+    "daysAgo": 1,
+    "data": {
+      "ps-title-block-1.subtitle": "13 et 14 novembre — Campus de Rivage",
+      "ps-timeline-item-1.title": "Accueil et café",
+      "ps-timeline-item-2.title": "Conférence d'ouverture",
+      "ps-two-column-text-1.leftContent": "**Infos pratiques**\n\n- Bâtiment A, salle Horizon\n- Déjeuner offert"
+    }
+  }
+]

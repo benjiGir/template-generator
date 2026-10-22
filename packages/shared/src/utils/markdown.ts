@@ -45,11 +45,17 @@ export function parseMarkdown(text: string): TextSegment[] {
   return segments;
 }
 
-/** Parse le Markdown en blocs (paragraphes, listes) */
+/**
+ * Parse le Markdown en blocs (paragraphes, listes). Comme en Markdown, une ligne vide sépare deux
+ * paragraphes (c'est ce que produit l'éditeur pour un retour à la ligne) ; des lignes qui se suivent
+ * forment un seul paragraphe.
+ */
 export function parseBlocks(text: string): Block[] {
   if (!text.trim()) return [];
 
   const blocks: Block[] = [];
+  // Le paragraphe en cours, que la ligne suivante prolonge ; null après une ligne vide ou une puce
+  let paragraph: Block | null = null;
 
   for (const line of text.split("\n")) {
     const ulMatch = /^-\s+(.+)$/.exec(line);
@@ -57,15 +63,17 @@ export function parseBlocks(text: string): Block[] {
 
     if (ulMatch?.[1]) {
       blocks.push({ type: "ul-item", content: ulMatch[1] });
+      paragraph = null;
     } else if (olMatch?.[1]) {
       blocks.push({ type: "ol-item", content: olMatch[1] });
-    } else if (line.trim()) {
-      const last = blocks[blocks.length - 1];
-      if (last?.type === "paragraph") {
-        last.content += " " + line;
-      } else {
-        blocks.push({ type: "paragraph", content: line });
-      }
+      paragraph = null;
+    } else if (!line.trim()) {
+      paragraph = null;
+    } else if (paragraph) {
+      paragraph.content += " " + line;
+    } else {
+      paragraph = { type: "paragraph", content: line };
+      blocks.push(paragraph);
     }
   }
 

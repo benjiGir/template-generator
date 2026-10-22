@@ -8,17 +8,29 @@ import {
   computeCompletion,
 } from "@template-generator/shared/utils/fields";
 import { templates, componentPresets, themes, documents } from "../db/schema";
-import { seedDocuments, seedPresets, seedTemplates } from "./data";
+import { DEFAULT_SEED_SET, seedDocuments, seedPresets, seedTemplates } from "./data";
 
 /*
- * Données de démonstration : thèmes intégrés, puis templates, presets et documents lus dans data/.
+ * Données de démonstration : thèmes intégrés, puis templates, presets et documents d'un jeu de data/.
+ *   pnpm --filter @template-generator/api run db:seed            # jeu « demo »
+ *   pnpm --filter @template-generator/api run db:seed -- komity  # un autre jeu
  * Relancer le seed n'insère que ce qui manque (repéré par le nom).
  */
 
+// pnpm transmet le séparateur « -- » tel quel : on prend le premier vrai argument
+const SET = process.argv.slice(2).find((arg) => arg !== "--") ?? DEFAULT_SEED_SET;
+
 // Lus et vérifiés avant toute écriture : un fichier invalide n'insère rien
-const TEMPLATES = seedTemplates();
-const PRESETS = seedPresets();
-const DOCUMENTS = seedDocuments();
+const TEMPLATES = seedTemplates(SET);
+const PRESETS = seedPresets(SET);
+const DOCUMENTS = seedDocuments(SET);
+
+const DAY = 24 * 60 * 60 * 1000;
+const now = Date.now();
+/** Date d'il y a n jours (aujourd'hui sans précision) */
+const ago = (days = 0) => new Date(now - days * DAY);
+
+console.log(`Jeu de données : ${SET}`);
 
 const pool = new Pool({ connectionString: process.env["DATABASE_URL"] });
 const db = drizzle(pool);
@@ -41,10 +53,14 @@ for (const tpl of TEMPLATES) {
     console.log(`  — Template déjà présent : ${tpl.name}`);
     continue;
   }
+  const { daysAgo, ...template } = tpl;
+  const date = ago(daysAgo);
   await db.insert(templates).values({
-    ...tpl,
-    publishedAt: tpl.published ? new Date() : null,
-    publishedVersion: tpl.published ? buildPublishedVersion(tpl) : null,
+    ...template,
+    publishedAt: template.published ? date : null,
+    publishedVersion: template.published ? buildPublishedVersion(template) : null,
+    createdAt: date,
+    updatedAt: date,
   });
   console.log(`  ✓ Template inséré : ${tpl.name}`);
 }
@@ -75,6 +91,9 @@ for (const doc of DOCUMENTS) {
   if (!template)
     throw new Error(`Seed : le document « ${doc.name} » désigne un template inconnu : « ${doc.template} »`);
   const templateSnapshot = buildDocumentSnapshot(template);
+  const date = ago(doc.daysAgo);
+  // Modifié après l'export : l'export date de deux jours avant la dernière modification
+  const exportedAt = doc.status !== "finalized" ? null : doc.modifiedAfterExport ? ago((doc.daysAgo ?? 0) + 2) : date;
   await db.insert(documents).values({
     templateId: template.id,
     name: doc.name,
@@ -82,7 +101,9 @@ for (const doc of DOCUMENTS) {
     data: doc.data,
     templateSnapshot,
     completionPercent: computeCompletion(templateSnapshot.editableFields, doc.data).percent,
-    exportedAt: doc.status === "finalized" ? new Date() : null,
+    exportedAt,
+    createdAt: exportedAt ?? date,
+    updatedAt: date,
   });
   console.log(`  ✓ Document inséré : ${doc.name}`);
 }

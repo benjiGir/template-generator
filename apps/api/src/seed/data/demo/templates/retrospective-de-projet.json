@@ -1,0 +1,297 @@
+{
+  "name": "Rétrospective de projet",
+  "description": "Le bilan d'un projet : chiffres, ce qui a marché, ce qui est à améliorer, les temps forts.",
+  "theme": "KOMITY Blue",
+  "published": true,
+  "daysAgo": 63,
+  "tags": ["projet", "bilan", "association"],
+  "editableFields": [
+    {
+      "nodeId": "rt-title",
+      "propKey": "subtitle",
+      "label": "Projet et saison",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 0
+    },
+    {
+      "nodeId": "rt-kpi-card-1",
+      "propKey": "description",
+      "label": "Vélos réparés",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": false,
+      "group": "En chiffres",
+      "order": 1
+    },
+    {
+      "nodeId": "rt-kpi-card-2",
+      "propKey": "description",
+      "label": "Bénévoles",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": false,
+      "group": "En chiffres",
+      "order": 2
+    },
+    {
+      "nodeId": "rt-kpi-card-3",
+      "propKey": "description",
+      "label": "Ateliers",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": false,
+      "group": "En chiffres",
+      "order": 3
+    },
+    {
+      "nodeId": "rt-kpi-card-4",
+      "propKey": "description",
+      "label": "Budget",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": false,
+      "group": "En chiffres",
+      "order": 4
+    },
+    {
+      "nodeId": "rt-detail-block-1",
+      "propKey": "paragraphs",
+      "label": "Ce qui a bien marché",
+      "type": "list",
+      "defaultValue": [],
+      "required": true,
+      "group": "Bilan",
+      "order": 5
+    },
+    {
+      "nodeId": "rt-detail-block-2",
+      "propKey": "paragraphs",
+      "label": "À améliorer",
+      "type": "list",
+      "defaultValue": [],
+      "required": true,
+      "group": "Bilan",
+      "order": 6
+    },
+    {
+      "nodeId": "rt-timeline-item-1",
+      "propKey": "description",
+      "label": "Temps fort 1",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Temps forts",
+      "order": 7
+    },
+    {
+      "nodeId": "rt-timeline-item-2",
+      "propKey": "description",
+      "label": "Temps fort 2",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Temps forts",
+      "order": 8
+    },
+    {
+      "nodeId": "rt-timeline-item-3",
+      "propKey": "description",
+      "label": "Temps fort 3",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Temps forts",
+      "order": 9
+    },
+    {
+      "nodeId": "rt-next-section-1",
+      "propKey": "items",
+      "label": "Priorités",
+      "type": "list",
+      "defaultValue": [],
+      "required": false,
+      "group": "Saison prochaine",
+      "order": 10
+    }
+  ],
+  "pages": [
+    {
+      "id": "rt-page-1",
+      "label": "Rétrospective",
+      "children": [
+        {
+          "id": "rt-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "VÉLO URBAIN",
+            "brandSub": "Collectif associatif",
+            "showChevron": false
+          }
+        },
+        {
+          "id": "rt-title",
+          "type": "title-block",
+          "props": {
+            "title": "Rétrospective",
+            "subtitle": "Ateliers de réparation — saison 2026"
+          }
+        },
+        {
+          "id": "rt-kpi-row-1",
+          "type": "kpi-row",
+          "props": {
+            "sectionTitle": "En chiffres"
+          },
+          "children": [
+            {
+              "id": "rt-kpi-card-1",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🔧",
+                "title": "Vélos réparés",
+                "description": "412 vélos remis en état.",
+                "color": "green"
+              }
+            },
+            {
+              "id": "rt-kpi-card-2",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "🙋",
+                "title": "Bénévoles",
+                "description": "38 bénévoles actifs.",
+                "color": "blue"
+              }
+            },
+            {
+              "id": "rt-kpi-card-3",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "📍",
+                "title": "Ateliers",
+                "description": "24 ateliers dans 6 quartiers.",
+                "color": "blue"
+              }
+            },
+            {
+              "id": "rt-kpi-card-4",
+              "type": "kpi-card",
+              "props": {
+                "emoji": "💶",
+                "title": "Budget",
+                "description": "92 % du budget consommé.",
+                "color": "amber"
+              }
+            }
+          ]
+        },
+        {
+          "id": "rt-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Bilan"
+          }
+        },
+        {
+          "id": "rt-two-column-grid-1",
+          "type": "two-column-grid",
+          "props": {
+            "gap": 16
+          },
+          "children": [
+            {
+              "id": "rt-detail-block-1",
+              "type": "detail-block",
+              "props": {
+                "title": "Ce qui a bien marché",
+                "paragraphs": [
+                  "Les ateliers du samedi matin ont fait le plein.",
+                  "Les partenariats avec les écoles ont attiré un nouveau public."
+                ],
+                "benefits": ["Bouche-à-oreille", "Horaires fixes", "Matériel mutualisé"],
+                "benefitsLabel": "Points forts",
+                "result": "",
+                "suite": "",
+                "color": "green"
+              }
+            },
+            {
+              "id": "rt-detail-block-2",
+              "type": "detail-block",
+              "props": {
+                "title": "À améliorer",
+                "paragraphs": ["Le stock de pièces a manqué en juillet."],
+                "benefits": ["Prévoir les commandes", "Former plus de bénévoles"],
+                "benefitsLabel": "Pistes",
+                "result": "",
+                "suite": "",
+                "color": "red"
+              }
+            }
+          ]
+        },
+        {
+          "id": "rt-section-header-2",
+          "type": "section-header",
+          "props": {
+            "text": "Les temps forts"
+          }
+        },
+        {
+          "id": "rt-timeline-item-1",
+          "type": "timeline-item",
+          "props": {
+            "date": "Mars",
+            "title": "Lancement",
+            "description": "Premier atelier place du Marché.",
+            "color": "blue"
+          }
+        },
+        {
+          "id": "rt-timeline-item-2",
+          "type": "timeline-item",
+          "props": {
+            "date": "Juin",
+            "title": "Fête du vélo",
+            "description": "**150 visiteurs** sur la journée.",
+            "color": "green"
+          }
+        },
+        {
+          "id": "rt-timeline-item-3",
+          "type": "timeline-item",
+          "props": {
+            "date": "Septembre",
+            "title": "Atelier mobile",
+            "description": "Le triporteur atelier circule dans trois quartiers.",
+            "color": "amber"
+          }
+        },
+        {
+          "id": "rt-next-section-1",
+          "type": "next-section",
+          "props": {
+            "title": "Pour la saison prochaine",
+            "intro": "Nos priorités :",
+            "items": [
+              "Ouvrir un deuxième local",
+              "Lancer des ateliers pour débutants",
+              "Trouver un partenaire pour les pièces"
+            ],
+            "summary": "Assemblée générale le 15 janvier."
+          }
+        },
+        {
+          "id": "rt-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Collectif Vélo Urbain — Document destiné aux adhérents"
+          }
+        }
+      ]
+    }
+  ]
+}

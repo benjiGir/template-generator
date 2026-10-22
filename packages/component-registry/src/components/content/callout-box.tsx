@@ -37,9 +37,13 @@ const VARIANT_COLORS = new Map([
 
 function CalloutBox({ theme, icon, title, content, color, variant }: Props) {
   const palette = VARIANT_COLORS.get(variant) ?? INFO;
-  const accentColor = color ?? palette.border;
+  // Couleur vide (valeur par défaut) : celles de la variante
+  const accentColor = color || palette.border;
   const bgColor = color ? `${color}12` : palette.bg;
   const textColor = palette.text;
+  // Fond clair de la variante : texte sombre, lisible quel que soit le thème (y compris sombre).
+  // Fond teinté de la couleur personnalisée : il laisse voir le fond de page, le texte suit le thème.
+  const contentColor = color ? theme.colors.text : "#1F2937";
 
   return (
     <div
@@ -70,7 +74,7 @@ function CalloutBox({ theme, icon, title, content, color, variant }: Props) {
               {title}
             </p>
           )}
-          <RichBlock text={content} style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: theme.colors.text }} />
+          <RichBlock text={content} style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: contentColor }} />
         </div>
       </div>
     </div>

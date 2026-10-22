@@ -11,7 +11,8 @@ const schema = defineSchema([
 type Props = PropsOf<typeof schema> & { theme: Theme };
 
 function IntroBox({ theme, content, accentColor }: Props) {
-  const borderColor = accentColor ?? theme.colors.primary;
+  // Couleur vide (valeur par défaut) : celle du thème
+  const borderColor = accentColor || theme.colors.primary;
 
   return (
     <div

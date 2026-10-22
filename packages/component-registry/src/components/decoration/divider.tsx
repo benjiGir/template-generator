@@ -21,7 +21,8 @@ const schema = defineSchema([
 type Props = PropsOf<typeof schema> & { theme: Theme };
 
 function Divider({ theme, style, color, thickness }: Props) {
-  const borderColor = color ?? theme.colors.border;
+  // Couleur vide (valeur par défaut) : celle du thème
+  const borderColor = color || theme.colors.border;
 
   return (
     <div

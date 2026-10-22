@@ -1,0 +1,57 @@
+{
+  "name": "Plan de communication (brouillon)",
+  "description": "Template en cours de conception : pas encore proposé dans le Studio.",
+  "theme": "KOMITY Blue",
+  "published": false,
+  "daysAgo": 1,
+  "tags": ["communication", "brouillon"],
+  "editableFields": [],
+  "pages": [
+    {
+      "id": "pl-page-1",
+      "label": "Plan",
+      "children": [
+        {
+          "id": "pl-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Plan de communication",
+            "subtitle": "Brouillon — à compléter"
+          }
+        },
+        {
+          "id": "pl-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Objectifs"
+          }
+        },
+        {
+          "id": "pl-text-block-1",
+          "type": "text-block",
+          "props": {
+            "content": "À rédiger…"
+          }
+        },
+        {
+          "id": "pl-section-header-2",
+          "type": "section-header",
+          "props": {
+            "text": "Calendrier"
+          }
+        },
+        {
+          "id": "pl-callout-box-1",
+          "type": "callout-box",
+          "props": {
+            "icon": "Info",
+            "title": "Section en construction",
+            "content": "Ajouter les temps forts du trimestre.",
+            "variant": "info",
+            "color": ""
+          }
+        }
+      ]
+    }
+  ]
+}

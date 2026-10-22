@@ -1,0 +1,244 @@
+{
+  "name": "Note de version produit",
+  "description": "Ce qui change dans une version : chiffres, nouveautés, changements incompatibles.",
+  "theme": "Minimal Dark",
+  "published": true,
+  "daysAgo": 6,
+  "tags": ["produit", "release"],
+  "editableFields": [
+    {
+      "nodeId": "nv-title-block-1",
+      "propKey": "title",
+      "label": "Numéro de version",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Version",
+      "order": 0
+    },
+    {
+      "nodeId": "nv-title-block-1",
+      "propKey": "subtitle",
+      "label": "Date de disponibilité",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "Version",
+      "order": 1
+    },
+    {
+      "nodeId": "nv-image-block-1",
+      "propKey": "image",
+      "label": "Capture d'écran",
+      "type": "image",
+      "defaultValue": {
+        "type": "base64",
+        "value": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgMzYwIj48cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgcng9IjEwIiBmaWxsPSIjMUUyOTNCIi8+PHJlY3Qgd2lkdGg9IjY0MCIgaGVpZ2h0PSIzNCIgcng9IjEwIiBmaWxsPSIjMzM0MTU1Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSIxNyIgcj0iNSIgZmlsbD0iI0Y4NzE3MSIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iMTciIHI9IjUiIGZpbGw9IiNGQkJGMjQiLz48Y2lyY2xlIGN4PSI1NiIgY3k9IjE3IiByPSI1IiBmaWxsPSIjMzREMzk5Ii8+PHJlY3QgeD0iMTYiIHk9IjUyIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjI5MiIgcng9IjYiIGZpbGw9IiMwRjE3MkEiLz48cmVjdCB4PSIyOCIgeT0iNzAiIHdpZHRoPSI5NiIgaGVpZ2h0PSIxMCIgcng9IjMiIGZpbGw9IiM4MThDRjgiLz48cmVjdCB4PSIyOCIgeT0iOTQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjI4IiB5PSIxMTQiIHdpZHRoPSI5MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjI4IiB5PSIxMzQiIHdpZHRoPSI3MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjE3MiIgeT0iNTIiIHdpZHRoPSI0NTIiIGhlaWdodD0iMTIwIiByeD0iNiIgZmlsbD0iIzBGMTcyQSIvPjxwb2x5bGluZSBwb2ludHM9IjE5MCwxNTAgMjUwLDEyMCAzMTAsMTMyIDM3MCw5NiA0MzAsMTA0IDQ5MCw3NCA1NTAsODYgNjA2LDY0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4MThDRjgiIHN0cm9rZS13aWR0aD0iNCIvPjxyZWN0IHg9IjE3MiIgeT0iMTg2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE1OCIgcng9IjYiIGZpbGw9IiMwRjE3MkEiLz48cmVjdCB4PSI0MDQiIHk9IjE4NiIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxNTgiIHJ4PSI2IiBmaWxsPSIjMEYxNzJBIi8+PHJlY3QgeD0iMTkwIiB5PSIyMDYiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIiIHJ4PSIzIiBmaWxsPSIjQTc4QkZBIi8+PHJlY3QgeD0iMTkwIiB5PSIyMzAiIHdpZHRoPSIxODAiIGhlaWdodD0iOCIgcng9IjMiIGZpbGw9IiM0NzU1NjkiLz48cmVjdCB4PSI0MjIiIHk9IjIwNiIgd2lkdGg9IjkwIiBoZWlnaHQ9IjEyIiByeD0iMyIgZmlsbD0iIzM0RDM5OSIvPjxyZWN0IHg9IjQyMiIgeT0iMjMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjgiIHJ4PSIzIiBmaWxsPSIjNDc1NTY5Ii8+PC9zdmc+"
+      },
+      "required": false,
+      "group": "Version",
+      "order": 2
+    },
+    {
+      "nodeId": "nv-metric-card-1",
+      "propKey": "value",
+      "label": "Gain de performance",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Chiffres",
+      "order": 3
+    },
+    {
+      "nodeId": "nv-metric-card-2",
+      "propKey": "value",
+      "label": "Nombre de nouveautés",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Chiffres",
+      "order": 4
+    },
+    {
+      "nodeId": "nv-metric-card-3",
+      "propKey": "value",
+      "label": "Nombre de corrections",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Chiffres",
+      "order": 5
+    },
+    {
+      "nodeId": "nv-two-column-text-1",
+      "propKey": "leftContent",
+      "label": "Nouveautés — colonne 1",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Nouveautés",
+      "order": 6
+    },
+    {
+      "nodeId": "nv-two-column-text-1",
+      "propKey": "rightContent",
+      "label": "Nouveautés — colonne 2",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Nouveautés",
+      "order": 7
+    },
+    {
+      "nodeId": "nv-callout-box-1",
+      "propKey": "content",
+      "label": "Changements incompatibles",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Nouveautés",
+      "order": 8
+    },
+    {
+      "nodeId": "nv-suite-text-1",
+      "propKey": "text",
+      "label": "Prochaine version",
+      "type": "textarea",
+      "defaultValue": "",
+      "required": false,
+      "group": "Suite",
+      "order": 9
+    }
+  ],
+  "pages": [
+    {
+      "id": "nv-page-1",
+      "label": "Version",
+      "children": [
+        {
+          "id": "nv-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "NORDLYS",
+            "brandSub": "Notes de version",
+            "showChevron": true
+          }
+        },
+        {
+          "id": "nv-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Nordlys 5.2",
+            "subtitle": "Disponible le 3 novembre"
+          }
+        },
+        {
+          "id": "nv-image-block-1",
+          "type": "image-block",
+          "props": {
+            "image": {
+              "type": "base64",
+              "value": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgMzYwIj48cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgcng9IjEwIiBmaWxsPSIjMUUyOTNCIi8+PHJlY3Qgd2lkdGg9IjY0MCIgaGVpZ2h0PSIzNCIgcng9IjEwIiBmaWxsPSIjMzM0MTU1Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSIxNyIgcj0iNSIgZmlsbD0iI0Y4NzE3MSIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iMTciIHI9IjUiIGZpbGw9IiNGQkJGMjQiLz48Y2lyY2xlIGN4PSI1NiIgY3k9IjE3IiByPSI1IiBmaWxsPSIjMzREMzk5Ii8+PHJlY3QgeD0iMTYiIHk9IjUyIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjI5MiIgcng9IjYiIGZpbGw9IiMwRjE3MkEiLz48cmVjdCB4PSIyOCIgeT0iNzAiIHdpZHRoPSI5NiIgaGVpZ2h0PSIxMCIgcng9IjMiIGZpbGw9IiM4MThDRjgiLz48cmVjdCB4PSIyOCIgeT0iOTQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjI4IiB5PSIxMTQiIHdpZHRoPSI5MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjI4IiB5PSIxMzQiIHdpZHRoPSI3MCIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzQ3NTU2OSIvPjxyZWN0IHg9IjE3MiIgeT0iNTIiIHdpZHRoPSI0NTIiIGhlaWdodD0iMTIwIiByeD0iNiIgZmlsbD0iIzBGMTcyQSIvPjxwb2x5bGluZSBwb2ludHM9IjE5MCwxNTAgMjUwLDEyMCAzMTAsMTMyIDM3MCw5NiA0MzAsMTA0IDQ5MCw3NCA1NTAsODYgNjA2LDY0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4MThDRjgiIHN0cm9rZS13aWR0aD0iNCIvPjxyZWN0IHg9IjE3MiIgeT0iMTg2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE1OCIgcng9IjYiIGZpbGw9IiMwRjE3MkEiLz48cmVjdCB4PSI0MDQiIHk9IjE4NiIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxNTgiIHJ4PSI2IiBmaWxsPSIjMEYxNzJBIi8+PHJlY3QgeD0iMTkwIiB5PSIyMDYiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIiIHJ4PSIzIiBmaWxsPSIjQTc4QkZBIi8+PHJlY3QgeD0iMTkwIiB5PSIyMzAiIHdpZHRoPSIxODAiIGhlaWdodD0iOCIgcng9IjMiIGZpbGw9IiM0NzU1NjkiLz48cmVjdCB4PSI0MjIiIHk9IjIwNiIgd2lkdGg9IjkwIiBoZWlnaHQ9IjEyIiByeD0iMyIgZmlsbD0iIzM0RDM5OSIvPjxyZWN0IHg9IjQyMiIgeT0iMjMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjgiIHJ4PSIzIiBmaWxsPSIjNDc1NTY5Ii8+PC9zdmc+"
+            },
+            "alt": "Capture du nouveau tableau de bord",
+            "caption": "Le nouveau tableau de bord",
+            "width": "full",
+            "alignment": "center"
+          }
+        },
+        {
+          "id": "nv-three-column-grid-1",
+          "type": "three-column-grid",
+          "props": {
+            "gap": 12
+          },
+          "children": [
+            {
+              "id": "nv-metric-card-1",
+              "type": "metric-card",
+              "props": {
+                "value": "35 %",
+                "label": "Chargement plus rapide",
+                "trend": "up",
+                "trendValue": "vs 5.1",
+                "color": "green"
+              }
+            },
+            {
+              "id": "nv-metric-card-2",
+              "type": "metric-card",
+              "props": {
+                "value": "12",
+                "label": "Nouveautés",
+                "trend": "neutral",
+                "trendValue": "",
+                "color": "blue"
+              }
+            },
+            {
+              "id": "nv-metric-card-3",
+              "type": "metric-card",
+              "props": {
+                "value": "27",
+                "label": "Corrections",
+                "trend": "neutral",
+                "trendValue": "",
+                "color": "amber"
+              }
+            }
+          ]
+        },
+        {
+          "id": "nv-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Nouveautés"
+          }
+        },
+        {
+          "id": "nv-two-column-text-1",
+          "type": "two-column-text",
+          "props": {
+            "ratio": "50-50",
+            "leftContent": "**Tableau de bord**\n\n- Widgets déplaçables\n- Thème sombre\n- Export CSV",
+            "rightContent": "**Administration**\n\n- Rôles personnalisés\n- Journal d'audit filtrable"
+          }
+        },
+        {
+          "id": "nv-callout-box-1",
+          "type": "callout-box",
+          "props": {
+            "icon": "AlertTriangle",
+            "title": "Changements incompatibles",
+            "content": "L'ancienne API v1 des rapports est retirée. Passez à la v2 avant le 1er décembre.",
+            "variant": "danger",
+            "color": ""
+          }
+        },
+        {
+          "id": "nv-divider-1",
+          "type": "divider",
+          "props": {
+            "style": "dashed",
+            "color": "",
+            "thickness": 1
+          }
+        },
+        {
+          "id": "nv-suite-text-1",
+          "type": "suite-text",
+          "props": {
+            "text": "Prochaine version : 5.3, prévue mi-décembre (recherche plein texte)."
+          }
+        },
+        {
+          "id": "nv-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Nordlys — notes de version publiques"
+          }
+        }
+      ]
+    }
+  ]
+}

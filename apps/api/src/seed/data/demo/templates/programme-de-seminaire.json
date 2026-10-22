@@ -1,0 +1,268 @@
+{
+  "name": "Programme de séminaire",
+  "description": "Programme sur deux jours, infos pratiques et plan d'accès.",
+  "theme": "Minimal Dark",
+  "published": true,
+  "daysAgo": 4,
+  "tags": ["événement", "formation"],
+  "editableFields": [
+    {
+      "nodeId": "ps-title-block-1",
+      "propKey": "subtitle",
+      "label": "Dates et lieu",
+      "type": "text",
+      "defaultValue": "",
+      "required": true,
+      "group": "En-tête",
+      "order": 0
+    },
+    {
+      "nodeId": "ps-intro-box-1",
+      "propKey": "content",
+      "label": "Présentation",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "En-tête",
+      "order": 1
+    },
+    {
+      "nodeId": "ps-timeline-item-1",
+      "propKey": "title",
+      "label": "Séquence 1",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 1",
+      "order": 2
+    },
+    {
+      "nodeId": "ps-timeline-item-2",
+      "propKey": "title",
+      "label": "Séquence 2",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 1",
+      "order": 3
+    },
+    {
+      "nodeId": "ps-timeline-item-3",
+      "propKey": "title",
+      "label": "Séquence 3",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 1",
+      "order": 4
+    },
+    {
+      "nodeId": "ps-timeline-item-4",
+      "propKey": "title",
+      "label": "Séquence 4",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 2",
+      "order": 5
+    },
+    {
+      "nodeId": "ps-timeline-item-5",
+      "propKey": "title",
+      "label": "Séquence 5",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 2",
+      "order": 6
+    },
+    {
+      "nodeId": "ps-timeline-item-6",
+      "propKey": "title",
+      "label": "Séquence 6",
+      "type": "text",
+      "defaultValue": "",
+      "required": false,
+      "group": "Jour 2",
+      "order": 7
+    },
+    {
+      "nodeId": "ps-two-column-text-1",
+      "propKey": "leftContent",
+      "label": "Infos pratiques",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": true,
+      "group": "Pratique",
+      "order": 8
+    },
+    {
+      "nodeId": "ps-two-column-text-1",
+      "propKey": "rightContent",
+      "label": "Contact",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Pratique",
+      "order": 9
+    },
+    {
+      "nodeId": "ps-callout-box-1",
+      "propKey": "content",
+      "label": "Modalités d'inscription",
+      "type": "richtext",
+      "defaultValue": "",
+      "required": false,
+      "group": "Pratique",
+      "order": 10
+    }
+  ],
+  "pages": [
+    {
+      "id": "ps-page-1",
+      "label": "Programme",
+      "children": [
+        {
+          "id": "ps-page-header-1",
+          "type": "page-header",
+          "props": {
+            "brandName": "CAMPUS NUMÉRIQUE RIVAGE",
+            "brandSub": "Événements",
+            "showChevron": true
+          }
+        },
+        {
+          "id": "ps-title-block-1",
+          "type": "title-block",
+          "props": {
+            "title": "Journées pédagogiques",
+            "subtitle": "13 et 14 novembre — Campus de Rivage"
+          }
+        },
+        {
+          "id": "ps-intro-box-1",
+          "type": "intro-box",
+          "props": {
+            "content": "Deux jours pour partager nos pratiques, découvrir de nouveaux outils et préparer le second semestre.",
+            "accentColor": ""
+          }
+        },
+        {
+          "id": "ps-section-header-1",
+          "type": "section-header",
+          "props": {
+            "text": "Jour 1"
+          }
+        },
+        {
+          "id": "ps-timeline-item-1",
+          "type": "timeline-item",
+          "props": {
+            "date": "9 h 00",
+            "title": "Accueil et café",
+            "description": "",
+            "color": "blue"
+          }
+        },
+        {
+          "id": "ps-timeline-item-2",
+          "type": "timeline-item",
+          "props": {
+            "date": "10 h 00",
+            "title": "Conférence d'ouverture",
+            "description": "*L'évaluation au service des apprentissages.*",
+            "color": "blue"
+          }
+        },
+        {
+          "id": "ps-timeline-item-3",
+          "type": "timeline-item",
+          "props": {
+            "date": "14 h 00",
+            "title": "Ateliers en petits groupes",
+            "description": "Quatre ateliers au choix.",
+            "color": "green"
+          }
+        },
+        {
+          "id": "ps-section-header-2",
+          "type": "section-header",
+          "props": {
+            "text": "Jour 2"
+          }
+        },
+        {
+          "id": "ps-timeline-item-4",
+          "type": "timeline-item",
+          "props": {
+            "date": "9 h 30",
+            "title": "Retours d'expérience",
+            "description": "Trois équipes présentent leurs projets.",
+            "color": "amber"
+          }
+        },
+        {
+          "id": "ps-timeline-item-5",
+          "type": "timeline-item",
+          "props": {
+            "date": "13 h 30",
+            "title": "Table ronde",
+            "description": "Le numérique en classe : où en est-on ?",
+            "color": "blue"
+          }
+        },
+        {
+          "id": "ps-timeline-item-6",
+          "type": "timeline-item",
+          "props": {
+            "date": "16 h 00",
+            "title": "Clôture",
+            "description": "",
+            "color": "green"
+          }
+        },
+        {
+          "id": "ps-two-column-text-1",
+          "type": "two-column-text",
+          "props": {
+            "ratio": "60-40",
+            "leftContent": "**Infos pratiques**\n\n- Bâtiment A, salle Horizon\n- Déjeuner offert les deux jours\n- Tram B, arrêt Campus",
+            "rightContent": "**Contact**\n\nAgathe Roy\n\n04 00 00 00 00"
+          }
+        },
+        {
+          "id": "ps-image-block-1",
+          "type": "image-block",
+          "props": {
+            "image": {
+              "type": "base64",
+              "value": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgMjYwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI2MCIgcng9IjgiIGZpbGw9IiNGMUY1RjkiLz48cGF0aCBkPSJNMCAxNzAgSDQwMCIgc3Ryb2tlPSIjQ0JENUUxIiBzdHJva2Utd2lkdGg9IjE4Ii8+PHBhdGggZD0iTTI1MCAwIFYyNjAiIHN0cm9rZT0iI0NCRDVFMSIgc3Ryb2tlLXdpZHRoPSIxNCIvPjxyZWN0IHg9IjQwIiB5PSI0MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI5MCIgcng9IjYiIGZpbGw9IiNDN0QyRkUiIHN0cm9rZT0iIzYzNjZGMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMTE1IiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzM3MzBBMyI+QsOidGltZW50IEE8L3RleHQ+PHJlY3QgeD0iMjkwIiB5PSI0MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjkwIiByeD0iNiIgZmlsbD0iI0UyRThGMCIvPjx0ZXh0IHg9IjMzMCIgeT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM0NzU1NjkiPlBhcmtpbmc8L3RleHQ+PHJlY3QgeD0iNDAiIHk9IjE5NSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI0NSIgcng9IjYiIGZpbGw9IiNFMkU4RjAiLz48dGV4dCB4PSIxMTUiIHk9IjIyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzQ3NTU2OSI+UmVzdGF1cmFudDwvdGV4dD48Y2lyY2xlIGN4PSIyNTAiIGN5PSIxNzAiIHI9IjkiIGZpbGw9IiNFRjQ0NDQiLz48dGV4dCB4PSIyNjQiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0I5MUMxQyI+QXJyw6p0IFRyYW0gQjwvdGV4dD48L3N2Zz4="
+            },
+            "alt": "Plan d'accès au campus",
+            "caption": "Plan d'accès",
+            "width": "half",
+            "alignment": "center"
+          }
+        },
+        {
+          "id": "ps-callout-box-1",
+          "type": "callout-box",
+          "props": {
+            "icon": "AlertCircle",
+            "title": "Inscription obligatoire",
+            "content": "Avant le 6 novembre, auprès du secrétariat.",
+            "variant": "warning",
+            "color": ""
+          }
+        },
+        {
+          "id": "ps-page-footer-1",
+          "type": "page-footer",
+          "props": {
+            "text": "Campus Numérique Rivage — Programme susceptible d'évoluer"
+          }
+        }
+      ]
+    }
+  ]
+}

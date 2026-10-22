@@ -1,0 +1,117 @@
+[
+  {
+    "baseType": "callout-box",
+    "label": "Alerte — action requise",
+    "description": "Encadré orange pour signaler une action à mener.",
+    "defaultProps": {
+      "icon": "AlertTriangle",
+      "title": "Action requise",
+      "content": "Décrivez l'action attendue et son échéance.",
+      "variant": "warning"
+    },
+    "category": "content"
+  },
+  {
+    "baseType": "callout-box",
+    "label": "Bon à savoir",
+    "description": "Encadré d'information neutre.",
+    "defaultProps": {
+      "icon": "Info",
+      "title": "Bon à savoir",
+      "content": "Une précision utile pour le lecteur.",
+      "variant": "info"
+    },
+    "category": "content"
+  },
+  {
+    "baseType": "callout-box",
+    "label": "Succès",
+    "description": "Encadré vert pour une bonne nouvelle ou une décision.",
+    "defaultProps": {
+      "icon": "CheckCircle",
+      "title": "C'est fait",
+      "content": "Ce qui a été obtenu.",
+      "variant": "success"
+    },
+    "category": "content"
+  },
+  {
+    "baseType": "quote-block",
+    "label": "Témoignage client",
+    "description": "Citation avec auteur et fonction.",
+    "defaultProps": {
+      "quote": "Ce que le client dit de nous, en une ou deux phrases.",
+      "author": "Prénom Nom",
+      "role": "Fonction, entreprise"
+    },
+    "category": "content"
+  },
+  {
+    "baseType": "metric-card",
+    "label": "Indicateur en hausse",
+    "description": "Métrique verte avec tendance à la hausse.",
+    "defaultProps": {
+      "value": "+12 %",
+      "label": "Indicateur",
+      "trend": "up",
+      "trendValue": "vs mois dernier",
+      "color": "green"
+    },
+    "category": "data"
+  },
+  {
+    "baseType": "metric-card",
+    "label": "Indicateur en baisse",
+    "description": "Métrique rouge avec tendance à la baisse.",
+    "defaultProps": {
+      "value": "−8 %",
+      "label": "Indicateur",
+      "trend": "down",
+      "trendValue": "vs mois dernier",
+      "color": "red"
+    },
+    "category": "data"
+  },
+  {
+    "baseType": "timeline-item",
+    "label": "Jalon atteint",
+    "description": "Étape de calendrier en vert.",
+    "defaultProps": {
+      "date": "Date",
+      "title": "Jalon atteint",
+      "description": "Ce qui a été livré.",
+      "color": "green"
+    },
+    "category": "data"
+  },
+  {
+    "baseType": "divider",
+    "label": "Séparateur pointillé",
+    "description": "Trait fin en pointillés entre deux parties.",
+    "defaultProps": {
+      "style": "dashed",
+      "thickness": 1
+    },
+    "category": "decoration"
+  },
+  {
+    "baseType": "summary-bar",
+    "label": "Bandeau d'informations",
+    "description": "Une ligne de synthèse : date, lieu, participants.",
+    "defaultProps": {
+      "text": "Date · Lieu · Participants"
+    },
+    "category": "decoration"
+  },
+  {
+    "baseType": "two-column-text",
+    "label": "Texte et encadré 60/40",
+    "description": "Deux colonnes : le texte à gauche, l'essentiel à droite.",
+    "defaultProps": {
+      "ratio": "60-40",
+      "leftContent": "Texte principal.",
+      "rightContent": "**En bref**\n\n- Point 1\n- Point 2"
+    },
+    "category": "layout"
+  }
+]
