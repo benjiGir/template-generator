@@ -19,7 +19,7 @@ variables:
   # Proposées dans le formulaire « Run pipeline » (Build → Pipelines → Run pipeline)
   IMAGE_TAG:
     value: ""
-    description: "Tag des images à publier (ex. v1.1), en plus du SHA du commit. Vide : nom de la branche."
+    description: "Tag des images à publier (ex. v1.1), en plus de latest. Vide : nom de la branche."
   REGISTRY_IMAGE:
     value: registry.lan.codyssee.tech/docforge
     description: "Registry et dossier des images : <REGISTRY_IMAGE>/back et <REGISTRY_IMAGE>/front."
@@ -78,13 +78,21 @@ e2e:
 #   - autres branches : bouton manuel « publish »
 publish:
   stage: publish
-  image: quay.io/podman/stable
+  image: quay.io/podman/stable:v5.8.2
+  # N'attend pas les tests : lançable à tout moment, même si une vérification échoue
+  needs: []
+  variables:
+    # Stockage et isolation compatibles avec un build dans le conteneur du runner (privilégié pour Podman)
+    STORAGE_DRIVER: vfs
+    BUILDAH_ISOLATION: chroot
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"
     - when: manual
       allow_failure: true
   script:
+    # Tag choisi dans « Run pipeline », sinon le nom de la branche (main…)
+    - TAG="${IMAGE_TAG:-$CI_COMMIT_REF_SLUG}"
     - podman build -f Dockerfile.api -t "$REGISTRY_IMAGE/back:$TAG" -t "$REGISTRY_IMAGE/back:latest" .
     - podman build -f Dockerfile.web -t "$REGISTRY_IMAGE/front:$TAG" -t "$REGISTRY_IMAGE/front:latest" .
     - for image in back front; do podman push "$REGISTRY_IMAGE/$image:$TAG"; podman push "$REGISTRY_IMAGE/$image:latest"; done

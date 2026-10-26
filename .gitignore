@@ -32,3 +32,6 @@ e2e/playwright-report
 
 # Secrets du déploiement Kubernetes
 deploy/k8s/secrets.env
+
+# Session de connexion des tests de bout en bout
+e2e/.auth
