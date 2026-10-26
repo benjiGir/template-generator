@@ -29,3 +29,6 @@ e2e/playwright-report
 # Build artifacts
 /tmp
 /out-tsc
+
+# Secrets du déploiement Kubernetes
+deploy/k8s/secrets.env

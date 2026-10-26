@@ -1,0 +1,77 @@
+# PostgreSQL 18, une instance, données sur un volume persistant
+apiVersion: v1
+kind: Service
+metadata:
+  name: docforge-db
+  labels:
+    app.kubernetes.io/name: docforge-db
+spec:
+  selector:
+    app.kubernetes.io/name: docforge-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: docforge-db
+  labels:
+    app.kubernetes.io/name: docforge-db
+spec:
+  serviceName: docforge-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: docforge-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: docforge-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: docforge
+            - name: POSTGRES_USER
+              value: docforge
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: docforge-secrets
+                  key: DB_PASSWORD
+          # PostgreSQL 18 range ses données sous /var/lib/postgresql/18/docker
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "docforge", "-d", "docforge"]
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "docforge", "-d", "docforge"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        # Classe de stockage par défaut du cluster ; sinon ajouter storageClassName
+        resources:
+          requests:
+            storage: 5Gi

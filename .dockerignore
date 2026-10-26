@@ -1,0 +1,11 @@
+# Contexte des images : les sources seulement, les dépendances sont installées dans l'image
+**/node_modules
+**/dist
+.pnpm-store
+.git
+e2e
+deploy
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example

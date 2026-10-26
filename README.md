@@ -92,7 +92,12 @@ docker-compose up --build
 
 L'application est accessible sur http://localhost:8080 (ou le port défini dans `WEB_PORT`).
 
-Au premier démarrage, les migrations et le seed sont appliqués automatiquement.
+Au premier démarrage, appliquer les migrations et ajouter les thèmes intégrés :
+
+```bash
+docker compose exec api pnpm --filter @template-generator/api run db:migrate
+docker compose exec api pnpm --filter @template-generator/api run db:seed:themes
+```
 
 ### Passer de PostgreSQL 17 à 18
 
@@ -112,6 +117,76 @@ docker compose exec -T db pg_restore -U docforge -d docforge --no-owner < docfor
 
 Une fois les données vérifiées, l'ancien volume peut être supprimé (`docker volume rm <projet>_pgdata`).
 
+## Déploiement Kubernetes
+
+Les manifestes sont dans `deploy/k8s` et s'appliquent avec Kustomize, intégré à `kubectl` :
+
+| Fichier              | Contenu                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `postgres.yaml`      | PostgreSQL 18 (StatefulSet, volume persistant de 5 Gi) et son Service `docforge-db`     |
+| `api.yaml`           | API (Deployment, 1 instance) et son Service `docforge-api` (port 3001)                  |
+| `web.yaml`           | Front nginx (Deployment, 1 instance) et son Service `docforge-web` (port 80, ClusterIP) |
+| `kustomization.yaml` | Namespace, images du registry, Secret généré depuis `secrets.env`                       |
+
+**1. Construire et pousser les images.** La CI GitLab s'en charge (job `images`, après les tests) et les publie sur
+`registry.lan.codyssee.tech/docforge/back` et `/front`, en x86_64 comme le nœud du cluster :
+
+| Déclencheur                                                                | Tags publiés                                            |
+| -------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Push sur `main`                                                            | `<sha court>`, `main`                                   |
+| Tag git (`git tag v1.1 && git push gitlab v1.1`)                           | `<sha court>`, `v1.1`                                   |
+| Build → Pipelines → **Run pipeline** (toute branche), variable `IMAGE_TAG` | `<sha court>`, `IMAGE_TAG` si renseignée                |
+| Autre branche ou merge request                                             | Bouton manuel `images` dans la pipeline : `<sha court>` |
+
+Le registry n'exige pas d'authentification aujourd'hui ; s'il en demande une, définir `REGISTRY_USER` et
+`REGISTRY_PASSWORD` (Settings → CI/CD → Variables, masquées). Le runner GitLab doit pouvoir joindre le registry.
+
+À la main, depuis un Mac Apple Silicon, `--platform linux/amd64` est indispensable (sinon `exec format error` au
+démarrage du conteneur) et passe par l'émulation, lente :
+
+```bash
+docker build --platform linux/amd64 -f Dockerfile.api -t registry.lan.codyssee.tech/docforge/back:v1.1 .
+docker push registry.lan.codyssee.tech/docforge/back:v1.1
+```
+
+**2. Configurer** : dans `deploy/k8s/kustomization.yaml`, le `namespace` et le tag des images (`newTag`) : une
+version (`v1.1`), un commit (`<sha court>`) ou `main` pour suivre la branche. Puis
+créer le mot de passe de la base, jamais commité :
+
+```bash
+cp deploy/k8s/secrets.env.example deploy/k8s/secrets.env
+echo "DB_PASSWORD=$(openssl rand -hex 24)" > deploy/k8s/secrets.env
+```
+
+**3. Déployer**, en vérifiant d'abord le contexte `kubectl` :
+
+```bash
+kubectl config current-context
+kubectl apply -k deploy/k8s
+kubectl -n docforge rollout status deployment/docforge-api
+```
+
+Au démarrage, le pod de l'API applique les migrations puis ajoute les thèmes intégrés manquants (deux conteneurs
+d'initialisation) ; tant que la base n'est pas prête, ils échouent et Kubernetes les relance. Pour une nouvelle version :
+changer `newTag`, puis `kubectl apply -k deploy/k8s`. Avec `newTag: main`, les images sont retéléchargées à chaque
+démarrage : `kubectl -n docforge rollout restart deployment/docforge-api deployment/docforge-web` prend le dernier build.
+
+**Quota.** Le namespace `docforge` est limité à 1 CPU et 1 Gi de mémoire (limites) : chaque conteneur, y compris
+ceux d'initialisation, déclare ses limites (700m et 768 Mi au total). Avant d'augmenter une limite ou un nombre
+d'instances : `kubectl -n docforge describe quota`.
+
+**Accès.** Le Service `docforge-web` est en ClusterIP : l'exposer par un Ingress ou un LoadBalancer selon le cluster.
+Pour tester sans exposition : `kubectl -n docforge port-forward svc/docforge-web 8080:80`, puis http://localhost:8080.
+nginx sert l'application et relaie `/api` vers `docforge-api` : un seul point d'entrée.
+
+**Données.** La base vit dans le volume `data-docforge-db-0`, conservé si le StatefulSet est supprimé. Sauvegarde :
+
+```bash
+kubectl -n docforge exec docforge-db-0 -- pg_dump -U docforge -d docforge -Fc > docforge.dump
+```
+
+Garder le même `DB_PASSWORD` : PostgreSQL ne le lit qu'à la création de la base.
+
 ## Variables d'environnement
 
 | Variable           | Description                                                                  | Défaut                                                 |
@@ -122,6 +197,7 @@ Une fois les données vérifiées, l'ancien volume peut être supprimé (`docker
 | `CORS_ORIGIN`      | Origine autorisée par CORS                                                   | `http://localhost:5173`                                |
 | `API_PROXY_TARGET` | API vers laquelle le serveur Vite relaie `/api` (dev)                        | `http://localhost:3001`                                |
 | `VITE_API_URL`     | URL de l'API appelée directement par le front (vide = relatif, via le proxy) | vide                                                   |
+| `API_UPSTREAM`     | API vers laquelle nginx relaie `/api` (image du front)                       | `http://api:3001`                                      |
 | `WEB_PORT`         | Port exposé pour le frontend (Docker)                                        | `8080`                                                 |
 
 ## API
@@ -308,7 +384,7 @@ pnpm --filter @template-generator/e2e exec playwright install chromium
   en commentaire, dans la config ou sur la ligne concernée (`// oxlint-disable-next-line <règle>`).
 - **Format** : [oxfmt](https://oxc.rs/docs/guide/usage/formatter), configuré dans `.oxfmtrc.json` (lignes de 120 caractères,
   guillemets doubles). Avec VS Code, l'extension Oxc formate à l'enregistrement.
-- **CI** : `.github/workflows/ci.yml` et `.gitlab-ci.yml` lancent les mêmes étapes à chaque push (installation figée, lint,
+- **CI** : `.github/workflows/ci.yml` et `.gitlab-ci.yml` lancent les mêmes vérifications à chaque push (installation figée, lint,
   format, types, tests avec une base PostgreSQL, build), puis les tests de bout en bout dans un job séparé. Les deux
-  fichiers sont à garder alignés.
+  fichiers sont à garder alignés. GitLab construit en plus les images (voir « Déploiement Kubernetes »).
 - **Versions** : Node dans `.nvmrc`, pnpm dans `packageManager` ; les Dockerfiles et le devcontainer suivent les mêmes.

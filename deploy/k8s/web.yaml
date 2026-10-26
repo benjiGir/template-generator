@@ -1,0 +1,61 @@
+# Front : nginx sert l'application et relaie /api vers le Service de l'API
+apiVersion: v1
+kind: Service
+metadata:
+  name: docforge-web
+  labels:
+    app.kubernetes.io/name: docforge-web
+spec:
+  # ClusterIP : l'exposition (Ingress, LoadBalancer…) est gérée à part. NodePort ou LoadBalancer pour l'ouvrir directement.
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: docforge-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docforge-web
+  labels:
+    app.kubernetes.io/name: docforge-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: docforge-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: docforge-web
+    spec:
+      containers:
+        - name: web
+          image: docforge-web
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: API_UPSTREAM
+              value: http://docforge-api:3001
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi

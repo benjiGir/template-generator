@@ -35,5 +35,7 @@ RUN pnpm --filter @template-generator/web run build
 # ---- Runtime ----
 FROM nginx:alpine
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+# Modèle : l'image remplace ${API_UPSTREAM} au démarrage
+COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
+ENV API_UPSTREAM=http://api:3001
 EXPOSE 80

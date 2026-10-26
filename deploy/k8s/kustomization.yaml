@@ -1,0 +1,39 @@
+# Déploiement DocForge : kubectl apply -k deploy/k8s
+# Avant le premier déploiement : renseigner le namespace, les images et secrets.env (voir le README, « Kubernetes »).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Namespace dans lequel vous avez les droits
+namespace: docforge
+
+# Quota du namespace : 1 CPU et 1 Gi de limites au total, et chaque conteneur doit déclarer les siennes.
+# Base 300m / 384Mi + API 300m / 320Mi + front 100m / 64Mi = 700m / 768Mi : reste la marge d'une mise à jour du front.
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: docforge
+
+resources:
+  - postgres.yaml
+  - api.yaml
+  - web.yaml
+
+# Images poussées sur le registry du cluster, construites pour linux/amd64 (le nœud est en x86_64).
+# Seul endroit où changer la version : tous les conteneurs (migrations comprises) prennent ce tag.
+images:
+  - name: docforge-api
+    newName: registry.lan.codyssee.tech/docforge/back
+    newTag: v1.0
+  - name: docforge-web
+    newName: registry.lan.codyssee.tech/docforge/front
+    newTag: v1.0
+  # Si le cluster n'accède pas à Docker Hub, pousser postgres:18-alpine sur le registry et l'indiquer ici
+  - name: postgres
+    newTag: 18-alpine
+
+# Mot de passe de la base, lu dans secrets.env (non versionné, modèle : secrets.env.example).
+# Le nom du Secret reçoit un suffixe calculé : le changer redémarre les pods qui l'utilisent.
+secretGenerator:
+  - name: docforge-secrets
+    envs:
+      - secrets.env
