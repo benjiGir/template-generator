@@ -128,18 +128,18 @@ Les manifestes sont dans `deploy/k8s` et s'appliquent avec Kustomize, intégré 
 | `web.yaml`           | Front nginx (Deployment, 1 instance) et son Service `docforge-web` (port 80, ClusterIP) |
 | `kustomization.yaml` | Namespace, images du registry, Secret généré depuis `secrets.env`                       |
 
-**1. Construire et pousser les images.** La CI GitLab s'en charge (job `images`, après les tests) et les publie sur
-`registry.lan.codyssee.tech/docforge/back` et `/front`, en x86_64 comme le nœud du cluster :
+**1. Construire et pousser les images.** La CI GitLab s'en charge avec Podman (jobs `publish-back` et `publish-front`,
+indépendants des tests) et les publie sur `registry.lan.codyssee.tech/docforge/back` et `/front`, en x86_64 comme le
+nœud du cluster :
 
-| Déclencheur                                                                | Tags publiés                                            |
-| -------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Push sur `main`                                                            | `<sha court>`, `main`                                   |
-| Tag git (`git tag v1.1 && git push gitlab v1.1`)                           | `<sha court>`, `v1.1`                                   |
-| Build → Pipelines → **Run pipeline** (toute branche), variable `IMAGE_TAG` | `<sha court>`, `IMAGE_TAG` si renseignée                |
-| Autre branche ou merge request                                             | Bouton manuel `images` dans la pipeline : `<sha court>` |
+| Déclencheur                                                       | Tags publiés                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------- |
+| Push sur `main`                                                   | `main`, `latest`                                   |
+| Build → Pipelines → **Run pipeline** (toute branche)              | `IMAGE_TAG` (sinon le nom de la branche), `latest` |
+| Autre branche ou merge request : boutons manuels dans la pipeline | nom de la branche, `latest`                        |
 
-Le registry n'exige pas d'authentification aujourd'hui ; s'il en demande une, définir `REGISTRY_USER` et
-`REGISTRY_PASSWORD` (Settings → CI/CD → Variables, masquées). Le runner GitLab doit pouvoir joindre le registry.
+Podman demande un runner GitLab privilégié. Si le registry exige un jour une authentification, ajouter un
+`podman login` dans le job avec des variables CI/CD masquées.
 
 À la main, depuis un Mac Apple Silicon, `--platform linux/amd64` est indispensable (sinon `exec format error` au
 démarrage du conteneur) et passe par l'émulation, lente :
@@ -150,7 +150,7 @@ docker push registry.lan.codyssee.tech/docforge/back:v1.1
 ```
 
 **2. Configurer** : dans `deploy/k8s/kustomization.yaml`, le `namespace` et le tag des images (`newTag`) : une
-version (`v1.1`), un commit (`<sha court>`) ou `main` pour suivre la branche. Puis
+version (`v1.1`) ou `main` pour suivre la branche. Puis
 créer le mot de passe de la base, jamais commité :
 
 ```bash

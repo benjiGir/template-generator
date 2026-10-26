@@ -71,20 +71,17 @@ e2e:
     paths: [e2e/playwright-report, e2e/test-results]
     expire_in: 1 week
 
-# Images de l'API (back) et du front (front), construites avec Podman sur le runner (x86_64, comme le cluster).
-#   - main : automatique après les tests, tags <sha> et main
-#   - tag git (v1.1) : tags <sha> et v1.1
-#   - Run pipeline : tags <sha> et IMAGE_TAG si renseignée
-#   - autres branches : bouton manuel « publish »
-publish:
+# Images de l'API (back) et du front (front), construites avec Podman sur le runner (x86_64, comme le cluster),
+# chacune dans son job : un build par conteneur, donc l'espace disque du runner pour chacun.
+#   - main : automatique, tags main et latest
+#   - Run pipeline : automatique, tags IMAGE_TAG (sinon nom de la branche) et latest
+#   - autres branches : boutons manuels « publish-back » et « publish-front »
+# Podman demande un runner privilégié.
+.publish:
   stage: publish
   image: quay.io/podman/stable:v5.8.2
   # N'attend pas les tests : lançable à tout moment, même si une vérification échoue
   needs: []
-  variables:
-    # Stockage et isolation compatibles avec un build dans le conteneur du runner (privilégié pour Podman)
-    STORAGE_DRIVER: vfs
-    BUILDAH_ISOLATION: chroot
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"
@@ -93,6 +90,18 @@ publish:
   script:
     # Tag choisi dans « Run pipeline », sinon le nom de la branche (main…)
     - TAG="${IMAGE_TAG:-$CI_COMMIT_REF_SLUG}"
-    - podman build -f Dockerfile.api -t "$REGISTRY_IMAGE/back:$TAG" -t "$REGISTRY_IMAGE/back:latest" .
-    - podman build -f Dockerfile.web -t "$REGISTRY_IMAGE/front:$TAG" -t "$REGISTRY_IMAGE/front:latest" .
-    - for image in back front; do podman push "$REGISTRY_IMAGE/$image:$TAG"; podman push "$REGISTRY_IMAGE/$image:latest"; done
+    - podman build -f "$DOCKERFILE" -t "$REGISTRY_IMAGE/$IMAGE:$TAG" -t "$REGISTRY_IMAGE/$IMAGE:latest" .
+    - podman push "$REGISTRY_IMAGE/$IMAGE:$TAG"
+    - podman push "$REGISTRY_IMAGE/$IMAGE:latest"
+
+publish-back:
+  extends: .publish
+  variables:
+    IMAGE: back
+    DOCKERFILE: Dockerfile.api
+
+publish-front:
+  extends: .publish
+  variables:
+    IMAGE: front
+    DOCKERFILE: Dockerfile.web
