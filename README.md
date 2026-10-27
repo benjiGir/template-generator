@@ -132,11 +132,15 @@ Les manifestes sont dans `deploy/k8s` et s'appliquent avec Kustomize, intégré 
 indépendants des tests) et les publie sur `registry.lan.codyssee.tech/docforge/back` et `/front`, en x86_64 comme le
 nœud du cluster :
 
-| Déclencheur                                                       | Tags publiés                                       |
-| ----------------------------------------------------------------- | -------------------------------------------------- |
-| Push sur `main`                                                   | `main`, `latest`                                   |
-| Build → Pipelines → **Run pipeline** (toute branche)              | `IMAGE_TAG` (sinon le nom de la branche), `latest` |
-| Autre branche ou merge request : boutons manuels dans la pipeline | nom de la branche, `latest`                        |
+| Déclencheur                                                       | Tag publié                            |
+| ----------------------------------------------------------------- | ------------------------------------- |
+| Push sur `main`                                                   | `v<version>` du `package.json` racine |
+| Tag git (`git tag v1.1 && git push gitlab v1.1`)                  | `v1.1`                                |
+| Build → Pipelines → **Run pipeline** (toute branche)              | `IMAGE_TAG` si renseignée             |
+| Autre branche ou merge request : boutons manuels dans la pipeline | nom de la branche                     |
+
+Jamais de `latest` : un tag désigne toujours une version précise. Pour publier une nouvelle version depuis `main`,
+monter `version` dans le `package.json` racine ; sans changement, le même tag est reconstruit et écrasé.
 
 Podman demande un runner GitLab privilégié. Si le registry exige un jour une authentification, ajouter un
 `podman login` dans le job avec des variables CI/CD masquées.
@@ -148,6 +152,21 @@ démarrage du conteneur) et passe par l'émulation, lente :
 docker build --platform linux/amd64 -f Dockerfile.api -t registry.lan.codyssee.tech/docforge/back:v1.1 .
 docker push registry.lan.codyssee.tech/docforge/back:v1.1
 ```
+
+**Déploiement automatique.** Sur `main`, le job `deploy` passe le cluster sur le tag que les jobs `publish` viennent
+de publier (`v<version>`) et attend la fin du déploiement. Si la version n'a pas changé, il redémarre les pods pour
+retélécharger l'image. Il ne touche qu'aux images : une modification des manifestes (ressources, variables, route)
+s'applique toujours avec `kubectl apply -k`, en gardant `newTag` sur la version déployée.
+
+Il lit le kubeconfig du compte de service dans la variable `KUBE_CONFIG`, encodée en base64 :
+
+```bash
+base64 -i kubeconfig.yaml | tr -d '\n' | pbcopy
+```
+
+Dans GitLab, **Settings → CI/CD → Variables → Add variable** : clé `KUBE_CONFIG`, valeur collée, type _Variable_,
+cocher **Protect variable** (seules les branches protégées, dont `main`, la reçoivent) et **Mask variable**. Le compte
+de service n'a besoin que de `get`, `list`, `watch` et `patch` sur les deployments du namespace `docforge`.
 
 **2. Configurer** : dans `deploy/k8s/kustomization.yaml`, le `namespace` et le tag des images (`newTag`) : une
 version (`v1.1`) ou `main` pour suivre la branche. Puis
@@ -172,7 +191,7 @@ changer `newTag`, puis `kubectl apply -k deploy/k8s`. Avec `newTag: main`, les i
 démarrage : `kubectl -n docforge rollout restart deployment/docforge-api deployment/docforge-web` prend le dernier build.
 
 **Quota.** Le namespace `docforge` est limité à 1 CPU et 1 Gi de mémoire (limites) : chaque conteneur, y compris
-ceux d'initialisation, déclare ses limites (700m et 768 Mi au total). Avant d'augmenter une limite ou un nombre
+ceux d'initialisation, déclare ses limites (900m et 960 Mi au total, 1 CPU et 1 024 Mi pendant la mise à jour du front). Avant d'augmenter une limite ou un nombre
 d'instances : `kubectl -n docforge describe quota`.
 
 **Accès.** Le Service `docforge-web` est en ClusterIP : l'exposer par un Ingress ou un LoadBalancer selon le cluster.

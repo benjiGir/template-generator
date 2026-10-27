@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/name: docforge-web
 spec:
   # ClusterIP : l'exposition (Ingress, LoadBalancer…) est gérée à part. NodePort ou LoadBalancer pour l'ouvrir directement.
-  type: ClusterIP
   selector:
     app.kubernetes.io/name: docforge-web
   ports:

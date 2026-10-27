@@ -1,5 +1,6 @@
 # Mêmes vérifications que .github/workflows/ci.yml : garder les deux fichiers alignés.
-# En plus, ici seulement : construction des images et envoi sur le registry du cluster (stage « publish »).
+# En plus, ici seulement : construction des images et envoi sur le registry du cluster (stage « publish »),
+# puis mise à jour du cluster depuis main (stage « deploy »).
 
 # Une seule pipeline par push : celle de la merge request quand il y en a une, sinon celle de la branche
 workflow:
@@ -11,7 +12,7 @@ workflow:
     # Tag git (v1.1…) : images publiées sous ce tag
     - if: $CI_COMMIT_TAG
 
-stages: [test, publish]
+stages: [test, publish, deploy]
 
 variables:
   # pnpm à la version fixée par le champ packageManager de package.json
@@ -19,7 +20,7 @@ variables:
   # Proposées dans le formulaire « Run pipeline » (Build → Pipelines → Run pipeline)
   IMAGE_TAG:
     value: ""
-    description: "Tag des images à publier (ex. v1.1), en plus de latest. Vide : nom de la branche."
+    description: "Tag des images à publier (ex. v1.1). Vide : tag git, version de package.json sur main, sinon nom de la branche."
   REGISTRY_IMAGE:
     value: registry.lan.codyssee.tech/docforge
     description: "Registry et dossier des images : <REGISTRY_IMAGE>/back et <REGISTRY_IMAGE>/front."
@@ -73,8 +74,11 @@ e2e:
 
 # Images de l'API (back) et du front (front), construites avec Podman sur le runner (x86_64, comme le cluster),
 # chacune dans son job : un build par conteneur, donc l'espace disque du runner pour chacun.
-#   - main : automatique, tags main et latest
-#   - Run pipeline : automatique, tags IMAGE_TAG (sinon nom de la branche) et latest
+# Un seul tag par image, jamais latest :
+#   - main : automatique, v<version> lue dans package.json (version à monter pour publier un nouveau tag)
+#   - tag git (v1.1) : automatique, v1.1
+#   - Run pipeline : automatique, IMAGE_TAG si renseignée
+#   - autres branches : manuel, nom de la branche
 #   - autres branches : boutons manuels « publish-back » et « publish-front »
 # Podman demande un runner privilégié.
 .publish:
@@ -83,16 +87,26 @@ e2e:
   # N'attend pas les tests : lançable à tout moment, même si une vérification échoue
   needs: []
   rules:
+    - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"
     - when: manual
       allow_failure: true
   script:
-    # Tag choisi dans « Run pipeline », sinon le nom de la branche (main…)
-    - TAG="${IMAGE_TAG:-$CI_COMMIT_REF_SLUG}"
-    - podman build -f "$DOCKERFILE" -t "$REGISTRY_IMAGE/$IMAGE:$TAG" -t "$REGISTRY_IMAGE/$IMAGE:latest" .
+    - |
+      if [ -n "$IMAGE_TAG" ]; then TAG="$IMAGE_TAG"
+      elif [ -n "$CI_COMMIT_TAG" ]; then TAG="$CI_COMMIT_TAG"
+      elif [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        TAG="v$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')"
+      else TAG="$CI_COMMIT_REF_SLUG"; fi
+    - echo "Publication de $REGISTRY_IMAGE/$IMAGE:$TAG"
+    - podman build -f "$DOCKERFILE" -t "$REGISTRY_IMAGE/$IMAGE:$TAG" .
     - podman push "$REGISTRY_IMAGE/$IMAGE:$TAG"
-    - podman push "$REGISTRY_IMAGE/$IMAGE:latest"
+    # Transmis au job deploy
+    - echo "DEPLOY_TAG=$TAG" > deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
 
 publish-back:
   extends: .publish
@@ -105,3 +119,49 @@ publish-front:
   variables:
     IMAGE: front
     DOCKERFILE: Dockerfile.web
+
+# Met le cluster à jour avec les images publiées par ce pipeline (v<version>), sur main seulement.
+# Version inchangée : les pods redémarrent pour retélécharger l'image (imagePullPolicy: Always).
+# Variable requise (Settings → CI/CD → Variables, protégée et masquée) :
+#   KUBE_CONFIG : kubeconfig du compte de service, encodé en base64 (base64 -i kubeconfig | tr -d '\n').
+#                 Droits limités au namespace docforge : get, list, watch et patch sur les deployments.
+deploy:
+  stage: deploy
+  # L'entrypoint de l'image est « kubectl » : vidé pour que GitLab lance le script dans un shell
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  variables:
+    # L'image tourne en non-root avec HOME=/ : le runner ne peut pas y écrire
+    HOME: /tmp
+    K8S_NAMESPACE: docforge
+  # DEPLOY_TAG vient du rapport dotenv des jobs publish
+  needs: [publish-back, publish-front]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  # Un seul déploiement à la fois si deux commits arrivent coup sur coup
+  resource_group: production
+  environment:
+    name: production
+    url: https://docforge.lan.codyssee.tech
+  script:
+    - printf '%s' "$KUBE_CONFIG" | base64 -d > "$CI_PROJECT_DIR/kubeconfig"
+    - export KUBECONFIG="$CI_PROJECT_DIR/kubeconfig"
+    - echo "Déploiement de $DEPLOY_TAG"
+    - |
+      # Les conteneurs de migration prennent la même image que l'API : schéma et code restent alignés
+      for target in "docforge-api back api migrate builtin-themes" "docforge-web front web"; do
+        set -- $target; deployment=$1; image="$REGISTRY_IMAGE/$2:$DEPLOY_TAG"; shift 2
+        current=$(kubectl -n "$K8S_NAMESPACE" get deployment "$deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')
+        if [ "$current" = "$image" ]; then
+          kubectl -n "$K8S_NAMESPACE" rollout restart deployment "$deployment"
+        else
+          args=""; for container in "$@"; do args="$args $container=$image"; done
+          kubectl -n "$K8S_NAMESPACE" set image deployment "$deployment" $args
+        fi
+      done
+    # L'API applique les migrations avant de démarrer : délai plus long
+    - kubectl -n "$K8S_NAMESPACE" rollout status deployment/docforge-api --timeout=300s
+    - kubectl -n "$K8S_NAMESPACE" rollout status deployment/docforge-web --timeout=120s
+  after_script:
+    - rm -f "$CI_PROJECT_DIR/kubeconfig"

@@ -7,7 +7,8 @@ kind: Kustomization
 namespace: docforge
 
 # Quota du namespace : 1 CPU et 1 Gi de limites au total, et chaque conteneur doit déclarer les siennes.
-# Base 300m / 384Mi + API 300m / 320Mi + front 100m / 64Mi = 700m / 768Mi : reste la marge d'une mise à jour du front.
+# Base 300m / 384Mi + API 500m / 512Mi + front 100m / 64Mi = 900m / 960Mi : reste la marge d'une mise à jour du front
+# (un second pod front de 100m / 64Mi le temps du déploiement). L'API se met à jour en Recreate, sans pod en plus.
 
 labels:
   - pairs:
@@ -17,16 +18,17 @@ resources:
   - postgres.yaml
   - api.yaml
   - web.yaml
+  - ingress.yaml
 
 # Images poussées sur le registry du cluster, construites pour linux/amd64 (le nœud est en x86_64).
 # Seul endroit où changer la version : tous les conteneurs (migrations comprises) prennent ce tag.
 images:
   - name: docforge-api
     newName: registry.lan.codyssee.tech/docforge/back
-    newTag: v1.0
+    newTag: v1.0.0
   - name: docforge-web
     newName: registry.lan.codyssee.tech/docforge/front
-    newTag: v1.0
+    newTag: v1.0.0
   # Si le cluster n'accède pas à Docker Hub, pousser postgres:18-alpine sur le registry et l'indiquer ici
   - name: postgres
     newTag: 18-alpine
